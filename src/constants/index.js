@@ -6,12 +6,12 @@ export const DEFAULT_BRAND = {
 };
 
 export const DEFAULT_COMPANY = {
-  sellerName: "LOFTDESK - Paweł Szalecki",
-  sellerAddress: "ul. Słoneczna 2, Brzozówka, 33-140 Lisia Góra",
-  sellerNip: "NIP 873-295-87-93",
-  sellerEmail: "loftdesk@gmail.com",
-  sellerPhone: "+48 501 633 917",
-  iban: "PL82105015621000009083380163",
+  sellerName: "LOFTDESK ",
+  sellerAddress: "",
+  sellerNip: "",
+  sellerEmail: "",
+  sellerPhone: "",
+  iban: "",
 };
 
 export const STORAGE_KEYS = {
