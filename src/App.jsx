@@ -500,7 +500,7 @@ const handleGenerateInvoicePDF = async (invoice) => {
           contracts={contracts}
           onRemove={removeContract}
           onMarkAsSigned={markAsSigned}
-          onGeneratePDF={handleGenerateContractPDF}
+          onGeneratePDF={(contract) => generateContractPDFFromHTML(contract, company)}
           onCreateNew={() => {
             setShowContracts(false);
             setShowContractForm(true);
