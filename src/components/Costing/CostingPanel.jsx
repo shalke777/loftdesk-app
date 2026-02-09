@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Trash2, FileText, DollarSign, List } from "lucide-react";
+import { Plus, Trash2, FileText, DollarSign, List, Calculator, X } from "lucide-react";
 import { currency } from "../../utils/format";
 
 export const CostingPanel = ({
