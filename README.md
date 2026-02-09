@@ -1,70 +1,66 @@
-# Getting Started with Create React App
+# 🏗️ LoftDesk - System zarządzania kosztorysami budowlanymi
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Aplikacja do zarządzania kosztorysami, fakturami i umowami dla firm budowlanych.
 
-## Available Scripts
+## 🚀 Instalacja
 
-In the project directory, you can run:
+1. Sklonuj repozytorium:
+```bash
+git clone https://github.com/twoj-nick/loftdesk-app.git
+cd loftdesk-app
+```
 
-### `npm start`
+2. Zainstaluj zależności:
+```bash
+npm install
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+3. Skonfiguruj Supabase:
+   - Załóż konto na [supabase.com](https://supabase.com)
+   - Utwórz nowy projekt
+   - Wykonaj SQL z pliku `supabase/schema.sql`
+   - Skopiuj klucze API z Settings → API
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+4. Utwórz plik `.env`:
+```bash
+cp .env.example .env
+```
 
-### `npm test`
+5. Edytuj `.env` i wklej swoje klucze Supabase:
+```
+VITE_SUPABASE_URL=https://twoj-projekt.supabase.co
+VITE_SUPABASE_ANON_KEY=twoj-klucz-anon
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+6. Uruchom aplikację:
+```bash
+npm start
+```
 
-### `npm run build`
+## 🗄️ Konfiguracja bazy danych
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Wykonaj w Supabase SQL Editor:
+```sql
+-- Zobacz plik supabase/schema.sql
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ✨ Funkcje
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- ✅ Kosztorysy budowlane
+- ✅ Faktury VAT
+- ✅ Umowy
+- ✅ Zarządzanie kontrahentami
+- ✅ Cennik usług
+- ✅ Cloud backup (Supabase)
+- ✅ Generowanie PDF
 
-### `npm run eject`
+## 🛠️ Technologie
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- React
+- Supabase (backend + auth)
+- jsPDF + html2canvas
+- Tailwind CSS (style inline)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 📄 Licencja
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+MIT
