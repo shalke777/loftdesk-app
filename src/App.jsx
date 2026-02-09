@@ -184,13 +184,7 @@ const handleGenerateInvoicePDF = async (invoice) => {
             </div>
 
             <div className="header-buttons">
-              <button
-                onClick={() => setShowBrandSettings(true)}
-                className="header-btn"
-              >
-                <Palette size={18} />
-                Ustawienia
-              </button>
+              
               <button onClick={handleBackup} className="header-btn">
                 <Download size={18} />
                 Backup
@@ -390,6 +384,31 @@ const handleGenerateInvoicePDF = async (invoice) => {
               <span className="badge badge-green">Faktury ({invoices.length})</span>
               <span className="badge badge-blue">Umowy ({contracts.length})</span>
             </div>
+           
+<div style={{ marginTop: '20px', display: 'flex', gap: '12px', justifyContent: 'center' }}>
+  <button
+    onClick={() => setShowBrandSettings(true)}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '10px 20px',
+      background: 'var(--color-primary)',
+      color: 'white',
+      border: 'none',
+      borderRadius: '8px',
+      fontSize: '14px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      transition: 'all 0.2s',
+    }}
+    onMouseOver={(e) => e.target.style.background = 'var(--color-primary-dark)'}
+    onMouseOut={(e) => e.target.style.background = 'var(--color-primary)'}
+  >
+    <Palette size={18} />
+    Ustawienia firmy i branding
+  </button>
+</div>
           </div>
         </div>
       </div>
