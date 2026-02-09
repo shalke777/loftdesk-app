@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { X, Trash2, Download, CheckCircle, FileText, Plus, XCircle, Search } from 'lucide-react';
+import { Trash2, Download, CheckCircle, FileText, Plus, XCircle, Search } from 'lucide-react';
 import { formatPL, currency } from "../../utils/format";
 
 export const InvoicesModal = ({ 

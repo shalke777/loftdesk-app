@@ -17,7 +17,7 @@ import { InvoicesModal } from "./components/Invoices/InvoicesModal";
 import { InvoiceForm } from "./components/Invoices/InvoiceForm";
 import { ContractsModal } from "./components/Contracts/ContractsModal";
 import { ContractForm } from "./components/Contracts/ContractForm";
-import { generateContractPDFFromHTML, generateInvoicePDFFromHTML } from "./utils/contractPDFTemplate";
+import { generateContractPDFFromHTML, generateCostingPDFFromHTML } from "./utils/contractPDFTemplate";
 import { CloudBackupModal } from './components/Auth/CloudBackupModal';
 import { useAuth } from './hooks/useAuth';
 import { 
@@ -170,10 +170,7 @@ const handleCreateInvoice = async (invoiceData) => {
 
   commitInvoiceNumber(invoiceData.number);
   
- const handleGenerateContractPDF = (contract) => {
-    generateContractPDFFromHTML(contract, company);
-  };
-  
+   
   alert("Faktura wystawiona! PDF został pobrany.");
 };
 
@@ -192,11 +189,7 @@ const handleGenerateInvoicePDF = async (invoice) => {
     alert("Umowa utworzona! PDF został pobrany.");
   };
 
-  const handleGenerateContractPDF = (contract) => {
-    generateContractPDFFromHTML(contract, company);
-  
-;}
-  return (
+ return (
 
     <div className="app-container">
     
@@ -417,7 +410,7 @@ const handleGenerateInvoicePDF = async (invoice) => {
           onRemoveLine={removeLine}
           onClearAll={clearAll}
           onOpenPriceList={() => setShowPriceList(true)}
-          onGeneratePDF={handleGenerateCostingPDF}
+          onGeneratePDF={(contract) => generateContractPDFFromHTML(contract, company)}
         />
 
         <div className="status-card">
