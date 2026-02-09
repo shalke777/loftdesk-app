@@ -35,20 +35,19 @@ export function useAuth() {
       return;
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        syncData(session.user.id);
-      }
-      setLoading(false);
-    });
-
+   supabase.auth.getSession().then(({ data: { session } }) => {
+  setUser(session?.user ?? null);
+  // if (session?.user) {
+  //   syncData(session.user.id); // WYŁĄCZONE - ładuj tylko ręcznie
+  // }
+  setLoading(false);
+});
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user && _event === 'SIGNED_IN') {
-        syncData(session.user.id);
-      }
-    });
+  setUser(session?.user ?? null);
+  // if (session?.user && _event === 'SIGNED_IN') {
+  //   syncData(session.user.id); // WYŁĄCZONE
+  // }
+});
 
     return () => subscription.unsubscribe();
   }, []);
