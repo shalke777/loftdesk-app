@@ -17,7 +17,6 @@ import { InvoicesModal } from "./components/Invoices/InvoicesModal";
 import { InvoiceForm } from "./components/Invoices/InvoiceForm";
 import { ContractsModal } from "./components/Contracts/ContractsModal";
 import { ContractForm } from "./components/Contracts/ContractForm";
-import { generateCostingPDF, generateInvoicePDF } from "./utils/pdfGenerator";
 import { generateContractPDFFromHTML, generateInvoicePDFFromHTML } from "./utils/contractPDFTemplate";
 import { CloudBackupModal } from './components/Auth/CloudBackupModal';
 import { useAuth } from './hooks/useAuth';
@@ -163,8 +162,8 @@ const handleGenerateCostingPDF = async () => {
     date: todayISO(),
   }, company);
 };
- const handleCreateInvoice = async (invoiceData) => {
-  const invoice = addInvoice({
+const handleCreateInvoice = async (invoiceData) => {
+  addInvoice({
     ...invoiceData,
     isPaid: false,
   });

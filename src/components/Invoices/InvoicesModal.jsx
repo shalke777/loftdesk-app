@@ -1,14 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { 
-  Search, 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  FileText,
-  CheckCircle,
-  XCircle,
-  Download
-} from "lucide-react";
+import { X, Trash2, Download, CheckCircle, FileText, Plus } from 'lucide-react';
 import { formatPL, currency } from "../../utils/format";
 
 export const InvoicesModal = ({ 
