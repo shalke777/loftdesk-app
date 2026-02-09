@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useAutoBackup } from './hooks/useAutoBackup';
 import { storage, makeBackupSnapshot, restoreBackupSnapshot, downloadJson, pickJsonFile } from "./utils/storage";
 import { todayISO } from "./utils/format";
 import { DEFAULT_COMPANY, STORAGE_KEYS } from "./constants";
@@ -42,7 +43,7 @@ export default function App() {
     };
   });
 
-  const { user } = useAuth();
+  const { user } = useAuth(); useAutoBackup(5);
   const [showCloudBackup, setShowCloudBackup] = useState(false);
  
   // ... reszta bez zmian ...

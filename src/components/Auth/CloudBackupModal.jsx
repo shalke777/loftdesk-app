@@ -50,7 +50,16 @@ export function CloudBackupModal({ onClose }) {
       setLoading(false);
     }
   };
-
+const handleSignOut = async () => {
+  try {
+    // Zapisz dane przed wylogowaniem
+    await saveBackupToCloud('Backup przy wylogowaniu');
+    await signOut();
+  } catch (error) {
+    console.error(error);
+    await signOut(); // Wyloguj nawet jeśli backup failed
+  }
+};
   const handleSaveBackup = async () => {
     setLoading(true);
     try {
@@ -186,10 +195,11 @@ export function CloudBackupModal({ onClose }) {
                 <Upload size={16} style={{ marginRight: '8px' }} />
                 Zapisz backup
               </button>
-              <button onClick={signOut} style={secondaryButtonStyle}>
-                <LogOut size={16} style={{ marginRight: '8px' }} />
-                Wyloguj
-              </button>
+              <button onClick={handleSignOut} style={secondaryButtonStyle}>
+  <LogOut size={16} style={{ marginRight: '8px' }} />
+  Wyloguj
+</button>
+              
             </div>
 
             <h3 style={{ marginBottom: '16px' }}>Twoje backupy:</h3>
