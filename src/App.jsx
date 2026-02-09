@@ -17,7 +17,7 @@ import { InvoicesModal } from "./components/Invoices/InvoicesModal";
 import { InvoiceForm } from "./components/Invoices/InvoiceForm";
 import { ContractsModal } from "./components/Contracts/ContractsModal";
 import { ContractForm } from "./components/Contracts/ContractForm";
-import { generateContractPDFFromHTML, generateCostingPDFFromHTML } from "./utils/contractPDFTemplate";
+import { generateContractPDFFromHTML, } from "./utils/contractPDFTemplate";
 import { CloudBackupModal } from './components/Auth/CloudBackupModal';
 import { useAuth } from './hooks/useAuth';
 import { 
@@ -122,46 +122,7 @@ export default function App() {
     replaceAll(list);
   };
 
-const handleGenerateCostingPDF = async () => {
-  if (costingLines.length === 0) {
-    alert("Dodaj przynajmniej jedną pozycję do kosztorysu!");
-    return;
-  }
 
-  let totalNet = 0;
-  let totalVat = 0;
-  let totalGross = 0;
-
-  costingLines.forEach((line) => {
-    const rate = rates[line.code];
-    if (!rate) return;
-
-    const net = rate.priceNet * line.qty;
-    const vat = net * rate.vat;
-    const gross = net + vat;
-
-    totalNet += net;
-    totalVat += vat;
-    totalGross += gross;
-  });
-
-  const summary = {
-    net: totalNet,
-    vat: totalVat,
-    gross: totalGross,
-    materials: totalNet * 0.3,
-  };
-
-  const { generateCostingPDFFromHTML } = await import("./utils/contractPDFTemplate");
-  
-  await generateCostingPDFFromHTML({
-    buyer,
-    lines: costingLines,
-    rates,
-    summary,
-    date: todayISO(),
-  }, company);
-};
 const handleCreateInvoice = async (invoiceData) => {
   addInvoice({
     ...invoiceData,
