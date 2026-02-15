@@ -123,7 +123,7 @@ export const generateCostingPDFFromHTML = async (data, company) => {
 
   const rows = lines.map((l) => {
     const rate = rates[l.code] || {};
-    const unitNet = (rate.mat_price || 0) + (rate.labor_price || 0);
+   const unitNet = rate.priceNet || 0;
     const net = unitNet * (l.qty || 0);
     const vat = net * 0.08;
     const gross = net + vat;
