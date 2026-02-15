@@ -6,6 +6,7 @@
   from = "/"
   to = "/landing/index.html"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/login"
