@@ -357,16 +357,55 @@ const handleGenerateInvoicePDF = async (invoice) => {
         </div>
 
         <CostingPanel
-          lines={costingLines}
-          rates={rates}
-          onAddLine={addLine}
-          onAddCustomLine={(data) => addCustomLine(data, addRate)}
-          onUpdateLine={updateLine}
-          onRemoveLine={removeLine}
-          onClearAll={clearAll}
-          onOpenPriceList={() => setShowPriceList(true)}
-          onGeneratePDF={(contract) => generateContractPDFFromHTML(contract, company)}
-        />
+  lines={costingLines}
+  rates={rates}
+  onAddLine={addLine}
+  onAddCustomLine={(data) => addCustomLine(data, addRate)}
+  onUpdateLine={updateLine}
+  onRemoveLine={removeLine}
+  onClearAll={clearAll}
+  onOpenPriceList={() => setShowPriceList(true)}
+  onGeneratePDF={async () => {
+    if (costingLines.length === 0) {
+      alert("Dodaj przynajmniej jedną pozycję do kosztorysu!");
+      return;
+    }
+
+    let totalNet = 0;
+    let totalVat = 0;
+    let totalGross = 0;
+
+    costingLines.forEach((line) => {
+      const rate = rates[line.code];
+      if (!rate) return;
+
+      const net = rate.priceNet * line.qty;
+      const vat = net * rate.vat;
+      const gross = net + vat;
+
+      totalNet += net;
+      totalVat += vat;
+      totalGross += gross;
+    });
+
+    const summary = {
+      net: totalNet,
+      vat: totalVat,
+      gross: totalGross,
+      materials: totalNet * 0.3,
+    };
+
+    const { generateCostingPDFFromHTML } = await import("./utils/contractPDFTemplate");
+    
+    await generateCostingPDFFromHTML({
+      buyer,
+      lines: costingLines,
+      rates,
+      summary,
+      date: todayISO(),
+    }, company);
+  }}
+/>
 
         <div className="status-card">
           <div className="status-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -480,11 +519,14 @@ const handleGenerateInvoicePDF = async (invoice) => {
           contracts={contracts}
           onRemove={removeContract}
           onMarkAsSigned={markAsSigned}
-          onGeneratePDF={(contract) => generateContractPDFFromHTML(contract, company)}
-          onCreateNew={() => {
-            setShowContracts(false);
-            setShowContractForm(true);
-          }}
+          onGeneratePDF={(contract) => {
+            
+  if (!contract || !contract.totalAmount) {
+    alert("Brak danych umowy - nie można wygenerować PDF");
+    return;
+  }
+  generateContractPDFFromHTML(contract, company);
+}}
         />
       )}
 
