@@ -37,3 +37,8 @@ dist/
 # Misc
 .DS_Store
 *.log
+node_modules
+build
+.env
+.env.*
+.DS_Store
