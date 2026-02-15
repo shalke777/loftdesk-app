@@ -76,7 +76,7 @@ export default function App() {
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const [showContracts, setShowContracts] = useState(false);
   const [showContractForm, setShowContractForm] = useState(false);
-  
+  console.log('🔍 showContractForm state:', showContractForm);
   const [buyer, setBuyer] = useState({
     name: "",
     address: "",
@@ -492,10 +492,13 @@ const handleGenerateInvoicePDF = async (invoice) => {
           onRemove={removeInvoice}
           onMarkAsPaid={markAsPaid}
           onGeneratePDF={handleGenerateInvoicePDF}
-          onCreateNew={() => {
-            setShowInvoices(false);
-            setShowInvoiceForm(true);
-          }}
+         javascriptonCreateNew={() => {
+  console.log('🔍 Creating new contract...');
+  console.log('🔍 Before - showContracts:', showContracts, 'showContractForm:', showContractForm);
+  setShowContracts(false);
+  setShowContractForm(true);
+  console.log('🔍 After state change called');
+}}
         />
       )}
 
@@ -512,36 +515,52 @@ const handleGenerateInvoicePDF = async (invoice) => {
         />
       )}
 
-      {showContracts && (
-        <ContractsModal
-          open={showContracts}
-          onClose={() => setShowContracts(false)}
-          contracts={contracts}
-          onRemove={removeContract}
-          onMarkAsSigned={markAsSigned}
-          onGeneratePDF={(contract) => {
-            
-  if (!contract || !contract.totalAmount) {
-    alert("Brak danych umowy - nie można wygenerować PDF");
-    return;
-  }
-  generateContractPDFFromHTML(contract, company);
-}}
-        />
-      )}
-
-      {showContractForm && (
-        <ContractForm
-          open={showContractForm}
-          onClose={() => setShowContractForm(false)}
-          onSave={handleCreateContract}
-          buyer={buyer}
-          company={company}
-          nextNumber={getNextContractNumber()}
-          costingLines={costingLines}
-          rates={rates}
-        />
-      )}
+{showContracts && (
+  <ContractsModal
+    open={showContracts}
+    onClose={() => setShowContracts(false)}
+    contracts={contracts}
+    onRemove={removeContract}
+    onMarkAsSigned={markAsSigned}
+    onGeneratePDF={(contract) => {
+      console.log('🔍 Generating contract PDF...');
+      console.log('🔍 Contract:', contract);
+      console.log('🔍 Company:', company);
+      
+      if (!contract || !contract.totalAmount) {
+        alert("Brak danych umowy - nie można wygenerować PDF");
+        console.error('❌ Contract validation failed');
+        return;
+      }
+      
+      try {
+        generateContractPDFFromHTML(contract, company);
+        console.log('✅ Contract PDF generated');
+      } catch (error) {
+        console.error('❌ Contract PDF generation error:', error);
+        alert('Błąd generowania PDF: ' + error.message);
+      }
+    }}
+    onCreateNew={() => {
+      console.log('🟢 Creating new contract...');
+      setShowContracts(false);
+      setShowContractForm(true);
+    }}
+  />
+)}
+{console.log('🔍 Rendering ContractForm, open=', showContractForm) || null}
+{showContractForm && (
+  <ContractForm
+  open={showContractForm}  
+  onClose={() => setShowContractForm(false)}
+  onSave={handleCreateContract}
+  buyer={buyer}
+  company={company}
+  nextNumber={getNextContractNumber()}
+  costingLines={costingLines}
+  rates={rates}
+/>
+)}
       {showCloudBackup && (
   <CloudBackupModal onClose={() => setShowCloudBackup(false)} />
 )}
