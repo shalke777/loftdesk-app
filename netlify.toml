@@ -2,30 +2,5 @@
   command = "npm run build"
   publish = "build"
 
-[[redirects]]
-  from = "/"
-  to = "/landing/index.html"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/login"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/register"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/app"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/app/*"
-  to = "/index.html"
-  status = 200
 [build.environment]
   NODE_VERSION = "20"
