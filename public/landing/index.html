@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoftDesk - System Fakturowania dla Firm Budowlanych</title>
+  <meta name="description" content="Automatyzuj faktury, umowy i kosztorysy budowlane. Generuj PDF jednym kliknięciem. Darmowa wersja próbna.">
+  <link rel="stylesheet" href="/landing/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-content">
+        <div class="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="#dc2626"/>
+            <path d="M8 12h16v2H8v-2zm0 4h16v2H8v-2zm0 4h10v2H8v-2z" fill="white"/>
+          </svg>
+          <span>LoftDesk</span>
+        </div>
+        <div class="nav-links">
+          <a href="#funkcje">Funkcje</a>
+          <a href="#cennik">Cennik</a>
+        <a href="/login" class="btn-secondary">Zaloguj się</a>
+<a href="/register" class="btn-primary">Wypróbuj za darmo</a>
+
+        </div>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          System fakturowania<br>
+          <span class="gradient-text">dla firm budowlanych</span>
+        </h1>
+        <p class="hero-subtitle">
+          Automatyzuj faktury, umowy i kosztorysy. Generuj profesjonalne PDF jednym kliknięciem. 
+          Oszczędź 10 godzin tygodniowo na papierologii.
+        </p>
+        <div class="hero-buttons">
+          <a href="/register" class="btn-primary btn-large">
+            Zacznij za darmo
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14m-7-7l7 7-7 7"/>
+            </svg>
+          </a>
+          <a href="#demo" class="btn-secondary btn-large">
+            Zobacz demo
+            <svg width="20" height="20" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Firm korzysta</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">10k+</div>
+            <div class="stat-label">Wygenerowanych faktur</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">4.9/5</div>
+            <div class="stat-label">Ocena użytkowników</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-image">
+        <div class="mockup">
+          <div class="mockup-header">
+            <div class="mockup-dot"></div>
+            <div class="mockup-dot"></div>
+            <div class="mockup-dot"></div>
+          </div>
+          <div class="mockup-content">
+            <img src="https://via.placeholder.com/600x400/dc2626/ffffff?text=LoftDesk+Screenshot" alt="LoftDesk Interface">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES SECTION -->
+  <section id="funkcje" class="features">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Wszystko czego potrzebujesz</h2>
+        <p class="section-subtitle">Kompleksowe narzędzie do zarządzania dokumentacją budowlaną</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📄</div>
+          <h3>Faktury VAT</h3>
+          <p>Generuj profesjonalne faktury w 30 sekund. Automatyczna numeracja, VAT, terminy płatności.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <h3>Kosztorysy</h3>
+          <p>Twórz szczegółowe wyceny z cennika. Pozycje roboczogodzinowe, materiały, VAT 8%.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📝</div>
+          <h3>Umowy</h3>
+          <p>Generuj umowy o wykonanie robót budowlanych z harmonogramem płatności.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📁</div>
+          <h3>Baza kontrahentów</h3>
+          <p>Przechowuj dane klientów (NIP, adres, kontakt). Import/export CSV.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">☁️</div>
+          <h3>Cloud backup</h3>
+          <p>Automatyczne kopie zapasowe w chmurze. Synchronizacja między urządzeniami.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3>Własny branding</h3>
+          <p>Logo firmy w PDF, własne kolory, dane kontaktowe w stopce dokumentów.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING SECTION -->
+  <section id="cennik" class="pricing">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Prosty i przejrzysty cennik</h2>
+        <p class="section-subtitle">Wybierz plan dopasowany do wielkości Twojej firmy</p>
+      </div>
+      <div class="pricing-grid">
+        
+        <!-- FREE -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3>Free</h3>
+            <div class="price">
+              <span class="price-amount">0</span>
+              <span class="price-currency">PLN</span>
+            </div>
+            <p class="price-period">Zawsze darmowy</p>
+          </div>
+          <ul class="pricing-features">
+            <li>✅ 5 faktur miesięcznie</li>
+            <li>✅ 3 umowy miesięcznie</li>
+            <li>✅ 10 kontrahentów</li>
+            <li>✅ Generowanie PDF</li>
+            <li>✅ Własne logo</li>
+            <li>❌ Cloud backup</li>
+            <li>❌ Priorytetowe wsparcie</li>
+          </ul>
+          <a href="/register" class="btn-secondary btn-block">Zacznij za darmo</a>
+        </div>
+
+        <!-- PRO - HIGHLIGHTED -->
+        <div class="pricing-card pricing-card-featured">
+          <div class="pricing-badge">Najpopularniejszy</div>
+          <div class="pricing-header">
+            <h3>Pro</h3>
+            <div class="price">
+              <span class="price-amount">49</span>
+              <span class="price-currency">PLN</span>
+            </div>
+            <p class="price-period">miesięcznie</p>
+          </div>
+          <ul class="pricing-features">
+            <li>✅ Nielimitowane faktury</li>
+            <li>✅ Nielimitowane umowy</li>
+            <li>✅ Nielimitowani kontrahenci</li>
+            <li>✅ Generowanie PDF</li>
+            <li>✅ Własne logo</li>
+            <li>✅ Cloud backup</li>
+            <li>✅ Priorytetowe wsparcie</li>
+          </ul>
+          <a href="/register" class="btn-primary btn-block">Wypróbuj 14 dni za darmo</a>
+        </div>
+
+        <!-- BUSINESS -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3>Business</h3>
+            <div class="price">
+              <span class="price-amount">99</span>
+              <span class="price-currency">PLN</span>
+            </div>
+            <p class="price-period">miesięcznie</p>
+          </div>
+          <ul class="pricing-features">
+            <li>✅ Wszystko z Pro</li>
+            <li>✅ Własna domena</li>
+            <li>✅ API dostęp</li>
+            <li>✅ Dedykowane wsparcie</li>
+            <li>✅ Onboarding 1-on-1</li>
+            <li>✅ SLA 99.9%</li>
+            <li>✅ Priorytet rozwoju funkcji</li>
+          </ul>
+          <a href="mailto:kontakt@loftdesk.pl" class="btn-secondary btn-block">Skontaktuj się</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="cta">
+    <div class="container">
+      <div class="cta-content">
+        <h2 class="cta-title">Gotowy na automatyzację?</h2>
+        <p class="cta-subtitle">Dołącz do setek firm budowlanych które oszczędzają czas z LoftDesk</p>
+        <a href="/register" class="btn-primary btn-large">
+          Zacznij za darmo - bez karty kredytowej
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14m-7-7l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <div class="footer-logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="#dc2626"/>
+              <path d="M8 12h16v2H8v-2zm0 4h16v2H8v-2zm0 4h10v2H8v-2z" fill="white"/>
+            </svg>
+            <span>LoftDesk</span>
+          </div>
+          <p>System fakturowania dla firm budowlanych</p>
+        </div>
+        <div class="footer-column">
+          <h4>Produkt</h4>
+          <a href="#funkcje">Funkcje</a>
+          <a href="#cennik">Cennik</a>
+          <a href="/login">Zaloguj się</a>
+        </div>
+        <div class="footer-column">
+          <h4>Wsparcie</h4>
+          <a href="mailto:support@loftdesk.pl">Kontakt</a>
+          <a href="#">FAQ</a>
+          <a href="#">Dokumentacja</a>
+        </div>
+        <div class="footer-column">
+          <h4>Prawne</h4>
+          <a href="#">Regulamin</a>
+          <a href="#">Polityka prywatności</a>
+          <a href="#">RODO</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 LoftDesk. Wszystkie prawa zastrzeżone.</p>
+      </div>
+    </div>
+  </footer>
+
+<script src="/landing/script.js"></script>
+</body>
+</html>
