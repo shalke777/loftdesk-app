@@ -6,7 +6,7 @@ export const DEFAULT_BRAND = {
 };
 
 export const DEFAULT_COMPANY = {
-  sellerName: "LOFTDESK ",
+  sellerName: "",
   sellerAddress: "",
   sellerNip: "",
   sellerEmail: "",
