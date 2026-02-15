@@ -484,23 +484,20 @@ const handleGenerateInvoicePDF = async (invoice) => {
         />
       )}
 
-      {showInvoices && (
-        <InvoicesModal
-          open={showInvoices}
-          onClose={() => setShowInvoices(false)}
-          invoices={invoices}
-          onRemove={removeInvoice}
-          onMarkAsPaid={markAsPaid}
-          onGeneratePDF={handleGenerateInvoicePDF}
-         javascriptonCreateNew={() => {
-  console.log('🔍 Creating new contract...');
-  console.log('🔍 Before - showContracts:', showContracts, 'showContractForm:', showContractForm);
-  setShowContracts(false);
-  setShowContractForm(true);
-  console.log('🔍 After state change called');
-}}
-        />
-      )}
+    {showInvoices && (
+  <InvoicesModal
+    open={showInvoices}
+    onClose={() => setShowInvoices(false)}
+    invoices={invoices}
+    onRemove={removeInvoice}
+    onMarkAsPaid={markAsPaid}
+    onGeneratePDF={handleGenerateInvoicePDF}
+    onCreateNew={() => {
+      setShowInvoices(false);
+      setShowInvoiceForm(true);
+    }}
+  />
+)}
 
       {showInvoiceForm && (
         <InvoiceForm
