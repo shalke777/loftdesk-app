@@ -723,3 +723,102 @@ textarea.input {
     flex-direction: column;
   }
 }
+/* MOBILE RESPONSIVENESS */
+@media (max-width: 768px) {
+  /* Tabele - scroll horizontal */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+
+  .table {
+    min-width: 800px; /* Minimalna szerokość - umożliwia scroll */
+  }
+
+  /* Header - pionowy układ przycisków */
+  .header-buttons {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .header-btn {
+    width: 100% !important;
+    justify-content: center;
+  }
+
+  /* Grid - jedna kolumna */
+  .grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Modal - pełna szerokość */
+  .modal-container {
+    max-width: 95% !important;
+    margin: 20px !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  /* Status card - pionowy układ badge'y */
+  .status-badges {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .badge {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  /* Kosztorys - przyciski akcji pionowo */
+  .costing-actions {
+    flex-direction: column !important;
+  }
+
+  /* Formularz - pojedyncze kolumny */
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Małe fonty dla tabel */
+  .table {
+    font-size: 11px;
+  }
+
+  .table th,
+  .table td {
+    padding: 6px 4px;
+  }
+
+  /* Przyciski w tabelach - mniejsze */
+  .table .btn {
+    padding: 4px 6px;
+    font-size: 10px;
+  }
+}
+
+/* Bardzo małe ekrany (telefony < 480px) */
+@media (max-width: 480px) {
+  .header-title {
+    font-size: 16px !important;
+  }
+
+  .header-subtitle {
+    font-size: 11px !important;
+  }
+
+  .card-title {
+    font-size: 16px !important;
+  }
+
+  .modal-title {
+    font-size: 18px !important;
+  }
+
+  /* Ukryj niektóre kolumny na bardzo małych ekranach */
+  .table th:nth-child(3),
+  .table td:nth-child(3) {
+    display: none; /* Ukryj 3 kolumnę */
+  }
+}
