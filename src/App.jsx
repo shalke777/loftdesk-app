@@ -36,12 +36,22 @@ import {
 import './App.css';
 
 function AppShell() {
+const handleLogout = async () => {
+  if (!supabase) {
+    alert("Brak konfiguracji Supabase (.env / ENV na Netlify).");
+    return;
+  }
+
+  await supabase.auth.signOut();
+  window.location.href = "/login"; // po wylogowaniu pokaż ekran logowania
+};
 
   const [company, setCompany] = useState(() => {
     const stored = storage.get(STORAGE_KEYS.COMPANY, DEFAULT_COMPANY);
     return {
       ...stored,
       logo: stored.logo || "",
+
     };
   });
 
@@ -217,6 +227,9 @@ const handleGenerateInvoicePDF = async (invoice) => {
                 <Cloud size={18} />
                 Cloud {user ? '✓' : ''}
               </button>
+<button className="header-btn" onClick={handleLogout}>
+  Wyloguj
+</button>
 
             </div>
           </div>
