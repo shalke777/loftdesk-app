@@ -1,7 +1,12 @@
-/                      /landing/index.html    200!
+/                      /landing/index.html                 200!
 
-/login                 /index.html            200
-/register              /index.html            200
+/faq                   /landing/faq.html                   200
+/docs                  /landing/docs.html                  200
+/regulamin             /landing/legal/regulamin.html       200
+/polityka-prywatnosci  /landing/legal/polityka-prywatnosci.html  200
+/rodo                  /landing/legal/rodo.html            200
 
-/app                   /index.html            200
-/app/*                 /index.html            200
+/login                 /index.html                         200
+/register              /index.html                         200
+/app                   /index.html                         200
+/app/*                 /index.html                         200
