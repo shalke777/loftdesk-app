@@ -1,7 +1,7 @@
 /                      /landing/index.html    200!
 
-/login                 /app                   302!
-/register              /app                   302!
+/login                 /index.html            200
+/register              /index.html            200
 
 /app                   /index.html            200
 /app/*                 /index.html            200

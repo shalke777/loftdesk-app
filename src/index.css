@@ -1,3 +1,19 @@
+:root{
+  --color-primary: #dc2626;
+  --color-primary-dark: #b91c1c;
+  --color-primary-light: #fecaca;
+  --color-accent: #f97316;
+
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+
+  --radius: 16px;
+  --shadow-soft: 0 1px 3px rgba(0,0,0,0.10);
+  --shadow-hover: 0 4px 12px rgba(0,0,0,0.10);
+}
+
+
 * {
   margin: 0;
   padding: 0;

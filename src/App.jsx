@@ -20,6 +20,8 @@ import { ContractForm } from "./components/Contracts/ContractForm";
 import { generateContractPDFFromHTML, } from "./utils/contractPDFTemplate";
 import { CloudBackupModal } from './components/Auth/CloudBackupModal';
 import { useAuth } from './hooks/useAuth';
+import { supabase } from "./lib/supabase";
+import AuthPage from "./AuthPage";
 import { 
   Palette, 
   Download, 
@@ -33,7 +35,8 @@ import {
 } from "lucide-react";
 import './App.css';
 
-export default function App() {
+function AppShell() {
+
   const [company, setCompany] = useState(() => {
     const stored = storage.get(STORAGE_KEYS.COMPANY, DEFAULT_COMPANY);
     return {
@@ -558,10 +561,65 @@ const handleGenerateInvoicePDF = async (invoice) => {
   rates={rates}
 />
 )}
+
       {showCloudBackup && (
   <CloudBackupModal onClose={() => setShowCloudBackup(false)} />
 )}
     </div>
     
   );
+}
+export default function App() {
+  // Uwaga: supabase MUSI być już importowany w tym pliku (bo masz popup logowania)
+  const [session, setSession] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    let alive = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!alive) return;
+      if (!supabase) {
+  return (
+    <div style={{ padding: 24, fontFamily: "system-ui" }}>
+      Brak konfiguracji Supabase. Ustaw REACT_APP_SUPABASE_URL i REACT_APP_SUPABASE_ANON_KEY.
+    </div>
+  );
+}
+
+      setSession(data.session);
+      setLoading(false);
+    });
+
+    const { data } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+    });
+
+    return () => {
+      alive = false;
+      data?.subscription?.unsubscribe?.();
+    };
+  }, []);
+
+  const path = window.location.pathname;
+  const isLogin = path === "/login";
+  const isRegister = path === "/register";
+  const isApp = path === "/app" || path.startsWith("/app/");
+
+  if (loading) return null;
+
+  // niezalogowany -> na /login, /register, /app pokaż pełny ekran auth
+  if (!session && (isLogin || isRegister || isApp)) {
+    return <AuthPage mode={isRegister ? "register" : "login"} supabase={supabase} />;
+  }
+
+  // zalogowany i wszedł na /login lub /register -> przerzuć do /app
+  if (session && (isLogin || isRegister)) {
+    window.location.replace("/app");
+    return null;
+  }
+
+  // zalogowany -> pokaż normalną apkę
+  return <AppShell />;
+  
 }

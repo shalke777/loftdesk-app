@@ -1,0 +1,11 @@
+/* AuthPage fix: buttons always visible */
+.auth-actions{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.auth-actions .btn{
+  width: 100%;
+}
