@@ -21,6 +21,7 @@ import { generateContractPDFFromHTML, } from "./utils/contractPDFTemplate";
 import { CloudBackupModal } from './components/Auth/CloudBackupModal';
 import { useAuth } from './hooks/useAuth';
 import { supabase } from "./lib/supabase";
+import { saveBackupToDb } from "./lib/backup";
 import AuthPage from "./AuthPage";
 import { 
   Palette, 
@@ -102,14 +103,44 @@ const handleLogout = async () => {
     storage.set(STORAGE_KEYS.COMPANY, company);
   }, [company]);
 
-  const handleBackup = () => {
+const handleBackup = async () => {
+  try {
     const snap = makeBackupSnapshot();
-    downloadJson(snap, `loftdesk_backup_${todayISO()}.json`);
-    alert("Backup zapisany!");
-  };
+    downloadJson(`loftdesk-backup-${todayISO()}.json`, snap);
+
+    await saveBackupToDb({ supabase, tenantId: null, payload: snap });
+
+    alert("Backup OK ✅ (plik + chmura)");
+  } catch (e) {
+    console.error(e);
+    alert("Backup error: " + (e?.message || e));
+  }
+};
 
   const handleRestore = async () => {
     try {
+      const handleBackup = async () => {
+  try {
+    // robisz snapshot tak jak już masz w projekcie
+    const snap = makeBackupSnapshot();
+
+    // 1) lokalny plik (to już masz działające w utils/storage)
+    downloadJson(`loftdesk-backup-${todayISO()}.json`, snap);
+
+    // 2) chmura (DB w Supabase) — NOWE
+    try {
+      await saveBackupToDb({ supabase, tenantId: null, payload: snap });
+      alert("Backup zapisany ✅ (plik + chmura)");
+    } catch (cloudErr) {
+      console.warn("Cloud backup error:", cloudErr);
+      alert("Plik pobrany ✅, ale zapis w chmurze nie wyszedł: " + (cloudErr?.message || cloudErr));
+    }
+  } catch (e) {
+    console.error(e);
+    alert("Nie udało się zrobić backupu.");
+  }
+};
+
       const { text } = await pickJsonFile();
       const snap = JSON.parse(text);
       restoreBackupSnapshot(snap);
@@ -227,8 +258,17 @@ const handleGenerateInvoicePDF = async (invoice) => {
                 <Cloud size={18} />
                 Cloud {user ? '✓' : ''}
               </button>
+              
+
 <button className="header-btn" onClick={handleLogout}>
   Wyloguj
+</button>
+<button className="header-btn" onClick={handleBackup}>
+  Backup
+</button>
+
+<button className="header-btn" onClick={handleRestore}>
+  Przywróć backup
 </button>
 
             </div>
