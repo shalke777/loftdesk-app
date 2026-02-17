@@ -117,40 +117,19 @@ const handleBackup = async () => {
   }
 };
 
-  const handleRestore = async () => {
-    try {
-      const handleBackup = async () => {
+const handleRestore = async () => {
   try {
-    // robisz snapshot tak jak już masz w projekcie
-    const snap = makeBackupSnapshot();
-
-    // 1) lokalny plik (to już masz działające w utils/storage)
-    downloadJson(`loftdesk-backup-${todayISO()}.json`, snap);
-
-    // 2) chmura (DB w Supabase) — NOWE
-    try {
-      await saveBackupToDb({ supabase, tenantId: null, payload: snap });
-      alert("Backup zapisany ✅ (plik + chmura)");
-    } catch (cloudErr) {
-      console.warn("Cloud backup error:", cloudErr);
-      alert("Plik pobrany ✅, ale zapis w chmurze nie wyszedł: " + (cloudErr?.message || cloudErr));
-    }
+    const { text } = await pickJsonFile();
+    const snap = JSON.parse(text);
+    restoreBackupSnapshot(snap);
+    alert("Backup wczytany! Odświeżam aplikację…");
+    window.location.reload();
   } catch (e) {
     console.error(e);
-    alert("Nie udało się zrobić backupu.");
+    alert("Nie udało się wczytać backupu.");
   }
 };
 
-      const { text } = await pickJsonFile();
-      const snap = JSON.parse(text);
-      restoreBackupSnapshot(snap);
-      alert("Backup wczytany! Odświeżam aplikację…");
-      window.location.reload();
-    } catch (e) {
-      console.error(e);
-      alert("Nie udało się wczytać backupu.");
-    }
-  };
 
   const handleSelectContractor = (contractor) => {
     setBuyer({
@@ -623,7 +602,14 @@ const handleGenerateInvoicePDF = async (invoice) => {
   );
 }
 export default function App() {
-  // Uwaga: supabase MUSI być już importowany w tym pliku (bo masz popup logowania)
+  if (!supabase) {
+    return (
+      <div style={{ padding: 24, fontFamily: "system-ui" }}>
+        Brak konfiguracji Supabase. Ustaw REACT_APP_SUPABASE_URL i REACT_APP_SUPABASE_ANON_KEY.
+      </div>
+    );
+  }
+
   const [session, setSession] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
 
