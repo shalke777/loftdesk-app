@@ -602,6 +602,33 @@ const handleGenerateInvoicePDF = async (invoice) => {
   );
 }
 export default function App() {
+  const [session, setSession] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
+    let alive = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!alive) return;
+      setSession(data.session);
+      setLoading(false);
+    });
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+    });
+
+    return () => {
+      alive = false;
+      sub?.subscription?.unsubscribe?.();
+    };
+  }, []);
+
   if (!supabase) {
     return (
       <div style={{ padding: 24, fontFamily: "system-ui" }}>
@@ -610,36 +637,6 @@ export default function App() {
     );
   }
 
-  const [session, setSession] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    let alive = true;
-
-    supabase.auth.getSession().then(({ data }) => {
-      if (!alive) return;
-      if (!supabase) {
-  return (
-    <div style={{ padding: 24, fontFamily: "system-ui" }}>
-      Brak konfiguracji Supabase. Ustaw REACT_APP_SUPABASE_URL i REACT_APP_SUPABASE_ANON_KEY.
-    </div>
-  );
-}
-
-      setSession(data.session);
-      setLoading(false);
-    });
-
-    const { data } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-    });
-
-    return () => {
-      alive = false;
-      data?.subscription?.unsubscribe?.();
-    };
-  }, []);
-
   const path = window.location.pathname;
   const isLogin = path === "/login";
   const isRegister = path === "/register";
@@ -647,18 +644,14 @@ export default function App() {
 
   if (loading) return null;
 
-  // niezalogowany -> na /login, /register, /app pokaż pełny ekran auth
   if (!session && (isLogin || isRegister || isApp)) {
     return <AuthPage mode={isRegister ? "register" : "login"} supabase={supabase} />;
   }
 
-  // zalogowany i wszedł na /login lub /register -> przerzuć do /app
   if (session && (isLogin || isRegister)) {
     window.location.replace("/app");
     return null;
   }
 
-  // zalogowany -> pokaż normalną apkę
   return <AppShell />;
-  
 }
