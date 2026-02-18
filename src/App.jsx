@@ -24,10 +24,6 @@ import { supabase } from "./lib/supabase";
 import { saveBackupToDb } from "./lib/backup";
 import { fetchUserPlan } from "./lib/plan";
 import { startCheckout } from "./lib/stripeCheckout";
-import { usePlan } from "./hooks/usePlan";
-import { canCreateInvoice } from "./lib/limits";
-import { countThisMonth, LIMITS } from "./lib/limits";
-
 import AuthPage from "./AuthPage";
 import { 
   Palette, 
@@ -63,19 +59,13 @@ const handleLogout = async () => {
   });
 
   const { user } = useAuth();
-const { plan } = usePlan(user);
+  const [plan, setPlan] = useState(() => localStorage.getItem("loftdesk_plan") || "free");
 
-const invoicesUsed = countThisMonth(invoices, "createdAt");
-const invoicesLimit = LIMITS[plan]?.invoicesPerMonth ?? LIMITS.free.invoicesPerMonth;
-const invoicesLeft = invoicesLimit === Infinity ? Infinity : Math.max(0, invoicesLimit - invoicesUsed);
+useEffect(() => {
+  localStorage.setItem("loftdesk_plan", plan);
+}, [plan]);
 
  // TODO: potem weź z Supabase/Stripe (pro/business)
-const LIMITS = {
-  free: { invoicesPerMonth: 5, contractsPerMonth: 5 },
-  pro: { invoicesPerMonth: Infinity, contractsPerMonth: Infinity },
-  business: { invoicesPerMonth: Infinity, contractsPerMonth: Infinity },
-  
-};
 
 
   const [showCloudBackup, setShowCloudBackup] = useState(false);
@@ -93,6 +83,41 @@ const LIMITS = {
     clearAll 
   } = useCosting();
   const { invoices, addInvoice, removeInvoice, markAsPaid } = useInvoices();
+// ---- LIMITY + liczenie w tym miesiącu ----
+const LIMITS = {
+  free: { invoicesPerMonth: 3, contractsPerMonth: 3 },
+  pro: { invoicesPerMonth: Infinity, contractsPerMonth: Infinity },
+  business: { invoicesPerMonth: Infinity, contractsPerMonth: Infinity },
+};
+
+const countThisMonth = (items, dateKey = "createdAt") => {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth();
+  return (items || []).filter((it) => {
+    const d = it?.[dateKey] ? new Date(it[dateKey]) : null;
+    return d && d.getFullYear() === y && d.getMonth() === m;
+  }).length;
+};
+
+// UI: ile zostało faktur w tym miesiącu
+const invoicesUsed = countThisMonth(invoices, "createdAt");
+const invoicesLimit = LIMITS[plan]?.invoicesPerMonth ?? 3;
+const invoicesLeft =
+  invoicesLimit === Infinity ? "∞" : Math.max(0, invoicesLimit - invoicesUsed);
+
+
+function countInvoicesThisMonth(list) {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  return (list || []).filter((inv) => {
+    const d = inv?.createdAt ? new Date(inv.createdAt) : null;
+    return d && d >= start;
+  }).length;
+}
+
+  // ---- LIMITY (Free) ----
+
   const { contracts, addContract, removeContract, markAsSigned } = useContracts();
   
   const { getNext: getNextInvoiceNumber, commit: commitInvoiceNumber } = useCounter(
@@ -197,32 +222,19 @@ const handleRestore = async () => {
   const handleImportContractors = (list) => {
     replaceAll(list);
   };
-const countThisMonth = (items, dateKey = "createdAt") => {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = now.getMonth();
-  return (items || []).filter((it) => {
-    const d = new Date(it?.[dateKey]);
-    return d.getFullYear() === y && d.getMonth() === m;
-  }).length;
-};
-
 
 const handleCreateInvoice = async (invoiceData) => {
-  
-const { ok, used, limit } = canCreateInvoice(plan, invoices);
-if (!ok) {
-  alert(
-    `Limit planu FREE: ${limit} faktury/miesiąc.\n` +
-    `Masz już: ${used}/${limit}.\n\n` +
-    `Kliknij "Kopie w chmurze" → tam będzie upgrade do PRO (dodamy to zaraz).`
-  );
-  return;
-}
+  const used = countThisMonth(invoices, "createdAt");
+  const limit = LIMITS[plan]?.invoicesPerMonth ?? 3;
 
+  if (limit !== Infinity && used >= limit) {
+    alert(
+      `Limit planu FREE: ${limit} faktury/miesiąc.\nMasz już: ${used}/${limit}.\n\nPrzejdź na PRO, żeby mieć bez limitu.`
+    );
+    return;
+  }
 
-
-if (used >= limit) {
+ if (used >= limit) {
   alert(`Limit planu ${plan.toUpperCase()}: ${limit} faktur / miesiąc.\nPrzejdź na Pro, żeby mieć bez limitu.`);
   return;
   
@@ -319,13 +331,10 @@ if (used >= limit) {
 </button>
 
 
-  <button
-    onClick={() => setShowInvoices(true)}
-    className="header-btn"
-  >
-    <Receipt size={18} />
-    Faktury ({invoices.length})
-  </button>
+<button onClick={() => setShowInvoices(true)} className="header-btn">
+  <Receipt size={18} />
+  Faktury ({invoices.length}) • pozostało: {invoicesLeft}
+</button>
 
   <button
     onClick={() => setShowContracts(true)}
@@ -563,7 +572,10 @@ if (used >= limit) {
               <span className="badge badge-green">Kontrahenci ({contractors.length})</span>
               <span className="badge badge-blue">Cennik ({Object.keys(rates).length})</span>
               <span className="badge badge-purple">Pozycje ({costingLines.length})</span>
-              <span className="badge badge-green">Faktury ({invoices.length})</span>
+            <span className="badge badge-purple">
+  Faktury: {invoicesUsed}/{invoicesLimit === Infinity ? "∞" : invoicesLimit}
+</span>
+
               <span className="badge badge-blue">Umowy ({contracts.length})</span>
               <span className="badge badge-blue">Plan: {plan.toUpperCase()}</span>
               <span className="badge badge-purple">
