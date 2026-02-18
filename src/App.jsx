@@ -714,9 +714,11 @@ Pro
     
   );
 }
+
 export default function App() {
   const [session, setSession] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
+  const [bootError, setBootError] = React.useState(null);
 
   React.useEffect(() => {
     if (!supabase) {
@@ -726,14 +728,23 @@ export default function App() {
 
     let alive = true;
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (!alive) return;
-      setSession(data.session);
-      setLoading(false);
-    });
+    (async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (!alive) return;
+        if (error) throw error;
+        setSession(data.session);
+      } catch (e) {
+        console.error("getSession failed:", e);
+        if (alive) setBootError(e);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
+      setLoading(false); // żeby nigdy nie utknęło na białym
     });
 
     return () => {
@@ -750,12 +761,22 @@ export default function App() {
     );
   }
 
+  if (loading) {
+    return <div style={{ padding: 24, fontFamily: "system-ui" }}>Ładowanie…</div>;
+  }
+
+  if (bootError) {
+    return (
+      <div style={{ padding: 24, fontFamily: "system-ui" }}>
+        Błąd startu: {String(bootError?.message || bootError)}
+      </div>
+    );
+  }
+
   const path = window.location.pathname;
   const isLogin = path === "/login";
   const isRegister = path === "/register";
   const isApp = path === "/app" || path.startsWith("/app/");
-
-  if (loading) return null;
 
   if (!session && (isLogin || isRegister || isApp)) {
     return <AuthPage mode={isRegister ? "register" : "login"} supabase={supabase} />;
