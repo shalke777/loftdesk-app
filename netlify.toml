@@ -7,3 +7,8 @@
  
 [functions]
   directory = "netlify/functions"
+
+[dev]
+  command = "npm start"
+  targetPort = 3000
+  port = 8888
