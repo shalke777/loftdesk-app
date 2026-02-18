@@ -24,6 +24,7 @@ import { supabase } from "./lib/supabase";
 import { saveBackupToDb } from "./lib/backup";
 import { fetchUserPlan } from "./lib/plan";
 import { startCheckout } from "./lib/stripeCheckout";
+import ErrorBoundary from "./ErrorBoundary";
 import AuthPage from "./AuthPage";
 import { 
   Palette, 
@@ -787,5 +788,10 @@ export default function App() {
     return null;
   }
 
-  return <AppShell />;
+  return (
+  <ErrorBoundary>
+    <AppShell />
+  </ErrorBoundary>
+);
+
 }
