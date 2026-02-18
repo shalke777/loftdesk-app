@@ -107,15 +107,6 @@ const invoicesLeft =
   invoicesLimit === Infinity ? "∞" : Math.max(0, invoicesLimit - invoicesUsed);
 
 
-function countInvoicesThisMonth(list) {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), 1);
-  return (list || []).filter((inv) => {
-    const d = inv?.createdAt ? new Date(inv.createdAt) : null;
-    return d && d >= start;
-  }).length;
-}
-
   // ---- LIMITY (Free) ----
 
   const { contracts, addContract, removeContract, markAsSigned } = useContracts();
