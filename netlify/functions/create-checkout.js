@@ -1,3 +1,8 @@
+if (!process.env.STRIPE_SECRET_KEY) {
+  return { statusCode: 500, body: JSON.stringify({ error: "Missing STRIPE_SECRET_KEY" }) };
+}
+
+
 const Stripe = require("stripe");
 const { createClient } = require("@supabase/supabase-js");
 
