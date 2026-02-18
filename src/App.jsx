@@ -22,6 +22,7 @@ import { CloudBackupModal } from './components/Auth/CloudBackupModal';
 import { useAuth } from './hooks/useAuth';
 import { supabase } from "./lib/supabase";
 import { saveBackupToDb } from "./lib/backup";
+import { fetchUserPlan } from "./lib/plan";
 import AuthPage from "./AuthPage";
 import { 
   Palette, 
@@ -57,6 +58,16 @@ const handleLogout = async () => {
   });
 
   const { user } = useAuth();
+const [plan, setPlan] = useState("free");
+ // TODO: potem weź z Supabase/Stripe (pro/business)
+const LIMITS = {
+  free: { invoicesPerMonth: 5, contractsPerMonth: 5 },
+  pro: { invoicesPerMonth: Infinity, contractsPerMonth: Infinity },
+  business: { invoicesPerMonth: Infinity, contractsPerMonth: Infinity },
+  
+};
+
+
   const [showCloudBackup, setShowCloudBackup] = useState(false);
  
   // ... reszta bez zmian ...
@@ -102,6 +113,27 @@ const handleLogout = async () => {
   useEffect(() => {
     storage.set(STORAGE_KEYS.COMPANY, company);
   }, [company]);
+
+useEffect(() => {
+  let alive = true;
+
+  (async () => {
+    try {
+      if (!user) {
+        if (alive) setPlan("free");
+        return;
+      }
+      const p = await fetchUserPlan(supabase);
+      if (alive) setPlan(p);
+    } catch (e) {
+      console.warn("fetchUserPlan error:", e);
+      if (alive) setPlan("free");
+    }
+  })();
+
+  return () => { alive = false; };
+}, [user]);
+
 
 const handleExport = async () => {
   try {
@@ -155,34 +187,62 @@ const handleRestore = async () => {
   const handleImportContractors = (list) => {
     replaceAll(list);
   };
+const countThisMonth = (items, dateKey = "createdAt") => {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth();
+  return (items || []).filter((it) => {
+    const d = new Date(it?.[dateKey]);
+    return d.getFullYear() === y && d.getMonth() === m;
+  }).length;
+};
 
 
 const handleCreateInvoice = async (invoiceData) => {
+  
+const used = countThisMonth(invoices, "createdAt");
+const limit = LIMITS[plan]?.invoicesPerMonth ?? 5;
+
+if (used >= limit) {
+  alert(`Limit planu ${plan.toUpperCase()}: ${limit} faktur / miesiąc.\nPrzejdź na Pro, żeby mieć bez limitu.`);
+  return;
+}
+
+
   addInvoice({
     ...invoiceData,
     isPaid: false,
   });
 
   commitInvoiceNumber(invoiceData.number);
-  
-   
   alert("Faktura wystawiona! PDF został pobrany.");
 };
+
 
 const handleGenerateInvoicePDF = async (invoice) => {
   const { generateInvoicePDFFromHTML } = await import("./utils/contractPDFTemplate");
   await generateInvoicePDFFromHTML(invoice, company);
 };
- const handleCreateContract = (contractData) => {
-    const contract = addContract({
-      ...contractData,
-      isSigned: false,
-    });
+const handleCreateContract = (contractData) => {
+  const used = countThisMonth(contracts, "createdAt");
+const limit = LIMITS[plan]?.contractsPerMonth ?? 3;
 
-    commitContractNumber(contractData.number);
-    generateContractPDFFromHTML(contract, company);
-    alert("Umowa utworzona! PDF został pobrany.");
-  };
+if (used >= limit) {
+  alert(`Limit planu ${plan.toUpperCase()}: ${limit} umowy / miesiąc.\nPrzejdź na Pro, żeby mieć bez limitu.`);
+  return;
+}
+
+
+  const contract = addContract({
+    ...contractData,
+    isSigned: false,
+  });
+
+  commitContractNumber(contractData.number);
+  generateContractPDFFromHTML(contract, company);
+  alert("Umowa utworzona! PDF został pobrany.");
+};
+
 
  return (
 
@@ -209,8 +269,9 @@ const handleGenerateInvoicePDF = async (invoice) => {
               />
               <div>
                 <h1 className="header-title">
-                  LoftDesk – Kosztorys / Faktura / Umowa
-                </h1>
+  LoftDesk – Kosztorys / Faktura / Umowa ({plan.toUpperCase()})
+</h1>
+
                 <p className="header-subtitle">
                   Kompleksowe wykończenia wnętrz • Małopolskie
                 </p>
