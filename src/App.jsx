@@ -103,19 +103,30 @@ const handleLogout = async () => {
     storage.set(STORAGE_KEYS.COMPANY, company);
   }, [company]);
 
-const handleBackup = async () => {
+const handleExport = async () => {
   try {
     const snap = makeBackupSnapshot();
+
+    // 1) zapis na dysk
     downloadJson(`loftdesk-backup-${todayISO()}.json`, snap);
 
-    await saveBackupToDb({ supabase, tenantId: null, payload: snap });
+    // 2) zapis do chmury (jeśli user zalogowany i supabase skonfigurowany)
+    if (supabase) {
+      try {
+        await saveBackupToDb({ supabase, tenantId: null, payload: snap });
+      } catch (cloudErr) {
+        console.warn("Cloud backup error:", cloudErr);
+        // nie blokuj użytkownika – plik i tak zapisany
+      }
+    }
 
-    alert("Backup OK ✅ (plik + chmura)");
+    alert("Zapisano ✅ (plik + chmura)");
   } catch (e) {
     console.error(e);
-    alert("Backup error: " + (e?.message || e));
+    alert("Błąd zapisu: " + (e?.message || e));
   }
 };
+
 
 const handleRestore = async () => {
   try {
@@ -206,51 +217,48 @@ const handleGenerateInvoicePDF = async (invoice) => {
               </div>
             </div>
 
-            <div className="header-buttons">
-              
-              <button onClick={handleBackup} className="header-btn">
-                <Download size={18} />
-                Backup
-              </button>
-              <button onClick={handleRestore} className="header-btn">
-                <Upload size={18} />
-                Restore
-              </button>
-              <button 
-                onClick={() => setShowInvoices(true)}
-                className="header-btn"
-              >
-                <Receipt size={18} />
-                Faktury ({invoices.length})
-              </button>
-              <button 
-                onClick={() => setShowContracts(true)}
-                className="header-btn"
-              >
-                <FileCheck size={18} />
-                Umowy ({contracts.length})
-              </button>
-              <button 
-              onClick={() => setShowCloudBackup(true)}
-                className="header-btn"
-              >
-                <Cloud size={18} />
-                Cloud {user ? '✓' : ''}
-              </button>
-              
-
-<button className="header-btn" onClick={handleLogout}>
-  Wyloguj
-</button>
-<button className="header-btn" onClick={handleBackup}>
-  Backup
+           <div className="header-buttons">
+ <button onClick={handleExport} className="header-btn" title="Zapisz plik na komputerze + kopia w chmurze">
+  <Download size={18} />
+  Zapisz do pliku
 </button>
 
-<button className="header-btn" onClick={handleRestore}>
-  Przywróć backup
+  <button
+    onClick={handleRestore}
+    className="header-btn"
+    title="Wczytaj plik z danymi z komputera"
+  >
+    <Upload size={18} />
+    Import danych
+  </button>
+
+  <button onClick={() => setShowCloudBackup(true)} className="header-btn" title="Przywracanie / historia kopii w chmurze">
+  <Cloud size={18} />
+  Import z chmury {user ? "✓" : ""}
 </button>
 
-            </div>
+
+  <button
+    onClick={() => setShowInvoices(true)}
+    className="header-btn"
+  >
+    <Receipt size={18} />
+    Faktury ({invoices.length})
+  </button>
+
+  <button
+    onClick={() => setShowContracts(true)}
+    className="header-btn"
+  >
+    <FileCheck size={18} />
+    Umowy ({contracts.length})
+  </button>
+
+  <button className="header-btn" onClick={handleLogout}>
+    Wyloguj
+  </button>
+</div>
+         
           </div>
         </div>
 
