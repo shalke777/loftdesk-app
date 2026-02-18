@@ -23,6 +23,11 @@ import { useAuth } from './hooks/useAuth';
 import { supabase } from "./lib/supabase";
 import { saveBackupToDb } from "./lib/backup";
 import { fetchUserPlan } from "./lib/plan";
+import { startCheckout } from "./lib/stripeCheckout";
+import { usePlan } from "./hooks/usePlan";
+import { canCreateInvoice } from "./lib/limits";
+import { countThisMonth, LIMITS } from "./lib/limits";
+
 import AuthPage from "./AuthPage";
 import { 
   Palette, 
@@ -58,7 +63,12 @@ const handleLogout = async () => {
   });
 
   const { user } = useAuth();
-const [plan, setPlan] = useState("free");
+const { plan } = usePlan(user);
+
+const invoicesUsed = countThisMonth(invoices, "createdAt");
+const invoicesLimit = LIMITS[plan]?.invoicesPerMonth ?? LIMITS.free.invoicesPerMonth;
+const invoicesLeft = invoicesLimit === Infinity ? Infinity : Math.max(0, invoicesLimit - invoicesUsed);
+
  // TODO: potem weź z Supabase/Stripe (pro/business)
 const LIMITS = {
   free: { invoicesPerMonth: 5, contractsPerMonth: 5 },
@@ -200,12 +210,22 @@ const countThisMonth = (items, dateKey = "createdAt") => {
 
 const handleCreateInvoice = async (invoiceData) => {
   
-const used = countThisMonth(invoices, "createdAt");
-const limit = LIMITS[plan]?.invoicesPerMonth ?? 5;
+const { ok, used, limit } = canCreateInvoice(plan, invoices);
+if (!ok) {
+  alert(
+    `Limit planu FREE: ${limit} faktury/miesiąc.\n` +
+    `Masz już: ${used}/${limit}.\n\n` +
+    `Kliknij "Kopie w chmurze" → tam będzie upgrade do PRO (dodamy to zaraz).`
+  );
+  return;
+}
+
+
 
 if (used >= limit) {
   alert(`Limit planu ${plan.toUpperCase()}: ${limit} faktur / miesiąc.\nPrzejdź na Pro, żeby mieć bez limitu.`);
   return;
+  
 }
 
 
@@ -319,7 +339,26 @@ if (used >= limit) {
     Wyloguj
   </button>
 </div>
-         
+         <button
+  className="header-btn"
+  onClick={async () => {
+    try { await startCheckout("pro"); }
+    catch (e) { alert(e.message); }
+  }}
+>
+  Pro 49 zł
+</button>
+
+<button
+  className="header-btn"
+  onClick={async () => {
+    try { await startCheckout("business"); }
+    catch (e) { alert(e.message); }
+  }}
+>
+  Business 99 zł
+</button>
+
           </div>
         </div>
 
@@ -526,6 +565,11 @@ if (used >= limit) {
               <span className="badge badge-purple">Pozycje ({costingLines.length})</span>
               <span className="badge badge-green">Faktury ({invoices.length})</span>
               <span className="badge badge-blue">Umowy ({contracts.length})</span>
+              <span className="badge badge-blue">Plan: {plan.toUpperCase()}</span>
+              <span className="badge badge-purple">
+  Faktury: {invoicesUsed}/{invoicesLimit === Infinity ? "∞" : invoicesLimit}
+</span>
+
             </div>
            
 <div style={{ marginTop: '20px', display: 'flex', gap: '12px', justifyContent: 'center' }}>
