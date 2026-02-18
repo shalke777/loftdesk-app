@@ -16,21 +16,16 @@ export function downloadJson(filename, dataObj) {
 export async function saveBackupToDb({ supabase, tenantId, payload }) {
   if (!supabase) throw new Error("Supabase nie jest skonfigurowany (ENV).");
 
-  // zamiast getUser() -> bierzemy session (bez wyjątku)
-  const { data, error: sErr } = await supabase.auth.getSession();
-  if (sErr) throw sErr;
-
-  const userId = data?.session?.user?.id;
-  if (!userId) {
-    throw new Error("Brak sesji. Zaloguj się w aplikacji i spróbuj ponownie.");
-  }
+  const { data: u, error: uErr } = await supabase.auth.getUser();
+  if (uErr) throw uErr;
+  const userId = u?.user?.id;
+  if (!userId) throw new Error("Brak zalogowanego usera.");
 
   const { error } = await supabase.from("user_backups").insert({
     user_id: userId,
     tenant_id: tenantId || null,
-    payload,
+    payload
   });
 
   if (error) throw error;
 }
-

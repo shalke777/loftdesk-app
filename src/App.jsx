@@ -338,27 +338,24 @@ if (used >= limit) {
   <button className="header-btn" onClick={handleLogout}>
     Wyloguj
   </button>
-</div>
-         <button
-  className="header-btn"
-  onClick={async () => {
-    try { await startCheckout("pro"); }
-    catch (e) { alert(e.message); }
+<div>
+    <button className="header-btn" onClick={async () => {
+    try { await startCheckout("pro"); } catch (e) { alert(e.message); }
+   
   }}
->
-  Pro 49 zł
+> 
+Pro
 </button>
 
 <button
-  className="header-btn"
-  onClick={async () => {
-    try { await startCheckout("business"); }
+  className="header-btn" onClick={async () => { try { await startCheckout("business"); }
     catch (e) { alert(e.message); }
   }}
 >
-  Business 99 zł
+  Business
 </button>
-
+</div>
+</div>  
           </div>
         </div>
 

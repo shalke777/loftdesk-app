@@ -1,29 +1,25 @@
 // src/lib/stripeCheckout.js
-import { supabase } from "./supabase"; // albo "./lib/supabase" – dopasuj do swojej ścieżki
-
 export async function startCheckout(plan) {
-  const { data, error } = await supabase.auth.getSession();
-  if (error) throw error;
-
-  const token = data?.session?.access_token;
-  if (!token) {
-    alert("Musisz być zalogowany, żeby kupić plan.");
-    window.location.href = "/login";
-    return;
-  }
-
   const res = await fetch("/.netlify/functions/create-checkout", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ plan }),
   });
 
-  const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json?.error || "Checkout error");
+  // Zamiast robić window.location na coś złego → pokaż sensowny błąd
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(
+      `Checkout error (${res.status}). ${
+        text ? text.slice(0, 200) : "Brak odpowiedzi z funkcji Netlify."
+      }`
+    );
+  }
 
-  if (json?.url) window.location.href = json.url;
-  else throw new Error("Brak URL do Stripe Checkout");
+  const data = await res.json().catch(() => ({}));
+  if (!data?.url) {
+    throw new Error("Checkout error: brak URL w odpowiedzi z create-checkout.");
+  }
+
+  window.location.href = data.url;
 }

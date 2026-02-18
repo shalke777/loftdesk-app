@@ -43,3 +43,5 @@ build
 .env.*
 .DS_Store
 git/
+# Local Netlify folder
+.netlify
