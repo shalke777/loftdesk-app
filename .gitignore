@@ -45,3 +45,5 @@ build
 git/
 # Local Netlify folder
 .netlify
+deno.lock
+react-app-rewired
