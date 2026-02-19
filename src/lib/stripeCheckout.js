@@ -1,25 +1,33 @@
-// src/lib/stripeCheckout.js
+import { supabase } from "./supabase";
+
 export async function startCheckout(plan) {
+  if (!supabase) throw new Error("Brak konfiguracji Supabase.");
+
+  const { data } = await supabase.auth.getSession();
+  const token = data?.session?.access_token;
+
+  if (!token) {
+    throw new Error("Musisz być zalogowany, żeby kupić plan.");
+  }
+
   const res = await fetch("/.netlify/functions/create-checkout", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify({ plan }),
   });
 
-  // Zamiast robić window.location na coś złego → pokaż sensowny błąd
+  const payload = await res.json().catch(() => ({}));
+
   if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(
-      `Checkout error (${res.status}). ${
-        text ? text.slice(0, 200) : "Brak odpowiedzi z funkcji Netlify."
-      }`
-    );
+    throw new Error(payload?.error || `Checkout error (${res.status})`);
   }
 
-  const data = await res.json().catch(() => ({}));
-  if (!data?.url) {
+  if (!payload?.url) {
     throw new Error("Checkout error: brak URL w odpowiedzi z create-checkout.");
   }
 
-  window.location.href = data.url;
+  window.location.href = payload.url;
 }
