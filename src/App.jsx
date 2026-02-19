@@ -40,6 +40,9 @@ import {
 import './App.css';
 
 function AppShell() {
+  console.log("URL ok?", !!process.env.REACT_APP_SUPABASE_URL);
+console.log("KEY ok?", !!process.env.REACT_APP_SUPABASE_ANON_KEY);
+
 const handleLogout = async () => {
   if (!supabase) {
     alert("Brak konfiguracji Supabase (.env / ENV na Netlify).");
