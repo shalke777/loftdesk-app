@@ -47,3 +47,8 @@ git/
 .netlify
 deno.lock
 react-app-rewired
+.env.local
+.env.local
+playwright-report/
+test-results/
+artifacts/
