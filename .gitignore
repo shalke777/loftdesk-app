@@ -52,3 +52,12 @@ react-app-rewired
 playwright-report/
 test-results/
 artifacts/
+
+# Playwright / lokalne
+.auth/
+playwright-report/
+test-results/
+artifacts/
+*.png
+.env.local
+
