@@ -2,7 +2,7 @@
 // Hook do zarządzania projektami przez Supabase
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '../../lib/supabase';
 import {
   validateProject, validateMilestone, validateTask,
   canTransitionProjectStatus, normalizeTaskOnStatusChange,
