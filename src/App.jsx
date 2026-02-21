@@ -24,6 +24,7 @@ import { supabase } from "./lib/supabase";
 import { saveBackupToDb } from "./lib/backup";
 import { fetchUserPlan } from "./lib/plan";
 import { startCheckout } from "./lib/stripeCheckout";
+import ProjectModal, { ProjectList } from './components/projects/ProjectModal';
 import ErrorBoundary from "./ErrorBoundary";
 import AuthPage from "./AuthPage";
 import { 
@@ -52,7 +53,8 @@ const handleLogout = async () => {
   await supabase.auth.signOut();
   window.location.href = "/login"; // po wylogowaniu pokaż ekran logowania
 };
-
+const [showProjects, setShowProjects] = useState(false);
+const [activeProjectId, setActiveProjectId] = useState(null);
   const [company, setCompany] = useState(() => {
     const stored = storage.get(STORAGE_KEYS.COMPANY, DEFAULT_COMPANY);
     return {
@@ -350,7 +352,13 @@ if (used >= limit) {
 > 
 Pro
 </button>
-
+<button
+  onClick={() => { setShowProjects(true); setActiveProjectId(null); }}
+  style={{ /* skopiuj styl z przycisku obok */ }}
+  data-testid="nav-projects"
+>
+  🏗️ Projekty
+</button>
 <button
   className="header-btn" onClick={async () => { try { await startCheckout("business"); }
     catch (e) { alert(e.message); }
@@ -714,6 +722,15 @@ Pro
       {showCloudBackup && (
   <CloudBackupModal onClose={() => setShowCloudBackup(false)} />
 )}
+
+{showProjects && (
+        <ProjectModal
+          projectId={activeProjectId}
+          onClose={() => { setShowProjects(false); setActiveProjectId(null); }}
+          onProjectSaved={() => {}}
+          contractors={contractors}
+        />
+      )}
     </div>
     
   );
