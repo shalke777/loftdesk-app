@@ -4,8 +4,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dokumentacja — LoftDesk</title>
-  <meta name="description" content="Szybki start: jak dodać firmę, kontrahenta i wygenerować fakturę PDF w LoftDesk." />
+  <meta name="description" content="Dokumentacja LoftDesk — szybki start, faktury, umowy, kosztorysy, PDF, backup i bezpieczeństwo." />
   <link rel="stylesheet" href="/landing/style.css" />
+  <style>
+    .doc-wrap { max-width: 860px; margin: 0 auto; }
+    .doc-section { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.07); padding: 36px 40px; margin-bottom: 24px; line-height: 1.75; }
+    .doc-section h2 { font-size: 1.2rem; font-weight: 700; color: #1e3a5f; margin: 0 0 14px; border-left: 4px solid #dc2626; padding-left: 12px; }
+    .doc-section h3 { font-size: 1rem; font-weight: 700; color: #2e5fac; margin: 20px 0 8px; }
+    .doc-section p { margin: 0 0 10px; color: #334155; font-size: 0.95rem; }
+    .doc-section ul, .doc-section ol { margin: 6px 0 14px 20px; padding: 0; color: #334155; font-size: 0.95rem; }
+    .doc-section ul li, .doc-section ol li { margin-bottom: 6px; }
+    .doc-section .tag { display: inline-block; background: #fef2f2; color: #dc2626; border-radius: 6px; font-size: 0.78rem; font-weight: 600; padding: 2px 8px; margin-bottom: 10px; }
+    .doc-section .note { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; font-size: 0.88rem; color: #64748b; margin-top: 12px; }
+    .doc-section .warning { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 14px 18px; font-size: 0.88rem; color: #92400e; margin-top: 12px; }
+    .doc-section strong { color: #1e293b; }
+    .doc-section a { color: #2e5fac; text-decoration: underline; }
+    .step { display: flex; gap: 14px; margin-bottom: 16px; align-items: flex-start; }
+    .step-num { background: #dc2626; color: white; border-radius: 8px; min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.9rem; flex-shrink: 0; }
+    .step-body { flex: 1; }
+    .step-title { font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .step-desc { color: #334155; font-size: 0.9rem; line-height: 1.6; }
+    .toc { background: #f8fafc; border-radius: 10px; padding: 20px 28px; margin-bottom: 28px; }
+    .toc h2 { font-size: 1rem; font-weight: 700; color: #1e3a5f; margin: 0 0 10px; }
+    .toc ol { margin: 0; padding-left: 20px; }
+    .toc ol li { margin-bottom: 4px; }
+    .toc ol li a { color: #2e5fac; text-decoration: none; font-size: 0.9rem; }
+    .toc ol li a:hover { text-decoration: underline; }
+    hr.doc-hr { border: none; border-top: 1px solid #e2e8f0; margin: 18px 0; }
+    @media (max-width: 600px) { .doc-section { padding: 20px 18px; } .step { gap: 10px; } }
+  </style>
 </head>
 <body>
   <nav class="navbar">
@@ -28,45 +55,393 @@
     </div>
   </nav>
 
-  <section class="features" style="padding-top: 110px;">
+  <section class="features" style="padding-top:110px; padding-bottom:60px;">
     <div class="container">
       <div class="section-header">
-        <h1 class="section-title">Dokumentacja</h1>
-        <p class="section-subtitle">Szybki start w 5 minut.</p>
+        <h1 class="section-title">Dokumentacja LoftDesk</h1>
+        <p class="section-subtitle">Instrukcja obsługi platformy — od rejestracji do generowania PDF.</p>
       </div>
 
-      <div class="features-grid" style="grid-template-columns: 1fr; gap: 12px;">
-        <div class="feature-card">
-          <h3>1) Załóż konto</h3>
-          <p>Wejdź w <a href="/register">/register</a>, podaj email i hasło. Jeśli potwierdzanie maila jest włączone — kliknij link w mailu.</p>
+      <div class="doc-wrap">
+
+        <div class="toc">
+          <h2>📋 Spis treści</h2>
+          <ol>
+            <li><a href="#start">Szybki start</a></li>
+            <li><a href="#konto">Konto i ustawienia firmy</a></li>
+            <li><a href="#kontrahenci">Baza kontrahentów</a></li>
+            <li><a href="#faktury">Faktury VAT</a></li>
+            <li><a href="#kosztorysy">Kosztorysy</a></li>
+            <li><a href="#umowy">Umowy</a></li>
+            <li><a href="#pdf">Generowanie PDF</a></li>
+            <li><a href="#backup">Backup i eksport danych</a></li>
+            <li><a href="#plany">Plany i limity</a></li>
+            <li><a href="#bezpieczenstwo">Bezpieczeństwo danych</a></li>
+            <li><a href="#ograniczenia">Ograniczenia odpowiedzialności</a></li>
+            <li><a href="#kontakt">Kontakt i wsparcie</a></li>
+          </ol>
         </div>
-        <div class="feature-card">
-          <h3>2) Uzupełnij dane firmy</h3>
-          <p>W aplikacji wpisz nazwę firmy, NIP, adres, konto bankowe. Te dane trafią do PDF.</p>
+
+        <!-- SZYBKI START -->
+        <div class="doc-section" id="start">
+          <span class="tag">Start</span>
+          <h2>Szybki start — pierwsze kroki</h2>
+          <p>Aby zacząć korzystać z LoftDesk, wykonaj poniższe kroki:</p>
+
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Załóż konto</div>
+              <div class="step-desc">Wejdź na <a href="/register">loftdesk.pl/register</a>, podaj e-mail i hasło. Konto jest aktywne natychmiast (plan Free, bez karty kredytowej).</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Uzupełnij dane swojej firmy</div>
+              <div class="step-desc">W aplikacji → sekcja „Dane Twojej firmy" → wpisz: nazwę, adres, NIP, IBAN, e-mail, telefon. Te dane trafią do każdego generowanego PDF.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Dodaj kontrahenta</div>
+              <div class="step-desc">Kliknij „Kontrahenci" → dodaj klienta (nazwa, adres, NIP, telefon, e-mail). Przy fakturze wybierasz go jednym kliknięciem.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">Utwórz dokument</div>
+              <div class="step-desc">Wybierz: Faktury → Nowa faktura, lub Kosztorysy, lub Umowy. Wypełnij dane i pozycje.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <div class="step-title">Generuj PDF</div>
+              <div class="step-desc">Kliknij „Generuj PDF" — plik zostanie automatycznie pobrany na Twój komputer.</div>
+            </div>
+          </div>
+
+          <div class="note">💡 <strong>Tip:</strong> Zrób backup po pierwszym uzupełnieniu danych — kliknij „Zapisz do pliku" w nagłówku aplikacji.</div>
         </div>
-        <div class="feature-card">
-          <h3>3) Dodaj kontrahenta</h3>
-          <p>Dodaj klienta (NIP, adres, kontakt). Później wybierasz go jednym kliknięciem przy fakturze.</p>
+
+        <!-- KONTO -->
+        <div class="doc-section" id="konto">
+          <span class="tag">Konto</span>
+          <h2>Konto i ustawienia firmy</h2>
+
+          <h3>Dane firmy</h3>
+          <p>Sekcja „Dane Twojej firmy" to centralny punkt ustawień. Dane te trafiają do wszystkich generowanych dokumentów PDF. Uzupełnij:</p>
+          <ul>
+            <li><strong>Nazwa firmy / imię i nazwisko</strong> — wyświetlana w nagłówku dokumentów</li>
+            <li><strong>Adres</strong> — ulica, kod pocztowy, miejscowość</li>
+            <li><strong>NIP</strong> — numer identyfikacji podatkowej</li>
+            <li><strong>IBAN</strong> — numer konta bankowego do płatności</li>
+            <li><strong>Telefon i e-mail</strong> — dane kontaktowe w dokumentach</li>
+          </ul>
+
+          <h3>Branding i logo</h3>
+          <p>W sekcji „Ustawienia firmy i branding" możesz wgrać logo firmy (PNG/JPG) oraz ustawić kolory marki. Logo pojawi się w nagłówku generowanych PDF.</p>
+
+          <h3>Zmiana hasła i bezpieczeństwo konta</h3>
+          <p>Hasło zmienisz przez opcję „Zapomniałem hasła" na stronie logowania. Nigdy nie udostępniaj danych logowania osobom trzecim — zgodnie z <a href="/regulamin">Regulaminem</a> (§ 3) odpowiadasz za działania wykonane z Twojego konta.</p>
         </div>
-        <div class="feature-card">
-          <h3>4) Wystaw fakturę / umowę / kosztorys</h3>
-          <p>Wypełnij pozycje, stawki i VAT. Zapisz dokument.</p>
+
+        <!-- KONTRAHENCI -->
+        <div class="doc-section" id="kontrahenci">
+          <span class="tag">Kontrahenci</span>
+          <h2>Baza kontrahentów</h2>
+
+          <h3>Dodawanie kontrahenta</h3>
+          <p>Kliknij przycisk „Kontrahenci" → „Dodaj kontrahenta". Wypełnij: nazwę, adres, NIP, telefon, e-mail. Zapisany kontrahent jest dostępny przy tworzeniu faktur i umów.</p>
+
+          <h3>Import i eksport</h3>
+          <p>Możesz importować i eksportować bazę kontrahentów w formacie CSV. Import pozwala przenieść istniejącą bazę klientów do LoftDesk.</p>
+
+          <div class="warning">
+            ⚠️ <strong>Ważne — RODO:</strong> Dane kontrahentów (osoby fizyczne) to dane osobowe. Jako użytkownik jesteś administratorem tych danych i zobowiązany do posiadania właściwej podstawy prawnej do ich przetwarzania (np. umowa, uzasadniony interes). LoftDesk przetwarza te dane wyłącznie w Twoim imieniu. Więcej w <a href="/rodo">dokumentacji RODO</a>.
+          </div>
         </div>
-        <div class="feature-card">
-          <h3>5) Generuj PDF</h3>
-          <p>Kliknij “Generuj PDF” i pobierz gotowy plik do wysyłki do klienta.</p>
+
+        <!-- FAKTURY -->
+        <div class="doc-section" id="faktury">
+          <span class="tag">Faktury</span>
+          <h2>Faktury VAT</h2>
+
+          <h3>Tworzenie faktury</h3>
+          <ol>
+            <li>Kliknij „Faktury" → „Nowa faktura"</li>
+            <li>Wybierz kontrahenta lub wpisz dane ręcznie</li>
+            <li>Uzupełnij pozycje: nazwa usługi/towaru, ilość, cena netto, stawka VAT</li>
+            <li>Ustaw numer faktury, datę wystawienia i termin płatności</li>
+            <li>Kliknij „Wystaw fakturę" — PDF zostanie automatycznie wygenerowany</li>
+          </ol>
+
+          <h3>Numeracja</h3>
+          <p>Numeracja faktur jest automatyczna i ciągła w ramach roku kalendarzowego. Możesz ustawić własny format. <strong>Użytkownik odpowiada za zachowanie ciągłości numeracji zgodnie z wymogami podatkowymi.</strong></p>
+
+          <h3>Stawki VAT</h3>
+          <p>Dostępne stawki: 23%, 8%, 5%, 0%, zw. (zwolniony). Wybierz odpowiednią dla swoich usług. W razie wątpliwości skonsultuj się z księgowym.</p>
+
+          <div class="warning">
+            ⚠️ <strong>Ważne — odpowiedzialność podatkowa:</strong> LoftDesk generuje dokumenty na podstawie danych wprowadzonych przez użytkownika. <strong>LoftDesk nie jest biurem rachunkowym ani doradcą podatkowym.</strong> Użytkownik ponosi wyłączną odpowiedzialność za poprawność wystawionych faktur i ich zgodność z aktualnymi przepisami prawa podatkowego. Zalecamy współpracę z księgowym.
+          </div>
+
+          <h3>Historia faktur</h3>
+          <p>Wszystkie wystawione faktury dostępne są w zakładce „Faktury". Możesz je przeglądać, oznaczać jako zapłacone i ponownie generować PDF.</p>
         </div>
+
+        <!-- KOSZTORYSY -->
+        <div class="doc-section" id="kosztorysy">
+          <span class="tag">Kosztorysy</span>
+          <h2>Kosztorysy</h2>
+
+          <h3>Tworzenie kosztorysu</h3>
+          <ol>
+            <li>W głównym panelu aplikacji znajduje się sekcja kosztorysowania</li>
+            <li>Kliknij „Dodaj pozycję" — wybierz z cennika lub dodaj własną</li>
+            <li>Ustaw ilości (m², mb, szt., roboczogodziny)</li>
+            <li>System automatycznie wyliczy wartości netto, VAT i brutto</li>
+            <li>Kliknij „Generuj PDF" aby pobrać kosztorys</li>
+          </ol>
+
+          <h3>Cennik</h3>
+          <p>LoftDesk zawiera domyślny cennik typowych prac budowlanych i wykończeniowych. Możesz go dowolnie modyfikować — dodawać, edytować i usuwać pozycje. Kliknij „Cennik" w aplikacji.</p>
+
+          <div class="warning">
+            ⚠️ <strong>Ważne:</strong> Domyślne stawki cennikowe są wartościami sugerowanymi przez LoftDesk i mogą nie odzwierciedlać aktualnych cen rynkowych w Twoim regionie. <strong>LoftDesk nie gwarantuje aktualności ani poprawności domyślnych stawek.</strong> Użytkownik zobowiązany jest do weryfikacji i dostosowania cen przed przekazaniem kosztorysu klientowi.
+          </div>
+        </div>
+
+        <!-- UMOWY -->
+        <div class="doc-section" id="umowy">
+          <span class="tag">Umowy</span>
+          <h2>Umowy</h2>
+
+          <h3>Tworzenie umowy</h3>
+          <ol>
+            <li>Kliknij „Umowy" → „Nowa umowa"</li>
+            <li>Wybierz kontrahenta</li>
+            <li>Uzupełnij: przedmiot umowy, zakres prac, termin realizacji, wartość i harmonogram płatności</li>
+            <li>Kliknij „Utwórz umowę" — PDF zostanie automatycznie wygenerowany</li>
+          </ol>
+
+          <div class="warning">
+            ⚠️ <strong>Ważne — odpowiedzialność prawna:</strong> <strong>LoftDesk nie świadczy usług prawnych.</strong> Szablony umów są narzędziem pomocniczym przygotowanym przez LoftDesk dla firm budowlanych. Użytkownik jest zobowiązany do weryfikacji treści umowy przez radcę prawnego lub adwokata przed jej podpisaniem — szczególnie w przypadku umów o znacznej wartości. <strong>LoftDesk nie ponosi odpowiedzialności za skutki prawne wynikające z zastosowania wygenerowanych umów.</strong>
+          </div>
+
+          <h3>Historia umów</h3>
+          <p>Wystawione umowy dostępne są w zakładce „Umowy". Możesz je przeglądać, oznaczać jako podpisane i ponownie generować PDF.</p>
+        </div>
+
+        <!-- PDF -->
+        <div class="doc-section" id="pdf">
+          <span class="tag">PDF</span>
+          <h2>Generowanie PDF</h2>
+
+          <p>PDF generowany jest bezpośrednio w przeglądarce — nie wymaga dodatkowych wtyczek ani programów. Kliknięcie „Generuj PDF" uruchamia pobieranie pliku na Twój komputer.</p>
+
+          <h3>Co zawiera PDF?</h3>
+          <ul>
+            <li>Dane Twojej firmy (z ustawień konta)</li>
+            <li>Logo firmy (jeśli wgrane)</li>
+            <li>Dane kontrahenta</li>
+            <li>Pozycje dokumentu z wartościami netto, VAT, brutto</li>
+            <li>Numer dokumentu, daty, termin płatności</li>
+            <li>IBAN do płatności (faktury)</li>
+          </ul>
+
+          <h3>Problemy z PDF</h3>
+          <p>Jeśli PDF wygląda nieprawidłowo — sprawdź czy wszystkie dane firmy są uzupełnione. Jeśli problem nadal występuje, napisz na <strong>support@loftdesk.pl</strong> dołączając screenshot.</p>
+
+          <div class="note">💡 PDF generowany jest na podstawie danych wprowadzonych przez użytkownika. LoftDesk nie weryfikuje poprawności merytorycznej treści dokumentów.</div>
+        </div>
+
+        <!-- BACKUP -->
+        <div class="doc-section" id="backup">
+          <span class="tag">Backup</span>
+          <h2>Backup i eksport danych</h2>
+
+          <h3>Eksport ręczny (wszystkie plany)</h3>
+          <p>Kliknij „Zapisz do pliku" w nagłówku aplikacji. Pobierzesz plik JSON ze wszystkimi danymi: firmą, kontrahentami, fakturami, umowami, kosztorysami. Plik zapisywany jest lokalnie na Twoim komputerze.</p>
+
+          <h3>Import danych</h3>
+          <p>Kliknij „Import danych" → wybierz wcześniej zapisany plik JSON. Dane zostaną wczytane do aplikacji. <strong>Uwaga: import zastępuje aktualne dane w aplikacji.</strong></p>
+
+          <h3>Backup chmurowy (Plan Pro i Business)</h3>
+          <p>Automatyczne kopie zapasowe w chmurze. Dostęp do historii kopii przez przycisk „Import z chmury".</p>
+
+          <div class="warning">
+            ⚠️ <strong>Zalecenie:</strong> Regularnie wykonuj eksport danych na swój komputer — szczególnie przed aktualizacjami lub zmianą planu. LoftDesk dokłada starań aby zapewnić bezpieczeństwo danych, jednak <strong>nie gwarantuje 100% dostępności usługi w każdym momencie.</strong> Użytkownik jest odpowiedzialny za posiadanie lokalnych kopii zapasowych ważnych dokumentów.
+          </div>
+        </div>
+
+        <!-- PLANY -->
+        <div class="doc-section" id="plany">
+          <span class="tag">Plany</span>
+          <h2>Plany i limity</h2>
+
+          <table style="width:100%; border-collapse:collapse; font-size:0.9rem; margin-top:8px;">
+            <thead>
+              <tr style="background:#f8fafc;">
+                <th style="padding:10px 12px; text-align:left; border:1px solid #e2e8f0;">Funkcja</th>
+                <th style="padding:10px 12px; text-align:center; border:1px solid #e2e8f0;">Free</th>
+                <th style="padding:10px 12px; text-align:center; border:1px solid #e2e8f0; color:#dc2626;">Pro</th>
+                <th style="padding:10px 12px; text-align:center; border:1px solid #e2e8f0;">Business</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:9px 12px; border:1px solid #e2e8f0;">Faktury / miesiąc</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0;">5</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0; color:#dc2626;">∞</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0;">∞</td>
+              </tr>
+              <tr style="background:#f8fafc;">
+                <td style="padding:9px 12px; border:1px solid #e2e8f0;">Umowy / miesiąc</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0;">3</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0; color:#dc2626;">∞</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0;">∞</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 12px; border:1px solid #e2e8f0;">Kontrahenci</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0;">10</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0; color:#dc2626;">∞</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0;">∞</td>
+              </tr>
+              <tr style="background:#f8fafc;">
+                <td style="padding:9px 12px; border:1px solid #e2e8f0;">Backup chmurowy</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0;">❌</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0; color:#dc2626;">✅</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0;">✅</td>
+              </tr>
+              <tr>
+                <td style="padding:9px 12px; border:1px solid #e2e8f0;">Cena netto / mies.</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0;">0 zł</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0; color:#dc2626;">29 zł</td>
+                <td style="padding:9px 12px; text-align:center; border:1px solid #e2e8f0;">99 zł</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top:12px; font-size:0.85rem; color:#64748b;">Aktualny cennik zawsze dostępny na <a href="/#cennik">loftdesk.pl/#cennik</a>. LoftDesk zastrzega prawo do zmiany cen z zachowaniem procedury opisanej w Regulaminie.</p>
+        </div>
+
+        <!-- BEZPIECZEŃSTWO -->
+        <div class="doc-section" id="bezpieczenstwo">
+          <span class="tag">Bezpieczeństwo</span>
+          <h2>Bezpieczeństwo danych</h2>
+
+          <ul>
+            <li>🔒 Szyfrowanie transmisji — protokół <strong>HTTPS / TLS</strong></li>
+            <li>🔒 Szyfrowanie danych w spoczynku w infrastrukturze chmurowej</li>
+            <li>🔒 Hasła przechowywane wyłącznie jako <strong>kryptograficzny hash</strong> — nigdy w postaci jawnej</li>
+            <li>🔒 Izolacja danych per konto — każdy użytkownik widzi wyłącznie swoje dane</li>
+            <li>🔒 Automatyczne kopie zapasowe w redundantnych lokalizacjach</li>
+            <li>🔒 Procedura reagowania na naruszenia — zgłoszenie do UODO w ciągu 72 h (art. 33 RODO)</li>
+          </ul>
+
+          <p>Szczegółowe informacje o ochronie danych osobowych dostępne są w <a href="/polityka-prywatnosci">Polityce Prywatności</a> i <a href="/rodo">dokumentacji RODO</a>.</p>
+        </div>
+
+        <!-- OGRANICZENIA -->
+        <div class="doc-section" id="ograniczenia">
+          <span class="tag">Ważne</span>
+          <h2>Ograniczenia odpowiedzialności — przeczytaj</h2>
+
+          <div class="warning" style="margin-top:0;">
+            <p><strong>LoftDesk jest narzędziem do tworzenia dokumentów — nie jest:</strong></p>
+            <ul style="margin: 8px 0 0 16px; color:#92400e;">
+              <li>biurem rachunkowym ani doradcą podatkowym</li>
+              <li>kancelarią prawną ani doradcą prawnym</li>
+              <li>systemem księgowym</li>
+            </ul>
+          </div>
+
+          <h3>Odpowiedzialność użytkownika</h3>
+          <ul>
+            <li>Użytkownik ponosi wyłączną odpowiedzialność za poprawność danych wprowadzonych do systemu.</li>
+            <li>Użytkownik zobowiązany jest do weryfikacji wygenerowanych dokumentów przed ich przekazaniem klientom lub organom podatkowym.</li>
+            <li>Użytkownik odpowiada za zgodność wystawianych faktur z aktualnymi przepisami podatkowymi.</li>
+            <li>Użytkownik odpowiada za weryfikację treści umów przez prawnika przed ich podpisaniem.</li>
+            <li>Użytkownik odpowiada za posiadanie właściwej podstawy prawnej do przetwarzania danych kontrahentów.</li>
+          </ul>
+
+          <h3>Odpowiedzialność LoftDesk</h3>
+          <p>Łączna odpowiedzialność LoftDesk wobec użytkownika niebędącego konsumentem jest ograniczona do kwoty opłat uiszczonych w ciągu ostatnich 12 miesięcy. LoftDesk nie ponosi odpowiedzialności za szkody pośrednie ani utracone korzyści. Szczegóły w <a href="/regulamin">Regulaminie</a> (§ 9).</p>
+
+          <div class="note">
+            Korzystając z LoftDesk potwierdzasz zapoznanie się z <a href="/regulamin">Regulaminem</a>, <a href="/polityka-prywatnosci">Polityką Prywatności</a> i <a href="/rodo">dokumentacją RODO</a>.
+          </div>
+        </div>
+
+        <!-- KONTAKT -->
+        <div class="doc-section" id="kontakt">
+          <span class="tag">Kontakt</span>
+          <h2>Kontakt i wsparcie</h2>
+
+          <p>📧 <strong>Wsparcie techniczne:</strong> support@loftdesk.pl</p>
+          <p>📧 <strong>Kwestie ogólne i prawne:</strong> kontakt@loftdesk.pl</p>
+          <p>🕐 <strong>Czas odpowiedzi:</strong> 1–2 dni robocze (Free) | do 24 h (Pro) | priorytetowo (Business)</p>
+
+          <hr class="doc-hr"/>
+          <p>Przed napisaniem do wsparcia sprawdź <a href="/faq">FAQ</a> — być może Twoje pytanie jest już tam opisane.</p>
+
+          <p style="margin-top: 16px; font-size:0.85rem; color:#94a3b8;">Dokumentacja aktualna na dzień: 21 lutego 2026 r. | Wersja 1.0</p>
+        </div>
+
       </div>
 
-      <div style="margin-top: 28px; text-align:center;">
+      <div style="margin-top: 28px; text-align:center; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
         <a class="btn-primary btn-large" href="/app">Otwórz aplikację</a>
-        <a class="btn-secondary btn-large" href="/faq" style="margin-left: 8px;">FAQ</a>
+        <a class="btn-secondary btn-large" href="/faq">FAQ</a>
       </div>
     </div>
   </section>
 
   <footer class="footer">
     <div class="container">
+      <div class="footer-content">
+        <div class="footer-column footer-column-brand">
+          <div class="footer-logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="#dc2626"/>
+              <path d="M8 12h16v2H8v-2zm0 4h16v2H8v-2zm0 4h10v2H8v-2z" fill="white"/>
+            </svg>
+            <span>LoftDesk</span>
+          </div>
+          <p>System fakturowania dla firm budowlanych</p>
+        </div>
+        <div class="footer-column">
+          <h4>Produkt</h4>
+          <div class="footer-links">
+            <a href="/#funkcje">Funkcje</a>
+            <a href="/#cennik">Cennik</a>
+            <a href="/login">Zaloguj się</a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h4>Wsparcie</h4>
+          <div class="footer-links">
+            <a href="mailto:support@loftdesk.pl">Kontakt</a>
+            <a href="/faq">FAQ</a>
+            <a href="/docs">Dokumentacja</a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h4>Prawne</h4>
+          <div class="footer-links">
+            <a href="/regulamin">Regulamin</a>
+            <a href="/polityka-prywatnosci">Polityka prywatności</a>
+            <a href="/rodo">RODO</a>
+          </div>
+        </div>
+      </div>
       <div class="footer-bottom">
         <p>&copy; 2026 LoftDesk. Wszystkie prawa zastrzeżone.</p>
       </div>
