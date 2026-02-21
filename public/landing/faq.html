@@ -6,6 +6,28 @@
   <title>FAQ — LoftDesk</title>
   <meta name="description" content="Najczęstsze pytania o LoftDesk — faktury, kosztorysy, umowy, PDF, konto i bezpieczeństwo." />
   <link rel="stylesheet" href="/landing/style.css" />
+  <style>
+    .faq-wrap { max-width: 860px; margin: 0 auto; }
+    .faq-section { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.07); padding: 36px 40px; margin-bottom: 24px; line-height: 1.75; }
+    .faq-section h2 { font-size: 1.2rem; font-weight: 700; color: #1e3a5f; margin: 0 0 20px; border-left: 4px solid #dc2626; padding-left: 12px; }
+    .faq-item { border-bottom: 1px solid #e2e8f0; padding: 18px 0; }
+    .faq-item:first-child { padding-top: 0; }
+    .faq-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .faq-question { font-weight: 700; color: #0f172a; font-size: 0.97rem; margin-bottom: 8px; display: flex; gap: 10px; }
+    .faq-question::before { content: "Q"; background: #dc2626; color: white; border-radius: 6px; font-size: 0.75rem; padding: 2px 7px; font-weight: 900; flex-shrink: 0; line-height: 1.8; }
+    .faq-answer { color: #334155; font-size: 0.9rem; line-height: 1.7; padding-left: 28px; }
+    .faq-answer a { color: #2e5fac; text-decoration: underline; }
+    .faq-answer strong { color: #1e293b; }
+    .tag { display: inline-block; background: #fef2f2; color: #dc2626; border-radius: 6px; font-size: 0.78rem; font-weight: 600; padding: 2px 8px; margin-bottom: 10px; }
+    .toc { background: #f8fafc; border-radius: 10px; padding: 20px 28px; margin-bottom: 28px; }
+    .toc h2 { font-size: 1rem; font-weight: 700; color: #1e3a5f; margin: 0 0 10px; }
+    .toc ol { margin: 0; padding-left: 20px; }
+    .toc ol li { margin-bottom: 4px; }
+    .toc ol li a { color: #2e5fac; text-decoration: none; font-size: 0.9rem; }
+    .toc ol li a:hover { text-decoration: underline; }
+    .note { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; font-size: 0.88rem; color: #64748b; margin-top: 16px; }
+    @media (max-width: 600px) { .faq-section { padding: 20px 18px; } }
+  </style>
 </head>
 <body>
   <nav class="navbar">
@@ -28,49 +50,323 @@
     </div>
   </nav>
 
-  <section class="features" style="padding-top: 110px;">
+  <section class="features" style="padding-top:110px; padding-bottom:60px;">
     <div class="container">
       <div class="section-header">
-        <h1 class="section-title">FAQ</h1>
-        <p class="section-subtitle">Najczęstsze pytania — krótko i konkretnie.</p>
+        <h1 class="section-title">FAQ — Najczęstsze pytania</h1>
+        <p class="section-subtitle">Odpowiedzi na pytania dotyczące konta, dokumentów, płatności i bezpieczeństwa.</p>
       </div>
 
-      <div class="features-grid" style="grid-template-columns: 1fr; gap: 12px;">
-        <div class="feature-card">
-          <h3>Czy LoftDesk jest darmowy?</h3>
-          <p>Tak — plan Free ma limity. Jeśli potrzebujesz nielimitowanych dokumentów, wybierasz Pro/Business.</p>
+      <div class="faq-wrap">
+
+        <div class="toc">
+          <h2>📋 Kategorie pytań</h2>
+          <ol>
+            <li><a href="#konto">Konto i rejestracja</a></li>
+            <li><a href="#plany">Plany i płatności</a></li>
+            <li><a href="#faktury">Faktury</a></li>
+            <li><a href="#umowy">Umowy i kosztorysy</a></li>
+            <li><a href="#pdf">Generowanie PDF</a></li>
+            <li><a href="#dane">Dane i bezpieczeństwo</a></li>
+            <li><a href="#prawne">Kwestie prawne i podatkowe</a></li>
+            <li><a href="#wsparcie">Wsparcie techniczne</a></li>
+          </ol>
         </div>
-        <div class="feature-card">
-          <h3>Czy muszę mieć kartę kredytową?</h3>
-          <p>Nie. Możesz zacząć w planie Free lub w okresie testowym bez podpinania karty (jeśli tak ustawisz).</p>
+
+        <!-- KONTO -->
+        <div class="faq-section" id="konto">
+          <span class="tag">Konto i rejestracja</span>
+          <h2>Konto i rejestracja</h2>
+
+          <div class="faq-item">
+            <div class="faq-question">Jak założyć konto w LoftDesk?</div>
+            <div class="faq-answer">Wejdź na <a href="/register">loftdesk.pl/register</a>, podaj adres e-mail i hasło. Konto jest aktywne natychmiast. Jeśli potwierdzanie e-mailem jest włączone — kliknij link w wiadomości.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Nie dostałem maila potwierdzającego rejestrację — co robić?</div>
+            <div class="faq-answer">Sprawdź folder spam/oferty/promocje. Jeśli potwierdzanie e-mailem jest wyłączone, konto działa od razu i mail może nie przyjść. Napisz na <strong>support@loftdesk.pl</strong> jeśli problem nadal występuje.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy mogę mieć kilka kont?</div>
+            <div class="faq-answer">Każde konto jest przypisane do jednego adresu e-mail. Udostępnianie konta innym osobom jest niezgodne z Regulaminem (z wyjątkiem Planu Business, który może obejmować wielu użytkowników).</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Jak zmienić hasło?</div>
+            <div class="faq-answer">W ustawieniach konta lub przez opcję „Zapomniałem hasła" na stronie logowania. Link resetujący jest ważny 24 godziny.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Jak usunąć konto?</div>
+            <div class="faq-answer">Wyślij prośbę na <strong>support@loftdesk.pl</strong>. Dane zostaną usunięte w ciągu 30 dni, z wyjątkiem danych wymaganych przepisami prawa (np. dane do faktur przez 5 lat). Szczegóły w <a href="/polityka-prywatnosci">Polityce Prywatności</a>.</div>
+          </div>
         </div>
-        <div class="feature-card">
-          <h3>Czy dokumenty są zgodne z wymogami?</h3>
-          <p>Szablony są przygotowane pod typowe potrzeby firm budowlanych. Jeśli masz wymagania “pod urząd” lub księgowość — dopasujemy treści.</p>
+
+        <!-- PLANY -->
+        <div class="faq-section" id="plany">
+          <span class="tag">Plany i płatności</span>
+          <h2>Plany i płatności</h2>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy LoftDesk jest darmowy?</div>
+            <div class="faq-answer">Plan Free jest dostępny bezpłatnie i nie wymaga karty kredytowej. Obejmuje: 5 faktur/mies., 3 umowy/mies., 10 kontrahentów. Plany Pro i Business są płatne i oferują dostęp nielimitowany.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy muszę podać kartę kredytową przy rejestracji?</div>
+            <div class="faq-answer">Nie. Plan Free nie wymaga danych płatniczych. Karta jest wymagana dopiero przy przejściu na Plan Pro lub Business.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Jak działa okres próbny?</div>
+            <div class="faq-answer">Plany płatne dostępne są z 14-dniowym bezpłatnym okresem próbnym. Karta nie zostanie obciążona przed jego końcem. Brak anulowania = automatyczne przejście na wybrany plan płatny.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Kiedy i jak naliczane są opłaty?</div>
+            <div class="faq-answer">Opłaty naliczane są z góry na początku każdego okresu rozliczeniowego (miesięcznego lub rocznego). Płatności realizowane są przez zewnętrznego operatora — LoftDesk nie przechowuje danych kart płatniczych.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy mogę zrezygnować w dowolnym momencie?</div>
+            <div class="faq-answer">Tak. Możesz anulować subskrypcję w dowolnym momencie. Dostęp do płatnego planu trwa do końca opłaconego okresu. Opłata za bieżący okres nie podlega zwrotowi, chyba że przepisy prawa stanowią inaczej (np. prawo odstąpienia konsumenta w ciągu 14 dni).</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy wystawiacie faktury VAT za subskrypcję?</div>
+            <div class="faq-answer">Tak. Faktury VAT wystawiane są elektronicznie i przesyłane na adres e-mail podany przy rejestracji. Aby faktura zawierała dane firmowe, uzupełnij NIP i adres w ustawieniach konta.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Co się stanie z moimi danymi po wygaśnięciu subskrypcji?</div>
+            <div class="faq-answer">Po wygaśnięciu subskrypcji konto przechodzi na plan Free (z limitami) lub zostaje zawieszone. Dane są przechowywane przez 30 dni od zamknięcia konta, po czym mogą zostać usunięte. Zalecamy eksport danych przed zamknięciem konta.</div>
+          </div>
         </div>
-        <div class="feature-card">
-          <h3>Czy mogę dodać logo i dane firmy?</h3>
-          <p>Tak — branding w PDF jest dostępny. Logo i dane firmy trafiają do stopki dokumentów.</p>
+
+        <!-- FAKTURY -->
+        <div class="faq-section" id="faktury">
+          <span class="tag">Faktury</span>
+          <h2>Faktury</h2>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy faktury generowane przez LoftDesk są zgodne z prawem?</div>
+            <div class="faq-answer">LoftDesk dostarcza narzędzie do tworzenia dokumentów — <strong>nie jest biurem rachunkowym ani doradcą podatkowym</strong>. Szablony są przygotowane zgodnie z typowymi wymogami polskiego prawa podatkowego (ustawa o VAT), jednak użytkownik ponosi wyłączną odpowiedzialność za poprawność danych i zgodność z przepisami. W razie wątpliwości skonsultuj się z księgowym.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy mogę wystawiać faktury bez VAT (dla firm zwolnionych)?</div>
+            <div class="faq-answer">Tak. Możesz wybrać stawkę VAT 0% lub „zw." przy tworzeniu faktury. Odpowiedzialność za prawidłowe zastosowanie zwolnienia spoczywa na użytkowniku.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Jak działa numeracja faktur?</div>
+            <div class="faq-answer">Numeracja jest automatyczna i ciągła w ramach roku kalendarzowego. Możesz ustawić własny format numeru. Użytkownik odpowiada za zachowanie ciągłości numeracji zgodnie z wymogami podatkowymi.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy mogę edytować wystawioną fakturę?</div>
+            <div class="faq-answer">Wystawione i zapisane faktury można przeglądać i pobierać jako PDF. Korektę faktury należy wystawić jako oddzielny dokument korygujący zgodnie z przepisami podatkowymi.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Co to jest KSeF i czy LoftDesk go obsługuje?</div>
+            <div class="faq-answer">KSeF (Krajowy System e-Faktur) to system Ministerstwa Finansów do wymiany faktur elektronicznych. LoftDesk posiada funkcję integracji z KSeF. LoftDesk nie ponosi odpowiedzialności za niedostępność systemu KSeF po stronie Ministerstwa Finansów.</div>
+          </div>
         </div>
-        <div class="feature-card">
-          <h3>Czy dane są bezpieczne?</h3>
-          <p>Tak — dostęp do danych jest per konto/tenant. Każdy użytkownik widzi tylko swoje dane.</p>
+
+        <!-- UMOWY I KOSZTORYSY -->
+        <div class="faq-section" id="umowy">
+          <span class="tag">Umowy i kosztorysy</span>
+          <h2>Umowy i kosztorysy</h2>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy umowy generowane przez LoftDesk mają moc prawną?</div>
+            <div class="faq-answer"><strong>LoftDesk dostarcza szablony umów — nie świadczy usług prawnych.</strong> Szablony są przygotowane przez LoftDesk jako narzędzie pomocnicze dla firm budowlanych. Użytkownik jest zobowiązany do weryfikacji treści umowy przez radcę prawnego lub adwokata przed jej podpisaniem. LoftDesk nie ponosi odpowiedzialności za skutki prawne wynikające z zastosowania wygenerowanych umów.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy mogę edytować treść szablonu umowy?</div>
+            <div class="faq-answer">Tak. Pola szablonu są edytowalne. Użytkownik odpowiada za ostateczną treść dokumentu.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy kosztorysy są wiążące dla klienta?</div>
+            <div class="faq-answer">Kosztorys wygenerowany przez LoftDesk jest dokumentem pomocniczym — narzędziem wyceny. Jego wiążący charakter zależy od sposobu przedstawienia klientowi i treści umowy między stronami. LoftDesk nie ponosi odpowiedzialności za spory wynikłe ze stosowania kosztorysów.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Skąd pochodzą stawki w cenniku?</div>
+            <div class="faq-answer">Stawki w cenniku są domyślnymi wartościami sugerowanymi przez LoftDesk na podstawie typowych rynkowych stawek w branży budowlanej. Użytkownik może je dowolnie modyfikować. <strong>LoftDesk nie gwarantuje aktualności ani rynkowej poprawności domyślnych stawek.</strong></div>
+          </div>
         </div>
-        <div class="feature-card">
-          <h3>Nie dostałem maila potwierdzającego rejestrację — co robić?</h3>
-          <p>Sprawdź spam/oferty. Jeśli potwierdzanie maila jest wyłączone, konto działa od razu i mail nie przychodzi.</p>
+
+        <!-- PDF -->
+        <div class="faq-section" id="pdf">
+          <span class="tag">Generowanie PDF</span>
+          <h2>Generowanie PDF</h2>
+
+          <div class="faq-item">
+            <div class="faq-question">Jak wygenerować PDF?</div>
+            <div class="faq-answer">Po wypełnieniu dokumentu (faktury, umowy lub kosztorysu) kliknij przycisk „Generuj PDF". Plik zostanie automatycznie pobrany na Twój komputer.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy PDF zawiera moje logo i dane firmy?</div>
+            <div class="faq-answer">Tak — logo i dane firmy (nazwa, adres, NIP, IBAN) trafiają do nagłówka/stopki dokumentu, pod warunkiem że zostały uzupełnione w ustawieniach konta.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy mogę wysłać PDF bezpośrednio do klienta?</div>
+            <div class="faq-answer">LoftDesk generuje plik PDF do pobrania. Wysyłka do klienta odbywa się przez Twój własny program pocztowy — LoftDesk nie wysyła e-maili w Twoim imieniu (poza funkcjami automatyzacji w wyższych planach).</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">PDF wygląda inaczej niż oczekiwałem — co robić?</div>
+            <div class="faq-answer">Upewnij się że dane firmy i logo są prawidłowo uzupełnione. Jeśli problem nadal wystąpi — opisz go i prześlij screenshot na <strong>support@loftdesk.pl</strong>.</div>
+          </div>
         </div>
+
+        <!-- DANE I BEZPIECZEŃSTWO -->
+        <div class="faq-section" id="dane">
+          <span class="tag">Dane i bezpieczeństwo</span>
+          <h2>Dane i bezpieczeństwo</h2>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy moje dane są bezpieczne?</div>
+            <div class="faq-answer">Tak. LoftDesk stosuje: szyfrowanie HTTPS/TLS, szyfrowanie danych w spoczynku, hasła przechowywane jako kryptograficzny hash, automatyczne kopie zapasowe. Każdy użytkownik widzi wyłącznie własne dane (izolacja per konto).</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy LoftDesk sprzedaje moje dane?</div>
+            <div class="faq-answer"><strong>Nie.</strong> LoftDesk nigdy nie sprzedaje danych użytkowników brokerom danych ani firmom reklamowym. Szczegóły w <a href="/polityka-prywatnosci">Polityce Prywatności</a>.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Jak wykonać kopię zapasową danych?</div>
+            <div class="faq-answer">W panelu aplikacji dostępna jest funkcja eksportu danych (plik JSON). Plan Pro i Business oferują automatyczny backup chmurowy. Zalecamy regularne wykonywanie eksportów.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Co się dzieje z danymi moich kontrahentów w systemie?</div>
+            <div class="faq-answer">Dane kontrahentów, które wprowadzasz do systemu, przetwarzane są przez LoftDesk jako podmiot przetwarzający (procesor) wyłącznie w celu świadczenia usług. Ty jako użytkownik jesteś administratorem tych danych i odpowiadasz za posiadanie właściwej podstawy prawnej do ich przetwarzania. Szczegóły w <a href="/rodo">dokumentacji RODO</a>.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Gdzie są przechowywane moje dane?</div>
+            <div class="faq-answer">Dane przechowywane są na serwerach w infrastrukturze chmurowej (Supabase). Szczegółowe informacje o lokalizacji serwerów i certyfikatach bezpieczeństwa dostępne są na żądanie pod adresem <strong>kontakt@loftdesk.pl</strong>.</div>
+          </div>
+        </div>
+
+        <!-- PRAWNE -->
+        <div class="faq-section" id="prawne">
+          <span class="tag">Kwestie prawne i podatkowe</span>
+          <h2>Kwestie prawne i podatkowe</h2>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy LoftDesk zastępuje księgowość?</div>
+            <div class="faq-answer"><strong>Nie.</strong> LoftDesk jest narzędziem do tworzenia dokumentów — nie świadczy usług księgowych, podatkowych ani prawnych. Użytkownik zobowiązany jest do współpracy z księgowym lub biurem rachunkowym w zakresie rozliczeń podatkowych.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Kto odpowiada za poprawność wystawionych dokumentów?</div>
+            <div class="faq-answer"><strong>Wyłącznie użytkownik.</strong> LoftDesk dostarcza narzędzie — użytkownik weryfikuje i zatwierdza treść każdego dokumentu przed jego przekazaniem klientowi lub organom podatkowym. LoftDesk nie ponosi odpowiedzialności za błędy merytoryczne w dokumentach.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy mogę skorzystać z AI Asystenta do tworzenia ofert?</div>
+            <div class="faq-answer">Tak. AI Asystent generuje propozycje ofert i wycen na podstawie notatek. <strong>Treści generowane przez AI stanowią wyłącznie pomoc — nie zastępują wiedzy eksperckiej użytkownika.</strong> Użytkownik odpowiada za ostateczną treść dokumentu i poprawność wyceny.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Jakie prawo reguluje korzystanie z LoftDesk?</div>
+            <div class="faq-answer">Prawo polskie. Szczegóły w <a href="/regulamin">Regulaminie</a> (§ 14).</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Co zrobić w przypadku sporu z LoftDesk?</div>
+            <div class="faq-answer">Najpierw skontaktuj się z nami na <strong>kontakt@loftdesk.pl</strong> — staramy się rozwiązywać sprawy polubownie. Konsumenci mogą skorzystać z platformy ODR (ec.europa.eu/consumers/odr) lub rzecznika praw konsumentów. Szczegóły w <a href="/regulamin">Regulaminie</a> (§ 10).</div>
+          </div>
+        </div>
+
+        <!-- WSPARCIE -->
+        <div class="faq-section" id="wsparcie">
+          <span class="tag">Wsparcie techniczne</span>
+          <h2>Wsparcie techniczne</h2>
+
+          <div class="faq-item">
+            <div class="faq-question">Jak skontaktować się ze wsparciem?</div>
+            <div class="faq-answer">📧 <strong>support@loftdesk.pl</strong> — odpowiadamy w ciągu 1-2 dni roboczych (Plan Free), do 24 h (Plan Pro), priorytetowo (Plan Business).</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Aplikacja nie działa — co robić?</div>
+            <div class="faq-answer">Spróbuj odświeżyć stronę (Ctrl+Shift+R). Wyczyść cache przeglądarki. Sprawdź czy problem nie dotyczy Twojej sieci. Jeśli problem nadal wystąpi — napisz na support@loftdesk.pl z opisem problemu i screenshotem.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Czy LoftDesk działa na telefonie?</div>
+            <div class="faq-answer">LoftDesk jest aplikacją webową dostępną przez przeglądarkę. Działa na urządzeniach mobilnych, choć interfejs jest zoptymalizowany pod ekrany komputerowe.</div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">Gdzie zgłosić błąd lub zaproponować nową funkcję?</div>
+            <div class="faq-answer">Napisz na <strong>kontakt@loftdesk.pl</strong>. Chętnie słuchamy opinii użytkowników — wiele funkcji LoftDesk powstało na ich prośbę.</div>
+          </div>
+
+          <div class="note">
+            Nie znalazłeś odpowiedzi na swoje pytanie? Napisz do nas: <strong>support@loftdesk.pl</strong> lub sprawdź <a href="/docs" style="color:#2e5fac;">Dokumentację</a>.
+          </div>
+        </div>
+
       </div>
 
-      <div style="margin-top: 28px; text-align:center;">
-        <a class="btn-primary btn-large" href="/register">Załóż konto</a>
-        <a class="btn-secondary btn-large" href="/" style="margin-left: 8px;">Wróć na landing</a>
+      <div style="margin-top: 28px; text-align:center; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a class="btn-primary btn-large" href="/register">Załóż konto za darmo</a>
+        <a class="btn-secondary btn-large" href="/docs">Dokumentacja</a>
       </div>
     </div>
   </section>
 
   <footer class="footer">
     <div class="container">
+      <div class="footer-content">
+        <div class="footer-column footer-column-brand">
+          <div class="footer-logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="#dc2626"/>
+              <path d="M8 12h16v2H8v-2zm0 4h16v2H8v-2zm0 4h10v2H8v-2z" fill="white"/>
+            </svg>
+            <span>LoftDesk</span>
+          </div>
+          <p>System fakturowania dla firm budowlanych</p>
+        </div>
+        <div class="footer-column">
+          <h4>Produkt</h4>
+          <div class="footer-links">
+            <a href="/#funkcje">Funkcje</a>
+            <a href="/#cennik">Cennik</a>
+            <a href="/login">Zaloguj się</a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h4>Wsparcie</h4>
+          <div class="footer-links">
+            <a href="mailto:support@loftdesk.pl">Kontakt</a>
+            <a href="/faq">FAQ</a>
+            <a href="/docs">Dokumentacja</a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h4>Prawne</h4>
+          <div class="footer-links">
+            <a href="/regulamin">Regulamin</a>
+            <a href="/polityka-prywatnosci">Polityka prywatności</a>
+            <a href="/rodo">RODO</a>
+          </div>
+        </div>
+      </div>
       <div class="footer-bottom">
         <p>&copy; 2026 LoftDesk. Wszystkie prawa zastrzeżone.</p>
       </div>
