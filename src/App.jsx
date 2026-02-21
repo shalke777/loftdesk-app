@@ -24,7 +24,7 @@ import { supabase } from "./lib/supabase";
 import { saveBackupToDb } from "./lib/backup";
 import { fetchUserPlan } from "./lib/plan";
 import { startCheckout } from "./lib/stripeCheckout";
-import ProjectModal, { ProjectList } from './components/projects/ProjectModal';
+import ProjectModal from './components/projects/ProjectModal';
 import ErrorBoundary from "./ErrorBoundary";
 import AuthPage from "./AuthPage";
 import { 

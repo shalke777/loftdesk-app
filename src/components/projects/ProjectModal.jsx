@@ -3,10 +3,11 @@
 // Wersja: MVP 1.0
 
 import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useProject, useProjects } from './useProjects';
 import {
   PROJECT_STATUS, TASK_STATUS, PROJECT_PRIORITY,
-  PROJECT_STATUS_TRANSITIONS, getAvailableProjectStatuses,
+  getAvailableProjectStatuses,
   validateProject, validateMilestone, validateTask,
   emptyProject, emptyTask, emptyMilestone,
   calcProjectProgress, calcProjectBudgetStatus, calcDaysLeft,
@@ -785,8 +786,7 @@ export default function ProjectModal({ projectId, onClose, onProjectSaved, contr
   const [activeTab, setActiveTab] = useState('summary');
   const [editingProject, setEditingProject] = useState(!projectId);
 
-  const {
-    project, milestones, tasks, members, activityLog,
+  const { project, milestones, tasks, members: _members, activityLog,
     loading, error, saving,
     saveProject, changeProjectStatus, archiveProject,
     saveMilestone, deleteMilestone,
@@ -975,7 +975,7 @@ export default function ProjectModal({ projectId, onClose, onProjectSaved, contr
 // ============================================================
 export function ProjectList({ onOpenProject, onNewProject }) {
   const [filters, setFilters] = useState({});
-  const { projects, loading, error, refetch } = useProjects(filters);
+  const { projects, loading, error, refetch :_refetch } = useProjects(filters);
 
   if (loading) return <div style={{ textAlign: 'center', padding: 40, color: '#94a3b8' }}>Ładowanie...</div>;
   if (error)   return <div style={{ color: '#dc2626', padding: 16 }}>Błąd: {error}</div>;
