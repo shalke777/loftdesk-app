@@ -1,224 +1,330 @@
-# INTEGRACJA MODUŁU PROJEKTY — LoftDesk
-# Dokument: gdzie co wkleić, co zmienić — minimalna praca z Twojej strony
+// src/components/projects/projectValidation.js
+// Walidacja i logika statusów dla modułu Projekty
 
-## ═══════════════════════════════════════════════════
-## KROK 1: PLIKI DO SKOPIOWANIA (bez zmian)
-## ═══════════════════════════════════════════════════
+// ============================================================
+// STAŁE
+// ============================================================
+export const PROJECT_STATUS = {
+  planned:      { label: 'Planowany',    color: '#64748b', bg: '#f1f5f9' },
+  in_progress:  { label: 'W realizacji', color: '#2563eb', bg: '#eff6ff' },
+  on_hold:      { label: 'Wstrzymany',   color: '#d97706', bg: '#fffbeb' },
+  for_handover: { label: 'Do odbioru',   color: '#7c3aed', bg: '#f5f3ff' },
+  completed:    { label: 'Zakończony',   color: '#16a34a', bg: '#f0fdf4' },
+  cancelled:    { label: 'Anulowany',    color: '#dc2626', bg: '#fef2f2' },
+};
 
-Skopiuj 4 pliki do projektu:
+export const TASK_STATUS = {
+  todo:        { label: 'Do zrobienia', color: '#64748b', bg: '#f1f5f9' },
+  in_progress: { label: 'W trakcie',    color: '#2563eb', bg: '#eff6ff' },
+  blocked:     { label: 'Zablokowane',  color: '#dc2626', bg: '#fef2f2' },
+  for_review:  { label: 'Do odbioru',  color: '#7c3aed', bg: '#f5f3ff' },
+  done:        { label: 'Zrobione',    color: '#16a34a', bg: '#f0fdf4' },
+};
 
-| Plik źródłowy (z downloadu) | Cel w projekcie |
-|---|---|
-| projectValidation.js | src/components/projects/projectValidation.js |
-| useProjects.js | src/components/projects/useProjects.js |
-| ProjectModal.jsx | src/components/projects/ProjectModal.jsx |
-| projects_migration.sql | SUPABASE/migrations/20260221_projects_module.sql |
-| projects.spec.js | tests/projects.spec.js |
+export const PROJECT_PRIORITY = {
+  low:      { label: 'Niski',     color: '#64748b' },
+  medium:   { label: 'Normalny',  color: '#2563eb' },
+  high:     { label: 'Wysoki',    color: '#d97706' },
+  critical: { label: 'Krytyczny', color: '#dc2626' },
+};
 
-Komendy Windows (CMD z folderu loftdesk-app):
-```
-mkdir src\components\projects
-copy projectValidation.js src\components\projects\projectValidation.js
-copy useProjects.js src\components\projects\useProjects.js
-copy ProjectModal.jsx src\components\projects\ProjectModal.jsx
-copy projects_migration.sql SUPABASE\migrations\20260221_projects_module.sql
-copy projects.spec.js tests\projects.spec.js
-```
+export const PROJECT_ROLE = {
+  owner:   { label: 'Właściciel', canEdit: true,  canDelete: true  },
+  manager: { label: 'Kierownik',  canEdit: true,  canDelete: false },
+  member:  { label: 'Członek',    canEdit: false, canDelete: false },
+  viewer:  { label: 'Obserwator', canEdit: false, canDelete: false },
+};
 
-## ═══════════════════════════════════════════════════
-## KROK 2: MIGRACJA SUPABASE
-## ═══════════════════════════════════════════════════
+// Dozwolone przejścia statusów projektu
+export const PROJECT_STATUS_TRANSITIONS = {
+  planned:      ['in_progress', 'cancelled'],
+  in_progress:  ['on_hold', 'for_handover', 'cancelled'],
+  on_hold:      ['in_progress', 'cancelled'],
+  for_handover: ['completed', 'in_progress'],
+  completed:    [],
+  cancelled:    ['planned'],
+};
 
-Otwórz Supabase Dashboard → SQL Editor → wklej zawartość pliku
-SUPABASE/migrations/20260221_projects_module.sql i kliknij RUN.
+// Dozwolone przejścia statusów zadań
+export const TASK_STATUS_TRANSITIONS = {
+  todo:        ['in_progress', 'blocked'],
+  in_progress: ['blocked', 'for_review', 'done'],
+  blocked:     ['todo', 'in_progress'],
+  for_review:  ['in_progress', 'done'],
+  done:        ['in_progress'],
+};
 
-WAŻNE: jeśli tabela `contractors` ma inną nazwę w Twojej bazie,
-zmień w SQL linię:
-  contractor_id UUID REFERENCES contractors(id) ON DELETE SET NULL,
-na właściwą nazwę tabeli.
+// ============================================================
+// WALIDACJA PROJEKTU
+// ============================================================
+export function validateProject(data) {
+  const errors = {};
 
-## ═══════════════════════════════════════════════════
-## KROK 3: ZMIANA W App.js (lub App.jsx)
-## ═══════════════════════════════════════════════════
+  // Nazwa
+  if (!data.name || data.name.trim().length < 2) {
+    errors.name = 'Nazwa projektu musi mieć minimum 2 znaki';
+  } else if (data.name.trim().length > 200) {
+    errors.name = 'Nazwa projektu może mieć maksymalnie 200 znaków';
+  }
 
-Znajdź plik: src/App.js (lub App.jsx)
+  // Kod projektu
+  if (!data.code || data.code.trim().length < 2) {
+    errors.code = 'Kod projektu musi mieć minimum 2 znaki';
+  } else if (data.code.trim().length > 20) {
+    errors.code = 'Kod projektu może mieć maksymalnie 20 znaków';
+  } else if (!/^[A-Z0-9\-_]+$/i.test(data.code.trim())) {
+    errors.code = 'Kod może zawierać tylko litery, cyfry, myślniki i podkreślenia';
+  }
 
-### 3a) Dodaj import na górze pliku:
-```jsx
-import ProjectModal, { ProjectList } from './components/projects/ProjectModal';
-```
+  // Daty
+  if (!data.start_date) {
+    errors.start_date = 'Data rozpoczęcia jest wymagana';
+  }
 
-### 3b) Dodaj state dla modalu projektów:
-W komponencie App (lub tam gdzie masz inne stany modali) dodaj:
-```jsx
-const [showProjects, setShowProjects] = useState(false);
-const [activeProjectId, setActiveProjectId] = useState(null);
-```
+  if (!data.end_date) {
+    errors.end_date = 'Planowana data zakończenia jest wymagana';
+  }
 
-### 3c) Dodaj renderowanie modalu:
-Znajdź miejsce gdzie renderujesz inne modale (np. InvoiceModal, ContractModal)
-i dodaj tuż obok:
-```jsx
-{showProjects && (
-  <ProjectModal
-    projectId={activeProjectId}
-    onClose={() => { setShowProjects(false); setActiveProjectId(null); }}
-    onProjectSaved={() => { /* opcjonalnie odśwież coś */ }}
-    contractors={contractors} /* przekaż swoją listę kontrahentów */
-  />
-)}
-```
+  if (data.start_date && data.end_date) {
+    const start = new Date(data.start_date);
+    const end   = new Date(data.end_date);
+    if (end < start) {
+      errors.end_date = 'Data zakończenia nie może być wcześniejsza niż data rozpoczęcia';
+    }
+  }
 
-### 3d) Aby otworzyć listę projektów jako widok:
-Możesz też osadzić ProjectList w dowolnym widoku:
-```jsx
-<ProjectList
-  onOpenProject={(id) => { setActiveProjectId(id); setShowProjects(true); }}
-  onNewProject={() => { setActiveProjectId(null); setShowProjects(true); }}
-/>
-```
+  // Status
+  if (!data.status || !PROJECT_STATUS[data.status]) {
+    errors.status = 'Wybierz prawidłowy status projektu';
+  }
 
-## ═══════════════════════════════════════════════════
-## KROK 4: PRZYCISK W NAWIGACJI
-## ═══════════════════════════════════════════════════
+  // Priorytet
+  if (!data.priority || !PROJECT_PRIORITY[data.priority]) {
+    errors.priority = 'Wybierz prawidłowy priorytet';
+  }
 
-Znajdź komponent nawigacji bocznej lub górnej (szukaj pliku z
-"Faktury", "Kosztorysy", "Kontrahenci" jako linki/buttony).
+  // Budżet (opcjonalny, ale jeśli podany to liczba dodatnia)
+  if (data.budget_net !== undefined && data.budget_net !== '' && data.budget_net !== null) {
+    const v = parseFloat(data.budget_net);
+    if (isNaN(v) || v < 0) {
+      errors.budget_net = 'Budżet musi być liczbą nieujemną';
+    }
+  }
 
-Dodaj przycisk projektów w tym samym stylu co pozostałe:
+  return errors;
+}
 
-```jsx
-<button
-  onClick={() => { setShowProjects(true); setActiveProjectId(null); }}
-  style={{ /* skopiuj styl z przycisku obok */ }}
-  data-testid="nav-projects"
->
-  🏗️ Projekty
-</button>
-```
+// ============================================================
+// WALIDACJA ETAPU (MILESTONE)
+// ============================================================
+export function validateMilestone(data, projectStartDate, projectEndDate) {
+  const errors = {};
 
-## ═══════════════════════════════════════════════════
-## KROK 5: WERYFIKACJA IMPORTU SUPABASE
-## ═══════════════════════════════════════════════════
+  if (!data.name || data.name.trim().length < 2) {
+    errors.name = 'Nazwa etapu musi mieć minimum 2 znaki';
+  }
 
-Plik useProjects.js importuje:
-```js
-import { supabase } from '../../lib/supabaseClient';
-```
+  if (!data.start_date) {
+    errors.start_date = 'Data rozpoczęcia etapu jest wymagana';
+  }
 
-Sprawdź czy Twój plik supabase ma dokładnie tę ścieżkę:
-  src/lib/supabaseClient.js (lub .ts)
+  if (!data.end_date) {
+    errors.end_date = 'Data zakończenia etapu jest wymagana';
+  }
 
-Jeśli jest inaczej (np. src/lib/supabase.js), zmień linię importu
-w useProjects.js na właściwą ścieżkę.
+  if (data.start_date && data.end_date) {
+    const start = new Date(data.start_date);
+    const end   = new Date(data.end_date);
+    if (end < start) {
+      errors.end_date = 'Data końca etapu nie może być wcześniejsza niż data startu';
+    }
+    if (projectStartDate && start < new Date(projectStartDate)) {
+      errors.start_date = 'Etap nie może zaczynać się przed datą startu projektu';
+    }
+    if (projectEndDate && end > new Date(projectEndDate)) {
+      errors.end_date = 'Etap nie może kończyć się po dacie zakończenia projektu';
+    }
+  }
 
-## ═══════════════════════════════════════════════════
-## KROK 6: OPCJONALNE - PRZEKAZANIE KONTRAHENTÓW
-## ═══════════════════════════════════════════════════
+  return errors;
+}
 
-ProjectModal przyjmuje prop `contractors` (lista kontrahentów do wyboru
-przy tworzeniu projektu). Przekaż swoją istniejącą listę:
+// ============================================================
+// WALIDACJA ZADANIA
+// ============================================================
+export function validateTask(data) {
+  const errors = {};
 
-Jeśli masz hook useContractors lub podobny:
-```jsx
-const { contractors } = useContractors(); // Twój istniejący hook
+  if (!data.title || data.title.trim().length < 2) {
+    errors.title = 'Tytuł zadania musi mieć minimum 2 znaki';
+  } else if (data.title.trim().length > 300) {
+    errors.title = 'Tytuł zadania może mieć maksymalnie 300 znaków';
+  }
 
-<ProjectModal
-  contractors={contractors || []}
-  ...
-/>
-```
+  if (!data.status || !TASK_STATUS[data.status]) {
+    errors.status = 'Wybierz prawidłowy status zadania';
+  }
 
-Jeśli contractors to już tablica w state - po prostu przekaż ją.
+  if (data.progress !== undefined) {
+    const p = parseInt(data.progress, 10);
+    if (isNaN(p) || p < 0 || p > 100) {
+      errors.progress = 'Postęp musi być między 0 a 100%';
+    }
+  }
 
-## ═══════════════════════════════════════════════════
-## KROK 7: GIT I DEPLOY
-## ═══════════════════════════════════════════════════
+  if (data.start_date && data.due_date) {
+    if (new Date(data.due_date) < new Date(data.start_date)) {
+      errors.due_date = 'Termin nie może być wcześniejszy niż data startu';
+    }
+  }
 
-```cmd
-git add src/components/projects/
-git add SUPABASE/migrations/20260221_projects_module.sql
-git add tests/projects.spec.js
-git commit -m "feat: Dodaj modul Projekty i Harmonogram MVP"
-git push origin main
-```
+  if (data.estimated_hours !== undefined && data.estimated_hours !== '' && data.estimated_hours !== null) {
+    const h = parseFloat(data.estimated_hours);
+    if (isNaN(h) || h < 0) {
+      errors.estimated_hours = 'Szacowane godziny muszą być liczbą nieujemną';
+    }
+  }
 
-## ═══════════════════════════════════════════════════
-## PLAN WDROŻENIA: MVP → V2 → V3
-## ═══════════════════════════════════════════════════
+  return errors;
+}
 
-### MVP (teraz - gotowe):
-✅ Tworzenie/edycja projektu (nazwa, kod, klient, daty, status, priorytet)
-✅ Etapy i harmonogram z wizualizacją Gantt
-✅ Zadania z filtrami, postępem, przypisaniem, statusami
-✅ Archiwizacja (soft delete) projektów i zadań
-✅ Historia aktywności (log zmian)
-✅ Zmiana statusów z walidacją przejść
-✅ Przesunięcie całego harmonogramu o N dni
-✅ Izolacja danych per użytkownik (RLS Supabase)
+// ============================================================
+// LOGIKA STATUSÓW
+// ============================================================
+export function canTransitionProjectStatus(currentStatus, targetStatus) {
+  return PROJECT_STATUS_TRANSITIONS[currentStatus]?.includes(targetStatus) ?? false;
+}
 
-### V2 (kolejne sprinty):
-☐ Zakładka Budżet: połączenie z kosztorysami i fakturami
-☐ Zakładka Dokumenty: powiązanie z plikami budowy
-☐ Zakładka Zespół: RBAC per projekt (owner/manager/member/viewer)
-☐ Zapraszanie współpracowników (e-mail)
-☐ Powiadomienia o zbliżających się terminach
-☐ Eksport projektu do PDF (raport dla klienta)
-☐ Widok Kanban (kolumny statusów)
-☐ Drag-and-drop zadań między etapami
+export function canTransitionTaskStatus(currentStatus, targetStatus) {
+  return TASK_STATUS_TRANSITIONS[currentStatus]?.includes(targetStatus) ?? false;
+}
 
-### V3 (długoterminowo):
-☐ Pełna integracja KSeF i dokumentów budowlanych
-☐ Subprojekty / projekty wielopoziomowe
-☐ Szablony projektów (kopiowanie struktury)
-☐ Mapa (geolokalizacja placu budowy)
-☐ Aplikacja mobilna PWA z offline mode
-☐ Integracja z GUS (auto-uzupełnianie danych klienta po NIP)
-☐ Raportowanie wieloprojektowe (dashboard zarządu)
+export function getAvailableProjectStatuses(currentStatus) {
+  return PROJECT_STATUS_TRANSITIONS[currentStatus] ?? [];
+}
 
-## ═══════════════════════════════════════════════════
-## TESTY QA - JAK URUCHOMIĆ
-## ═══════════════════════════════════════════════════
+export function getAvailableTaskStatuses(currentStatus) {
+  return TASK_STATUS_TRANSITIONS[currentStatus] ?? [];
+}
 
-Playwright jest już zainstalowany w projekcie. Uruchom:
+// Auto-postęp: task done => 100%
+export function normalizeTaskOnStatusChange(task, newStatus) {
+  const updated = { ...task, status: newStatus };
+  if (newStatus === 'done') {
+    updated.progress = 100;
+    updated.completed_at = new Date().toISOString();
+  } else if (newStatus === 'todo') {
+    updated.progress = 0;
+    updated.completed_at = null;
+  }
+  return updated;
+}
 
-```cmd
-npx playwright test tests/projects.spec.js
-```
+// ============================================================
+// OBLICZENIA PROJEKTU
+// ============================================================
+export function calcProjectProgress(tasks = []) {
+  const active = tasks.filter(t => !t.is_archived);
+  if (!active.length) return 0;
+  const sum = active.reduce((acc, t) => acc + (t.progress || 0), 0);
+  return Math.round(sum / active.length);
+}
 
-Lub z raportem HTML:
-```cmd
-npx playwright test tests/projects.spec.js --reporter=html
-npx playwright show-report
-```
+export function calcProjectBudgetStatus(project) {
+  const budget = parseFloat(project.budget_net) || 0;
+  const costs  = parseFloat(project.costs_actual) || 0;
+  if (!budget) return null;
+  const pct = (costs / budget) * 100;
+  return {
+    pct: Math.round(pct),
+    remaining: budget - costs,
+    overBudget: costs > budget,
+    color: pct > 100 ? '#dc2626' : pct > 80 ? '#d97706' : '#16a34a',
+  };
+}
 
-Zmienne środowiskowe dla testów (utwórz plik .env.test):
-```
-TEST_USER_EMAIL=twoj@email.pl
-TEST_USER_PASSWORD=TwojeHaslo123
-```
+export function calcDaysLeft(endDate) {
+  if (!endDate) return null;
+  const diff = new Date(endDate) - new Date();
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
 
-## ═══════════════════════════════════════════════════
-## PODSUMOWANIE - STRUKTURA MODUŁU
-## ═══════════════════════════════════════════════════
+export function isProjectOverdue(project) {
+  if (['completed', 'cancelled'].includes(project.status)) return false;
+  return calcDaysLeft(project.end_date) < 0;
+}
 
-```
-src/components/projects/
-├── projectValidation.js   ← stałe, walidacja, logika statusów
-├── useProjects.js         ← hook danych (Supabase CRUD)
-└── ProjectModal.jsx       ← UI (modal + lista)
+// ============================================================
+// POMOCNICZE
+// ============================================================
+export function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('pl-PL', {
+    day: '2-digit', month: '2-digit', year: 'numeric'
+  });
+}
 
-SUPABASE/migrations/
-└── 20260221_projects_module.sql  ← 5 tabel + RLS + widok
+export function generateProjectCode(name) {
+  if (!name) return '';
+  return name
+    .toUpperCase()
+    .replace(/[^A-Z0-9\s]/g, '')
+    .trim()
+    .split(/\s+/)
+    .map(w => w.slice(0, 3))
+    .slice(0, 3)
+    .join('-')
+    + '-' + new Date().getFullYear().toString().slice(2);
+}
 
-tests/
-└── projects.spec.js       ← 30+ testów Playwright
-```
+export function emptyProject() {
+  const today = new Date().toISOString().split('T')[0];
+  const inMonth = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+  return {
+    name: '',
+    code: '',
+    description: '',
+    contractor_id: null,
+    address: '',
+    manager_name: '',
+    manager_email: '',
+    manager_phone: '',
+    start_date: today,
+    end_date: inMonth,
+    status: 'planned',
+    priority: 'medium',
+    budget_net: '',
+    tags: [],
+  };
+}
 
-Tabele w bazie:
-- projects              → główne projekty
-- project_milestones    → etapy harmonogramu
-- project_tasks         → zadania
-- project_members       → RBAC per projekt
-- project_activity_log  → historia zmian
-- project_summary       → widok obliczeniowy (VIEW)
+export function emptyTask(projectId, milestoneId = null) {
+  return {
+    project_id: projectId,
+    milestone_id: milestoneId,
+    title: '',
+    description: '',
+    status: 'todo',
+    priority: 'medium',
+    progress: 0,
+    assigned_to: '',
+    assigned_email: '',
+    start_date: '',
+    due_date: '',
+    estimated_hours: '',
+    tags: [],
+  };
+}
+
+export function emptyMilestone(projectId) {
+  const today = new Date().toISOString().split('T')[0];
+  return {
+    project_id: projectId,
+    name: '',
+    description: '',
+    start_date: today,
+    end_date: today,
+    color: '#dc2626',
+    sort_order: 0,
+  };
+}
