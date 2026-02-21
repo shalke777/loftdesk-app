@@ -6,6 +6,26 @@
   <title>Regulamin — LoftDesk</title>
   <meta name="description" content="Regulamin świadczenia usług LoftDesk." />
   <link rel="stylesheet" href="/landing/style.css" />
+  <style>
+    .rodo-wrap { max-width: 860px; margin: 0 auto; }
+    .rodo-section { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.07); padding: 36px 40px; margin-bottom: 24px; line-height: 1.75; }
+    .rodo-section h2 { font-size: 1.2rem; font-weight: 700; color: #1e3a5f; margin: 0 0 14px; border-left: 4px solid #dc2626; padding-left: 12px; }
+    .rodo-section h3 { font-size: 1rem; font-weight: 700; color: #2e5fac; margin: 20px 0 8px; }
+    .rodo-section p { margin: 0 0 10px; color: #334155; font-size: 0.95rem; }
+    .rodo-section ul, .rodo-section ol { margin: 6px 0 14px 20px; padding: 0; color: #334155; font-size: 0.95rem; }
+    .rodo-section ul li, .rodo-section ol li { margin-bottom: 6px; }
+    .rodo-section .tag { display: inline-block; background: #fef2f2; color: #dc2626; border-radius: 6px; font-size: 0.78rem; font-weight: 600; padding: 2px 8px; margin-bottom: 10px; }
+    .rodo-section .note { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; font-size: 0.88rem; color: #64748b; margin-top: 12px; }
+    .rodo-section strong { color: #1e293b; }
+    .toc { background: #f8fafc; border-radius: 10px; padding: 20px 28px; margin-bottom: 28px; }
+    .toc h2 { font-size: 1rem; font-weight: 700; color: #1e3a5f; margin: 0 0 10px; border: none; padding: 0; }
+    .toc ol { margin: 0; padding-left: 20px; }
+    .toc ol li { margin-bottom: 4px; }
+    .toc ol li a { color: #2e5fac; text-decoration: none; font-size: 0.9rem; }
+    .toc ol li a:hover { text-decoration: underline; }
+    hr.rodo-hr { border: none; border-top: 1px solid #e2e8f0; margin: 18px 0; }
+    @media (max-width: 600px) { .rodo-section { padding: 20px 18px; } }
+  </style>
 </head>
 <body>
   <nav class="navbar">
@@ -28,57 +48,275 @@
     </div>
   </nav>
 
-  <section class="features" style="padding-top:110px;">
+  <section class="features" style="padding-top:110px; padding-bottom:60px;">
     <div class="container">
       <div class="section-header">
-        <h1 class="section-title">Regulamin</h1>
-        <p class="section-subtitle">Szablon — uzupełnij dane firmy przed publikacją.</p>
+        <h1 class="section-title">Regulamin świadczenia usług</h1>
+        <p class="section-subtitle">Warunki korzystania z platformy LoftDesk. Obowiązuje od: 21 lutego 2026 r.</p>
       </div>
 
-      <div class="feature-card" style="line-height:1.7;">
-        <p><strong>1. Informacje ogólne</strong><br/>
-          Usługa LoftDesk (“Usługa”) jest świadczona przez: <strong>[Nazwa firmy / imię i nazwisko]</strong>, <strong>[adres]</strong>, NIP: <strong>[NIP]</strong>, email: <strong>[email]</strong>.
-        </p>
+      <div class="rodo-wrap">
 
-        <p><strong>2. Konto i dostęp</strong><br/>
-          Korzystanie z Usługi wymaga utworzenia konta. Użytkownik odpowiada za poufność hasła oraz działania wykonane w ramach konta.
-        </p>
+        <div class="toc">
+          <h2>📋 Spis treści</h2>
+          <ol>
+            <li><a href="#definicje">Definicje</a></li>
+            <li><a href="#ogolne">Postanowienia ogólne</a></li>
+            <li><a href="#konto">Rejestracja i konto</a></li>
+            <li><a href="#plany">Plany i opłaty</a></li>
+            <li><a href="#dostepnosc">Zakres usług i dostępność</a></li>
+            <li><a href="#obowiazki">Prawa i obowiązki użytkownika</a></li>
+            <li><a href="#ip">Własność intelektualna</a></li>
+            <li><a href="#dane">Ochrona danych osobowych</a></li>
+            <li><a href="#odpowiedzialnosc">Odpowiedzialność</a></li>
+            <li><a href="#reklamacje">Reklamacje</a></li>
+            <li><a href="#zmiany">Zmiany regulaminu</a></li>
+            <li><a href="#rozwiazanie">Rozwiązanie umowy</a></li>
+            <li><a href="#ksef">KSeF (e-Faktury)</a></li>
+            <li><a href="#koncowe">Postanowienia końcowe</a></li>
+          </ol>
+        </div>
 
-        <p><strong>3. Zakres Usługi</strong><br/>
-          LoftDesk umożliwia m.in. tworzenie faktur, umów i kosztorysów oraz generowanie plików PDF. Funkcje mogą się zmieniać wraz z rozwojem produktu.
-        </p>
+        <div class="rodo-section" id="definicje">
+          <span class="tag">§ 1</span>
+          <h2>Definicje</h2>
+          <ul>
+            <li><strong>Usługodawca / LoftDesk</strong> — [UZUPEŁNIJ: Nazwa firmy, forma prawna, adres, NIP], prowadząca serwis pod adresem www.loftdesk.pl.</li>
+            <li><strong>Użytkownik</strong> — osoba fizyczna, prawna lub jednostka organizacyjna, która zarejestrowała Konto. Jeżeli Użytkownikiem jest konsument (osoba fizyczna działająca poza działalnością gospodarczą), przysługują mu dodatkowe uprawnienia wskazane w Regulaminie.</li>
+            <li><strong>Konto</strong> — indywidualny profil Użytkownika umożliwiający korzystanie z Usług.</li>
+            <li><strong>Usługi</strong> — platforma SaaS do zarządzania fakturami, kosztorysami, umowami i bazą kontrahentów dla firm budowlanych.</li>
+            <li><strong>Plan</strong> — wybrany wariant subskrypcji (Free, Pro, Business) określający zakres Usług i cenę.</li>
+            <li><strong>Okres rozliczeniowy</strong> — miesiąc kalendarzowy lub rok, za który naliczana jest opłata.</li>
+            <li><strong>RODO</strong> — Rozporządzenie Parlamentu Europejskiego i Rady (UE) 2016/679 z dnia 27 kwietnia 2016 r.</li>
+          </ul>
+        </div>
 
-        <p><strong>4. Plany i płatności</strong><br/>
-          Usługa może być dostępna w planie darmowym oraz płatnych. Aktualny cennik jest dostępny na stronie. Płatności (jeśli włączone) realizowane są przez zewnętrznego operatora.
-        </p>
+        <div class="rodo-section" id="ogolne">
+          <span class="tag">§ 2</span>
+          <h2>Postanowienia ogólne</h2>
+          <ol>
+            <li>Regulamin określa zasady świadczenia Usług przez LoftDesk, prawa i obowiązki Stron oraz zasady ochrony danych osobowych.</li>
+            <li>Świadczenie Usług odbywa się na podstawie przepisów polskiego prawa, w szczególności: Kodeksu cywilnego, ustawy o świadczeniu usług drogą elektroniczną oraz ustawy o prawach konsumenta.</li>
+            <li>Korzystanie z Usług jest możliwe po zarejestrowaniu Konta i akceptacji Regulaminu oraz Polityki Prywatności.</li>
+            <li>Rejestracja oznacza zawarcie umowy o świadczenie usług drogą elektroniczną na warunkach określonych w Regulaminie.</li>
+          </ol>
+        </div>
 
-        <p><strong>5. Odpowiedzialność</strong><br/>
-          Użytkownik odpowiada za poprawność danych wprowadzanych do dokumentów. LoftDesk dostarcza narzędzia, nie zastępuje księgowości ani obsługi prawnej.
-        </p>
+        <div class="rodo-section" id="konto">
+          <span class="tag">§ 3</span>
+          <h2>Rejestracja i konto</h2>
+          <ol>
+            <li>Rejestracja Konta jest bezpłatna i wymaga podania aktualnego adresu e-mail oraz utworzenia hasła.</li>
+            <li>Użytkownik zobowiązuje się do podania prawdziwych, aktualnych i kompletnych danych.</li>
+            <li>Użytkownik ponosi wyłączną odpowiedzialność za bezpieczeństwo danych dostępowych do Konta. LoftDesk nie ponosi odpowiedzialności za szkody wynikłe z ujawnienia danych dostępowych przez Użytkownika.</li>
+            <li>Niedozwolone jest udostępnianie Konta osobom trzecim (z zastrzeżeniem planu Business z wieloma użytkownikami).</li>
+            <li>Użytkownik będący przedsiębiorcą oświadcza, że osoba rejestrująca Konto jest upoważniona do działania w jego imieniu.</li>
+            <li>LoftDesk zastrzega prawo odmowy rejestracji lub usunięcia Konta w przypadku naruszenia Regulaminu lub podania fałszywych danych.</li>
+          </ol>
+        </div>
 
-        <p><strong>6. Rezygnacja</strong><br/>
-          Użytkownik może zakończyć korzystanie z Usługi w dowolnym momencie. Administrator może zawiesić konto w przypadku nadużyć.
-        </p>
+        <div class="rodo-section" id="plany">
+          <span class="tag">§ 4</span>
+          <h2>Plany i opłaty</h2>
+          <h3>4.1. Dostępne plany</h3>
+          <ul>
+            <li><strong>Plan Free</strong> — bezpłatny, z ograniczeniami: 5 faktur/mies., 3 umowy/mies., 10 kontrahentów, bez backupu.</li>
+            <li><strong>Plan Pro</strong> — 29 zł netto/miesiąc. Dostęp nielimitowany do podstawowych funkcji + backup chmurowy + priorytetowe wsparcie.</li>
+            <li><strong>Plan Business</strong> — 99 zł netto/miesiąc. Wszystkie funkcje Pro + własna domena, API, dedykowane wsparcie, SLA 99,9%.</li>
+          </ul>
+          <p>Aktualny cennik dostępny jest na stronie loftdesk.pl/cennik. LoftDesk zastrzega prawo zmiany cen z zachowaniem procedury opisanej w § 11.</p>
+          <h3>4.2. Okres próbny</h3>
+          <p>Plany płatne dostępne są z 14-dniowym bezpłatnym okresem próbnym. Karta płatnicza nie zostanie obciążona przed jego zakończeniem. Brak anulowania przed końcem okresu próbnego oznacza automatyczne przejście na wybrany Plan płatny.</p>
+          <h3>4.3. Płatności</h3>
+          <ol>
+            <li>Opłaty naliczane są z góry za każdy Okres rozliczeniowy.</li>
+            <li>Płatności obsługiwane są przez zewnętrznych operatorów. LoftDesk nie przechowuje pełnych danych kart płatniczych.</li>
+            <li>W przypadku braku płatności LoftDesk ma prawo zawiesić dostęp do Usług po uprzednim wezwaniu e-mailowym z 7-dniowym terminem.</li>
+            <li>Faktury VAT wystawiane są elektronicznie i dostarczane na adres e-mail Użytkownika.</li>
+          </ol>
+          <h3>4.4. Zmiana planu</h3>
+          <p>Przejście na wyższy Plan jest natychmiastowe (z proporcjonalnym rozliczeniem). Downgrade do niższego Planu następuje z początkiem następnego Okresu rozliczeniowego.</p>
+        </div>
 
-        <p><strong>7. Kontakt</strong><br/>
-          W sprawach Usługi: <strong>[email kontaktowy]</strong>.
-        </p>
+        <div class="rodo-section" id="dostepnosc">
+          <span class="tag">§ 5</span>
+          <h2>Zakres usług i dostępność</h2>
+          <ol>
+            <li>LoftDesk zapewnia dostęp do platformy 24/7, z zastrzeżeniem planowanych i nieplanowanych przerw technicznych.</li>
+            <li>Planowane przerwy techniczne będą ogłaszane z co najmniej 24-godzinnym wyprzedzeniem.</li>
+            <li>Dla Planu Business LoftDesk zapewnia SLA na poziomie 99,9% czasu dostępności miesięcznie (z wyłączeniem planowanych przerw konserwacyjnych).</li>
+            <li>LoftDesk zastrzega prawo do modyfikacji funkcjonalności Usług, w tym dodawania nowych i wycofywania istniejących funkcji, z zachowaniem procedury powiadamiania opisanej w § 11.</li>
+          </ol>
+        </div>
 
-        <p><strong>8. Postanowienia końcowe</strong><br/>
-          Regulamin może być aktualizowany. O istotnych zmianach poinformujemy w Usłudze lub mailowo.
-        </p>
-      </div>
+        <div class="rodo-section" id="obowiazki">
+          <span class="tag">§ 6</span>
+          <h2>Prawa i obowiązki użytkownika</h2>
+          <h3>6.1. Użytkownik ma prawo do:</h3>
+          <ul>
+            <li>Korzystania z Usług zgodnie z wybranym Planem.</li>
+            <li>Eksportu własnych danych (faktury, kosztorysy, baza kontrahentów) w formatach PDF i CSV.</li>
+            <li>Wsparcia technicznego zgodnie z poziomem wybranego Planu.</li>
+            <li>Modyfikacji i usunięcia Konta w dowolnym momencie.</li>
+          </ul>
+          <h3>6.2. Użytkownik zobowiązuje się do:</h3>
+          <ul>
+            <li>Korzystania z Usług wyłącznie w celach zgodnych z prawem i Regulaminem.</li>
+            <li>Nienaruszania praw osób trzecich, w szczególności praw do ochrony danych osobowych.</li>
+            <li>Niepodejmowania działań mogących zakłócić funkcjonowanie Serwisu (ataki DDoS, próby nieautoryzowanego dostępu).</li>
+            <li>Posiadania właściwej podstawy prawnej do przetwarzania danych kontrahentów wprowadzanych do systemu.</li>
+            <li>Niezamieszczania w systemie danych szczególnych kategorii (art. 9 RODO) bez właściwej podstawy prawnej.</li>
+          </ul>
+          <h3>6.3. Zakazy</h3>
+          <ul>
+            <li>Odwrotna inżynieria (reverse engineering) oprogramowania LoftDesk.</li>
+            <li>Korzystanie z Usług w celu tworzenia konkurencyjnych produktów.</li>
+            <li>Sprzedaż, sublicencjonowanie lub odsprzedaż dostępu do Usług bez zgody LoftDesk.</li>
+            <li>Wprowadzanie do systemu treści nielegalnych lub naruszających prawa autorskie.</li>
+          </ul>
+        </div>
 
-      <div style="margin-top: 18px; color:#64748b; font-size:14px;">
-        * To jest szablon. Uzupełnij dane firmy i dopasuj treść do modelu płatności/okresu próbnego.
+        <div class="rodo-section" id="ip">
+          <span class="tag">§ 7</span>
+          <h2>Własność intelektualna</h2>
+          <ol>
+            <li>Wszelkie prawa własności intelektualnej do Serwisu, oprogramowania, interfejsu i innych materiałów LoftDesk przysługują wyłącznie Usługodawcy.</li>
+            <li>LoftDesk udziela Użytkownikowi niewyłącznej, niezbywalnej licencji na korzystanie z Usług wyłącznie na potrzeby własnej działalności w ramach wybranego Planu.</li>
+            <li>Użytkownik zachowuje wszelkie prawa do danych i treści wprowadzonych przez siebie do systemu. LoftDesk nie nabywa żadnych praw do tych danych z wyjątkiem prawa do ich przetwarzania w celu świadczenia Usług.</li>
+          </ol>
+        </div>
+
+        <div class="rodo-section" id="dane">
+          <span class="tag">§ 8</span>
+          <h2>Ochrona danych osobowych</h2>
+          <ol>
+            <li>Zasady przetwarzania danych osobowych Użytkownika określa <a href="/polityka-prywatnosci" style="color:#2e5fac;">Polityka Prywatności</a> stanowiąca integralną część Regulaminu.</li>
+            <li>W zakresie danych kontrahentów wprowadzanych przez Użytkownika do systemu, LoftDesk działa jako podmiot przetwarzający na zlecenie Użytkownika (art. 28 RODO). Warunki powierzenia określa <a href="/rodo" style="color:#2e5fac;">Dokumentacja RODO</a>.</li>
+            <li>Użytkownik jako Administrator danych jest odpowiedzialny za zapewnienie właściwej podstawy prawnej przetwarzania danych kontrahentów oraz realizację obowiązku informacyjnego wobec tych osób.</li>
+          </ol>
+        </div>
+
+        <div class="rodo-section" id="odpowiedzialnosc">
+          <span class="tag">§ 9</span>
+          <h2>Odpowiedzialność</h2>
+          <h3>9.1. Odpowiedzialność LoftDesk</h3>
+          <p>LoftDesk nie ponosi odpowiedzialności za:</p>
+          <ul>
+            <li>Szkody wynikłe z nieprawidłowego korzystania z Usług przez Użytkownika.</li>
+            <li>Utratę danych spowodowaną działaniem siły wyższej (powódź, pożar, atak hakerski nieobjęty winą LoftDesk).</li>
+            <li>Szkody pośrednie, utracone korzyści, utratę przychodów — w maksymalnym zakresie dozwolonym przez prawo.</li>
+            <li>Treść dokumentów (faktur, umów, kosztorysów) generowanych przez Użytkownika — Użytkownik ponosi wyłączną odpowiedzialność za ich poprawność merytoryczną i prawną.</li>
+            <li>Poprawność wycen lub ofert generowanych przez AI Asystenta — stanowią one wyłącznie pomoc, nie zastępują wiedzy eksperckiej Użytkownika.</li>
+          </ul>
+          <div class="note">Łączna odpowiedzialność LoftDesk wobec Użytkownika niebędącego konsumentem ograniczona jest do kwoty opłat uiszczonych przez Użytkownika w ciągu ostatnich 12 miesięcy poprzedzających zdarzenie wywołujące szkodę.</div>
+          <h3>9.2. Wyłączenie odpowiedzialności — przepisy podatkowe</h3>
+          <p>LoftDesk nie jest biurem rachunkowym ani doradcą podatkowym. Dokumenty generowane przez platformę stanowią narzędzia pomocnicze. Użytkownik zobowiązany jest do weryfikacji ich zgodności z aktualnymi przepisami prawa podatkowego. LoftDesk nie ponosi odpowiedzialności za skutki błędów wynikłych z zastosowania dokumentów generowanych przez system.</p>
+        </div>
+
+        <div class="rodo-section" id="reklamacje">
+          <span class="tag">§ 10</span>
+          <h2>Reklamacje</h2>
+          <ol>
+            <li>Reklamacje można składać drogą e-mailową na adres: <strong>support@loftdesk.pl</strong></li>
+            <li>Reklamacja powinna zawierać: dane Użytkownika (e-mail), opis problemu, datę i okoliczności jego wystąpienia oraz oczekiwany sposób rozwiązania.</li>
+            <li>Reklamacje rozpatrywane są w terminie 14 dni od ich otrzymania. W uzasadnionych przypadkach termin może być przedłużony do 30 dni.</li>
+            <li>Konsumenci mogą skorzystać z pozasądowego rozwiązywania sporów poprzez: Platformę ODR (https://ec.europa.eu/consumers/odr), polubowne sądy konsumenckie przy Inspekcji Handlowej lub Rzecznika Praw Konsumentów.</li>
+          </ol>
+        </div>
+
+        <div class="rodo-section" id="zmiany">
+          <span class="tag">§ 11</span>
+          <h2>Zmiany regulaminu</h2>
+          <ol>
+            <li>LoftDesk zastrzega prawo do zmiany Regulaminu w przypadku: zmiany przepisów prawa, rozszerzenia zakresu Usług, zmiany cennika lub wymogów bezpieczeństwa.</li>
+            <li>O zmianie Regulaminu Użytkownik zostanie poinformowany drogą e-mailową z co najmniej <strong>14-dniowym wyprzedzeniem</strong> przed wejściem zmian w życie.</li>
+            <li>Jeżeli Użytkownik nie zaakceptuje nowego Regulaminu, ma prawo rozwiązać umowę ze skutkiem natychmiastowym, przesyłając oświadczenie na adres: <strong>kontakt@loftdesk.pl</strong>. Brak sprzeciwu w terminie 14 dni poczytuje się za akceptację zmian.</li>
+            <li>W przypadku Użytkowników będących konsumentami zmiana cennika wymaga ich wyraźnej zgody.</li>
+          </ol>
+        </div>
+
+        <div class="rodo-section" id="rozwiazanie">
+          <span class="tag">§ 12</span>
+          <h2>Rozwiązanie umowy</h2>
+          <h3>12.1. Rozwiązanie przez Użytkownika</h3>
+          <ol>
+            <li>Użytkownik może rozwiązać umowę (usunąć Konto) w dowolnym momencie poprzez panel ustawień lub drogą e-mailową na adres: <strong>support@loftdesk.pl</strong></li>
+            <li>Usunięcie Konta na Planie płatnym w trakcie Okresu rozliczeniowego nie skutkuje zwrotem opłaty za niewykorzystany okres, chyba że przepisy prawa stanowią inaczej.</li>
+          </ol>
+          <h3>12.2. Prawo odstąpienia konsumenta</h3>
+          <p>Użytkownik będący konsumentem ma prawo odstąpić od umowy w terminie 14 dni od jej zawarcia bez podawania przyczyny. Prawo odstąpienia nie przysługuje jeżeli świadczenie usługi cyfrowej zostało w pełni wykonane za wyraźną zgodą konsumenta, który przed jej rozpoczęciem został poinformowany o utracie prawa odstąpienia.</p>
+          <h3>12.3. Rozwiązanie przez LoftDesk</h3>
+          <p>LoftDesk może rozwiązać umowę z zachowaniem 30-dniowego okresu wypowiedzenia lub ze skutkiem natychmiastowym w przypadku: rażącego naruszenia Regulaminu, korzystania z Usług w celach niezgodnych z prawem, długotrwałego braku płatności lub likwidacji działalności LoftDesk.</p>
+          <div class="note">W przypadku rozwiązania umowy z winy LoftDesk Użytkownikowi przysługuje proporcjonalny zwrot opłaty za niewykorzystany Okres rozliczeniowy.</div>
+        </div>
+
+        <div class="rodo-section" id="ksef">
+          <span class="tag">§ 13</span>
+          <h2>KSeF (e-Faktury)</h2>
+          <ol>
+            <li>Funkcjonalność KSeF umożliwia wysyłanie i odbieranie faktur za pośrednictwem Krajowego Systemu e-Faktur prowadzonego przez Ministerstwo Finansów.</li>
+            <li>Użytkownik udziela LoftDesk pełnomocnictwa do działania w jego imieniu w zakresie wymiany faktur przez KSeF, zgodnie z przepisami ustawy o VAT.</li>
+            <li>LoftDesk nie ponosi odpowiedzialności za niedostępność lub błędy po stronie systemu KSeF Ministerstwa Finansów.</li>
+            <li>Użytkownik ponosi wyłączną odpowiedzialność za prawidłowość danych zamieszczonych na fakturach wysyłanych przez KSeF.</li>
+          </ol>
+        </div>
+
+        <div class="rodo-section" id="koncowe">
+          <span class="tag">§ 14</span>
+          <h2>Postanowienia końcowe</h2>
+          <ol>
+            <li>Prawem właściwym dla Regulaminu i umów zawieranych na jego podstawie jest prawo polskie.</li>
+            <li>Wszelkie spory strony będą dążyły rozwiązywać polubownie. W przypadku braku porozumienia sądem właściwym jest sąd powszechny właściwy dla siedziby LoftDesk — z zastrzeżeniem, że konsumenci mogą wybrać sąd według miejsca swojego zamieszkania.</li>
+            <li>Jeżeli którekolwiek z postanowień Regulaminu okaże się nieważne, pozostałe postanowienia zachowują moc.</li>
+            <li>Integralną część Regulaminu stanowią: <a href="/polityka-prywatnosci" style="color:#2e5fac;">Polityka Prywatności</a> oraz <a href="/rodo" style="color:#2e5fac;">Dokumentacja RODO</a>.</li>
+          </ol>
+          <p style="color:#94a3b8; font-size:0.85rem; margin-top: 16px;">Regulamin obowiązuje od: 21 lutego 2026 r. | Wersja 1.0</p>
+        </div>
+
       </div>
     </div>
   </section>
 
   <footer class="footer">
     <div class="container">
+      <div class="footer-content">
+        <div class="footer-column footer-column-brand">
+          <div class="footer-logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="#dc2626"/>
+              <path d="M8 12h16v2H8v-2zm0 4h16v2H8v-2zm0 4h10v2H8v-2z" fill="white"/>
+            </svg>
+            <span>LoftDesk</span>
+          </div>
+          <p>System fakturowania dla firm budowlanych</p>
+        </div>
+        <div class="footer-column">
+          <h4>Produkt</h4>
+          <div class="footer-links">
+            <a href="/#funkcje">Funkcje</a>
+            <a href="/#cennik">Cennik</a>
+            <a href="/login">Zaloguj się</a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h4>Wsparcie</h4>
+          <div class="footer-links">
+            <a href="mailto:support@loftdesk.pl">Kontakt</a>
+            <a href="/faq">FAQ</a>
+            <a href="/docs">Dokumentacja</a>
+          </div>
+        </div>
+        <div class="footer-column">
+          <h4>Prawne</h4>
+          <div class="footer-links">
+            <a href="/regulamin">Regulamin</a>
+            <a href="/polityka-prywatnosci">Polityka prywatności</a>
+            <a href="/rodo">RODO</a>
+          </div>
+        </div>
+      </div>
       <div class="footer-bottom">
-        <p>&copy; 2026 LoftDesk.</p>
+        <p>&copy; 2026 LoftDesk. Wszystkie prawa zastrzeżone.</p>
       </div>
     </div>
   </footer>
