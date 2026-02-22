@@ -163,7 +163,11 @@ const payload = {
       await fetchAll();
       return { success: true, data: result.data };
     } catch (err) {
-      return { success: false, errors: { global: err.message } };
+      if (err.message?.includes('idx_projects_code_user')) {
+    return { success: false, errors: { code: 'Ten kod projektu już istnieje. Zmień kod na unikalny.' } };
+  }
+  return { success: false, errors: { global: err.message } };
+
     } finally {
       setSaving(false);
     }
