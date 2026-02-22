@@ -138,15 +138,18 @@ export function useProject(projectId) {
     setSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-    const payload = {
+   const isValidUUID = (v) => v && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+
+const payload = {
   ...formData,
   user_id: user.id,
   updated_at: new Date().toISOString(),
-  budget_net:   formData.budget_net   === '' ? null : formData.budget_net,
-  budget_gross: formData.budget_gross === '' ? null : formData.budget_gross,
-  costs_actual: formData.costs_actual === '' ? null : formData.costs_actual,
+  budget_net:     formData.budget_net     === '' ? null : formData.budget_net,
+  budget_gross:   formData.budget_gross   === '' ? null : formData.budget_gross,
+  costs_actual:   formData.costs_actual   === '' ? null : formData.costs_actual,
+  contractor_id:  isValidUUID(formData.contractor_id)  ? formData.contractor_id  : null,
+  milestone_id:   isValidUUID(formData.milestone_id)   ? formData.milestone_id   : null,
 };
-
       let result;
       if (projectId) {
         result = await supabase.from('projects').update(payload).eq('id', projectId).select().single();
