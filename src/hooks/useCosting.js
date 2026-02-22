@@ -2,10 +2,18 @@
 // Hybrydowy: jeśli projectId podany — zapisuje w Supabase
 //            jeśli nie — działa jak poprzednio (localStorage)
 import { useState, useEffect, useCallback } from 'react';
-import { storage } from '../utils/storage.js';
 import { supabase } from '../lib/supabase';
 
 const STORAGE_KEY = 'loftdesk_costing_lines';
+
+function lsGet() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  catch { return []; }
+}
+function lsSet(lines) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(lines)); }
+  catch {}
+}
 
 function makeLocalLine(code, qty = 1) {
   return { id: `${Date.now()}_${Math.random().toString(36).slice(2)}`, code, qty, note: '' };
@@ -28,7 +36,6 @@ export function useCosting(projectId = null) {
         code:     r.code,
         qty:      Number(r.qty),
         note:     r.note || '',
-        // pola pomocnicze dla CostingPanel
         name:     r.name,
         unit:     r.unit,
         priceNet: Number(r.price_net),
@@ -42,26 +49,23 @@ export function useCosting(projectId = null) {
     if (projectId) {
       fetchFromDb();
     } else {
-      setCostingLines(storage.get(STORAGE_KEY, []));
+      setCostingLines(lsGet());
     }
   }, [projectId, fetchFromDb]);
 
   const saveLocal = (lines) => {
     setCostingLines(lines);
-    if (!projectId) storage.set(STORAGE_KEY, lines);
+    if (!projectId) lsSet(lines);
   };
 
-  // Dodaj linię z cennika
   const addLine = async (code) => {
     if (projectId) {
       const { data: { user } } = await supabase.auth.getUser();
-      const count = costingLines.length;
       await supabase.from('costing_lines').insert({
-        user_id:    user.id,
-        project_id: projectId,
+        user_id: user.id, project_id: projectId,
         code, qty: 1, note: '',
         name: '', unit: 'm²', price_net: 0, vat_rate: 0.08,
-        sort_order: count,
+        sort_order: costingLines.length,
       });
       await fetchFromDb();
     } else {
@@ -69,22 +73,16 @@ export function useCosting(projectId = null) {
     }
   };
 
-  // Dodaj własną pozycję
   const addCustomLine = async (lineData, addRate) => {
     const code = `DIRECT_${Date.now()}`;
     if (addRate) addRate(code, {
-      category: 'Własne',
-      name: lineData.name,
-      unit: lineData.unit,
-      priceNet: lineData.priceNet,
-      vat: lineData.vat,
+      category: 'Własne', name: lineData.name, unit: lineData.unit,
+      priceNet: lineData.priceNet, vat: lineData.vat,
     });
-
     if (projectId) {
       const { data: { user } } = await supabase.auth.getUser();
       await supabase.from('costing_lines').insert({
-        user_id:    user.id,
-        project_id: projectId,
+        user_id: user.id, project_id: projectId,
         code, qty: lineData.qty || 1, note: lineData.note || '',
         name: lineData.name, unit: lineData.unit,
         price_net: lineData.priceNet, vat_rate: lineData.vat,
@@ -98,8 +96,7 @@ export function useCosting(projectId = null) {
 
   const updateLine = async (id, field, value) => {
     if (projectId) {
-      const dbField = field === 'qty' ? 'qty' : field === 'note' ? 'note' : field;
-      await supabase.from('costing_lines').update({ [dbField]: value }).eq('id', id);
+      await supabase.from('costing_lines').update({ [field]: value }).eq('id', id);
       setCostingLines(prev => prev.map(l => l.id === id ? { ...l, [field]: value } : l));
     } else {
       saveLocal(costingLines.map(l => l.id === id ? { ...l, [field]: value } : l));
