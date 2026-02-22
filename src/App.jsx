@@ -116,37 +116,52 @@ function AppShell() {
   const [projects, setProjects] = useState([]);
   const [showProjectForm, setShowProjectForm] = useState(false);
 
-  // ✅ FIX: useAuth() musi być PRZED useEffect używającym `user`
+  // ✅ useAuth PRZED useEffect z user
   const { user } = useAuth();
+
+  const loadProjects = async () => {
+    if (!user || !supabase) return;
+    setProjectsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("projects")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setProjects(data || []);
+    } catch (e) {
+      console.warn("Projects load error:", e);
+      setProjects([]);
+    } finally {
+      setProjectsLoading(false);
+    }
+  };
 
   // Załaduj projekty z Supabase
   useEffect(() => {
-    if (!user || !supabase) return;
-
     let alive = true;
-    setProjectsLoading(true);
 
-    supabase
-      .from("projects")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .then(({ data, error }) => {
+    (async () => {
+      if (!user || !supabase) return;
+      setProjectsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("projects")
+          .select("*")
+          .order("created_at", { ascending: false });
+
         if (!alive) return;
-        if (error) {
-          console.warn("Projects load error:", error);
-          setProjects([]);
-          return;
-        }
+        if (error) throw error;
         setProjects(data || []);
-      })
-      .catch((e) => {
+      } catch (e) {
         if (!alive) return;
-        console.warn("Projects load catch:", e);
+        console.warn("Projects load error:", e);
         setProjects([]);
-      })
-      .finally(() => {
+      } finally {
         if (alive) setProjectsLoading(false);
-      });
+      }
+    })();
 
     return () => {
       alive = false;
@@ -157,6 +172,17 @@ function AppShell() {
     if (!supabase) return;
     await supabase.from("projects").delete().eq("id", id);
     setProjects((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const openProjectModal = (id = null) => {
+    setActiveProjectId(id);
+    setShowProjects(false); // ✅ zamknij listę projektów (żeby nie było overlay na overlay)
+    setShowProjectForm(true);
+  };
+
+  const closeProjectModal = () => {
+    setShowProjectForm(false);
+    setActiveProjectId(null);
   };
 
   const [buyer, setBuyer] = useState({ name: "", address: "", nip: "", phone: "", email: "" });
@@ -297,7 +323,6 @@ function AppShell() {
     alert("Faktura wystawiona! PDF został pobrany.");
   };
 
-  // ✅ FIX: bez zagnieżdżonego handleGenerateInvoicePDF (to rozwalało klamry / parser)
   const handleCreateContract = async (contractData) => {
     const used = countThisMonth(contracts, "createdAt");
     const limit = LIMITS[plan]?.contractsPerMonth ?? 3;
@@ -830,9 +855,9 @@ function AppShell() {
           >
             <div
               style={{
-                maxWidth: 1100,
+                maxWidth: 1280,
                 margin: "0 auto",
-                background: "#f8fafc",
+                background: "#f1f5f9",
                 borderRadius: 20,
                 padding: 28,
                 boxShadow: "0 25px 60px rgba(0,0,0,0.3)",
@@ -868,16 +893,8 @@ function AppShell() {
               </div>
 
               <Dashboard
-                onOpenProject={(id) => {
-                  setShowDashboard(false);
-                  setActiveProjectId(id);
-                  setShowProjects(true);
-                }}
-                onNewProject={() => {
-                  setShowDashboard(false);
-                  setActiveProjectId(null);
-                  setShowProjects(true);
-                }}
+                onOpenProject={(id) => openProjectModal(id)}
+                onNewProject={() => openProjectModal(null)}
               />
             </div>
           </div>
@@ -889,7 +906,8 @@ function AppShell() {
           <ProjectsPage
             projects={projects}
             loading={projectsLoading}
-            onCreateProject={() => setShowProjectForm(true)}
+            onCreateProject={() => openProjectModal(null)}
+            onOpenProject={(id) => openProjectModal(id)}
             onDeleteProject={handleDeleteProject}
             onClose={() => setShowProjects(false)}
             rates={rates}
@@ -902,11 +920,24 @@ function AppShell() {
       {showProjectForm && (
         <Portal>
           <ProjectModal
-            projectId={null}
-            onClose={() => setShowProjectForm(false)}
-            onProjectSaved={(newProject) => {
-              setProjects((prev) => [newProject, ...prev]);
-              setShowProjectForm(false);
+            projectId={activeProjectId}
+            onClose={closeProjectModal}
+            onProjectSaved={async (savedProject) => {
+              // Jeśli modal zwraca obiekt projektu -> update lokalnie
+              if (savedProject && savedProject.id) {
+                setProjects((prev) => {
+                  const exists = prev.some((p) => p.id === savedProject.id);
+                  if (exists) {
+                    return prev.map((p) => (p.id === savedProject.id ? savedProject : p));
+                  }
+                  return [savedProject, ...prev];
+                });
+              } else {
+                // Jeśli modal NIE zwraca obiektu (obecna implementacja) -> przeładuj listę
+                await loadProjects();
+              }
+
+              closeProjectModal();
             }}
             contractors={contractors}
           />

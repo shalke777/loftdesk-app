@@ -19,7 +19,7 @@ import {
 // ============================================================
 const S = {
   overlay: {
-    position: 'fixed', inset: 0, zIndex: 1000,
+    position: 'fixed', inset: 0, zIndex: 10050,
     background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(3px)',
     display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
     padding: '16px',
