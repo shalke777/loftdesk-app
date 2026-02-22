@@ -3,8 +3,8 @@
 // Wersja: MVP 1.0
 
 import React, { useState, useEffect, useRef } from 'react';
-import React, { useState, useEffect } from 'react';
 import { useProject, useProjects } from './useProjects';
+
 import {
   PROJECT_STATUS, TASK_STATUS, PROJECT_PRIORITY,
   getAvailableProjectStatuses,
