@@ -138,11 +138,14 @@ export function useProject(projectId) {
     setSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      const payload = {
-        ...formData,
-        user_id: user.id,
-        updated_at: new Date().toISOString(),
-      };
+    const payload = {
+  ...formData,
+  user_id: user.id,
+  updated_at: new Date().toISOString(),
+  budget_net:   formData.budget_net   === '' ? null : formData.budget_net,
+  budget_gross: formData.budget_gross === '' ? null : formData.budget_gross,
+  costs_actual: formData.costs_actual === '' ? null : formData.costs_actual,
+};
 
       let result;
       if (projectId) {
