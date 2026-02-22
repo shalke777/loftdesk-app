@@ -26,6 +26,8 @@ import { fetchUserPlan } from "./lib/plan";
 import { startCheckout } from "./lib/stripeCheckout";
 import ProjectModal from './components/projects/ProjectModal';
 import { Dashboard } from './components/Dashboard/Dashboard';
+import { AppNav } from './components/shared/AppNav';
+import { AppLayout } from './components/shared/AppLayout';
 import ErrorBoundary from "./ErrorBoundary";
 import AuthPage from "./AuthPage";
 import { 
@@ -277,7 +279,30 @@ if (used >= limit) {
 
 
  return (
-
+    <AppLayout
+      nav={
+        <AppNav
+          plan={plan}
+          invoices={invoices}
+          contracts={contracts}
+          invoicesLeft={invoicesLeft}
+          activeModule="main"
+          onDashboard={() => setShowDashboard(true)}
+          onProjects={() => { setShowProjects(true); setActiveProjectId(null); }}
+          onInvoices={() => setShowInvoices(true)}
+          onContracts={() => setShowContracts(true)}
+          onClients={() => setShowContractors(true)}
+          onExport={handleExport}
+          onImport={handleRestore}
+          onCloud={() => setShowCloudBackup(true)}
+          onBrand={() => setShowBrandSettings(true)}
+          onLogout={handleLogout}
+          onUpgradePro={async () => { try { await startCheckout('pro'); } catch(e) { alert(e.message); } }}
+        />
+      }
+      pageTitle="Kosztorys i dokumenty"
+      pageSubtitle="Kompleksowe wykończenia wnętrz • Małopolskie"
+    >
     <div className="app-container">
     
       <style>{`
@@ -301,8 +326,8 @@ if (used >= limit) {
               />
               <div>
                 <h1 className="header-title">
-  LoftDesk – Kosztorys / Faktura / Umowa ({plan.toUpperCase()})
-</h1>
+          LoftDesk – Kosztorys / Faktura / Umowa ({plan.toUpperCase()})
+                </h1>
 
                 <p className="header-subtitle">
                   Kompleksowe wykończenia wnętrz • Małopolskie
@@ -763,7 +788,7 @@ src/components/Dashboard/Dashboard.jsx
   />
 )}
     </div>
-    
+    </AppLayout>
   );
 }
 
