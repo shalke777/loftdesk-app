@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import { storage, makeBackupSnapshot, restoreBackupSnapshot, downloadJson, pickJsonFile } from "./utils/storage";
 import { todayISO } from "./utils/format";
 import { DEFAULT_COMPANY, STORAGE_KEYS } from "./constants";
@@ -33,18 +34,28 @@ import AuthPage from "./AuthPage";
 import { Palette, Users, Building2, CheckCircle2 } from "lucide-react";
 import './App.css';
 
+// Portal - renderuje modale bezpośrednio na document.body
+function Portal({ children }) {
+  const [el] = useState(() => document.createElement('div'));
+  useEffect(() => {
+    document.body.appendChild(el);
+    return () => { document.body.removeChild(el); };
+  }, [el]);
+  return ReactDOM.createPortal(children, el);
+}
+
 function AppShell() {
-  const [showDashboard, setShowDashboard]     = useState(false);
-  const [showProjects, setShowProjects]       = useState(false);
-  const [activeProjectId, setActiveProjectId] = useState(null);
-  const [showBrandSettings, setShowBrandSettings] = useState(false);
-  const [showContractors, setShowContractors] = useState(false);
-  const [showPriceList, setShowPriceList]     = useState(false);
-  const [showInvoices, setShowInvoices]       = useState(false);
-  const [showInvoiceForm, setShowInvoiceForm] = useState(false);
-  const [showContracts, setShowContracts]     = useState(false);
+  const [showDashboard,    setShowDashboard]    = useState(false);
+  const [showProjects,     setShowProjects]     = useState(false);
+  const [activeProjectId,  setActiveProjectId]  = useState(null);
+  const [showBrandSettings,setShowBrandSettings]= useState(false);
+  const [showContractors,  setShowContractors]  = useState(false);
+  const [showPriceList,    setShowPriceList]    = useState(false);
+  const [showInvoices,     setShowInvoices]     = useState(false);
+  const [showInvoiceForm,  setShowInvoiceForm]  = useState(false);
+  const [showContracts,    setShowContracts]    = useState(false);
   const [showContractForm, setShowContractForm] = useState(false);
-  const [showCloudBackup, setShowCloudBackup] = useState(false);
+  const [showCloudBackup,  setShowCloudBackup]  = useState(false);
 
   const [buyer, setBuyer] = useState({ name: "", address: "", nip: "", phone: "", email: "" });
   const [company, setCompany] = useState(() => {
@@ -169,7 +180,6 @@ function AppShell() {
 
   return (
     <>
-      {/* CSS variables */}
       <style>{`
         :root {
           --color-primary: ${brand.primary};
@@ -179,7 +189,6 @@ function AppShell() {
         }
       `}</style>
 
-      {/* Główny layout z nawigacją */}
       <AppLayout
         nav={
           <AppNav
@@ -204,12 +213,11 @@ function AppShell() {
         pageTitle="Kosztorys i dokumenty"
         pageSubtitle="Kompleksowe wykończenia wnętrz • Małopolskie"
       >
-        {/* Dane nabywcy i firmy */}
         <div className="grid-2">
           <div className="card">
             <div className="card-header">
               <h2 className="card-title">
-                <Users size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: 8 }} />
+                <Users size={20} style={{ display:'inline-block', verticalAlign:'middle', marginRight:8 }} />
                 Dane nabywcy
               </h2>
               <button className="btn-secondary" onClick={() => setShowContractors(true)}>
@@ -247,7 +255,7 @@ function AppShell() {
 
           <div className="card">
             <h2 className="card-title">
-              <Building2 size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: 8 }} />
+              <Building2 size={20} style={{ display:'inline-block', verticalAlign:'middle', marginRight:8 }} />
               Dane Twojej firmy
             </h2>
             <div className="form-group">
@@ -285,24 +293,18 @@ function AppShell() {
           </div>
         </div>
 
-        {/* Kosztorys */}
         <CostingPanel
-          lines={costingLines}
-          rates={rates}
+          lines={costingLines} rates={rates}
           onAddLine={addLine}
           onAddCustomLine={(data) => addCustomLine(data, addRate)}
-          onUpdateLine={updateLine}
-          onRemoveLine={removeLine}
-          onClearAll={clearAll}
+          onUpdateLine={updateLine} onRemoveLine={removeLine} onClearAll={clearAll}
           onOpenPriceList={() => setShowPriceList(true)}
           onGeneratePDF={async () => {
             if (costingLines.length === 0) { alert("Dodaj przynajmniej jedną pozycję!"); return; }
             let totalNet = 0, totalVat = 0, totalGross = 0;
             costingLines.forEach((line) => {
-              const rate = rates[line.code];
-              if (!rate) return;
-              const net = rate.priceNet * line.qty;
-              const vat = net * rate.vat;
+              const rate = rates[line.code]; if (!rate) return;
+              const net = rate.priceNet * line.qty; const vat = net * rate.vat;
               totalNet += net; totalVat += vat; totalGross += net + vat;
             });
             const { generateCostingPDFFromHTML } = await import("./utils/contractPDFTemplate");
@@ -314,10 +316,9 @@ function AppShell() {
           }}
         />
 
-        {/* Status */}
         <div className="status-card">
-          <div className="status-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <CheckCircle2 size={48} style={{ color: 'var(--color-primary)' }} />
+          <div className="status-icon" style={{ display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <CheckCircle2 size={48} style={{ color:'var(--color-primary)' }} />
           </div>
           <div className="status-content">
             <h3 className="status-title">Aplikacja gotowa do pracy!</h3>
@@ -330,7 +331,7 @@ function AppShell() {
               <span className="badge badge-blue">Umowy ({contracts.length})</span>
               <span className="badge badge-blue">Plan: {plan.toUpperCase()}</span>
             </div>
-            <div style={{ marginTop: 20, display: 'flex', gap: 12, justifyContent: 'center' }}>
+            <div style={{ marginTop:20, display:'flex', gap:12, justifyContent:'center' }}>
               <button onClick={() => setShowBrandSettings(true)} className="btn-primary">
                 <Palette size={18} /> Ustawienia firmy i branding
               </button>
@@ -339,83 +340,103 @@ function AppShell() {
         </div>
       </AppLayout>
 
-      {/* ═══ MODALE — poza AppLayout żeby position:fixed działało ═══ */}
+      {/* ═══ MODALE przez Portal — zawsze na document.body ═══ */}
 
       {showBrandSettings && (
-        <BrandSettings brand={brand} setBrand={setBrand} company={company}
-          setCompany={setCompany} onClose={() => setShowBrandSettings(false)} />
+        <Portal>
+          <BrandSettings brand={brand} setBrand={setBrand} company={company}
+            setCompany={setCompany} onClose={() => setShowBrandSettings(false)} />
+        </Portal>
       )}
 
       {showContractors && (
-        <ContractorsModal open={showContractors} onClose={() => setShowContractors(false)}
-          contractors={contractors} onUpsert={upsert} onRemove={remove}
-          onImport={replaceAll} onSelect={handleSelectContractor} />
+        <Portal>
+          <ContractorsModal open={showContractors} onClose={() => setShowContractors(false)}
+            contractors={contractors} onUpsert={upsert} onRemove={remove}
+            onImport={replaceAll} onSelect={handleSelectContractor} />
+        </Portal>
       )}
 
       {showPriceList && (
-        <PriceListModal open={showPriceList} onClose={() => setShowPriceList(false)}
-          rates={rates} onUpdate={updateRate} onAdd={addRate} onReset={resetToDefaults} />
+        <Portal>
+          <PriceListModal open={showPriceList} onClose={() => setShowPriceList(false)}
+            rates={rates} onUpdate={updateRate} onAdd={addRate} onReset={resetToDefaults} />
+        </Portal>
       )}
 
       {showInvoices && (
-        <InvoicesModal open={showInvoices} onClose={() => setShowInvoices(false)}
-          invoices={invoices} onRemove={removeInvoice} onMarkAsPaid={markAsPaid}
-          onGeneratePDF={handleGenerateInvoicePDF}
-          onCreateNew={() => { setShowInvoices(false); setShowInvoiceForm(true); }} />
+        <Portal>
+          <InvoicesModal open={showInvoices} onClose={() => setShowInvoices(false)}
+            invoices={invoices} onRemove={removeInvoice} onMarkAsPaid={markAsPaid}
+            onGeneratePDF={handleGenerateInvoicePDF}
+            onCreateNew={() => { setShowInvoices(false); setShowInvoiceForm(true); }} />
+        </Portal>
       )}
 
       {showInvoiceForm && (
-        <InvoiceForm open={showInvoiceForm} onClose={() => setShowInvoiceForm(false)}
-          onSave={handleCreateInvoice} buyer={buyer} company={company}
-          rates={rates} nextNumber={getNextInvoiceNumber()} costingLines={costingLines} />
+        <Portal>
+          <InvoiceForm open={showInvoiceForm} onClose={() => setShowInvoiceForm(false)}
+            onSave={handleCreateInvoice} buyer={buyer} company={company}
+            rates={rates} nextNumber={getNextInvoiceNumber()} costingLines={costingLines} />
+        </Portal>
       )}
 
       {showContracts && (
-        <ContractsModal open={showContracts} onClose={() => setShowContracts(false)}
-          contracts={contracts} onRemove={removeContract} onMarkAsSigned={markAsSigned}
-          onGeneratePDF={(contract) => {
-            if (!contract || !contract.totalAmount) { alert("Brak danych umowy"); return; }
-            try { generateContractPDFFromHTML(contract, company); }
-            catch (error) { alert('Błąd PDF: ' + error.message); }
-          }}
-          onCreateNew={() => { setShowContracts(false); setShowContractForm(true); }} />
+        <Portal>
+          <ContractsModal open={showContracts} onClose={() => setShowContracts(false)}
+            contracts={contracts} onRemove={removeContract} onMarkAsSigned={markAsSigned}
+            onGeneratePDF={(contract) => {
+              if (!contract || !contract.totalAmount) { alert("Brak danych umowy"); return; }
+              try { generateContractPDFFromHTML(contract, company); }
+              catch (err) { alert('Błąd PDF: ' + err.message); }
+            }}
+            onCreateNew={() => { setShowContracts(false); setShowContractForm(true); }} />
+        </Portal>
       )}
 
       {showContractForm && (
-        <ContractForm open={showContractForm} onClose={() => setShowContractForm(false)}
-          onSave={handleCreateContract} buyer={buyer} company={company}
-          nextNumber={getNextContractNumber()} costingLines={costingLines} rates={rates} />
+        <Portal>
+          <ContractForm open={showContractForm} onClose={() => setShowContractForm(false)}
+            onSave={handleCreateContract} buyer={buyer} company={company}
+            nextNumber={getNextContractNumber()} costingLines={costingLines} rates={rates} />
+        </Portal>
       )}
 
       {showCloudBackup && (
-        <CloudBackupModal onClose={() => setShowCloudBackup(false)} />
+        <Portal>
+          <CloudBackupModal onClose={() => setShowCloudBackup(false)} />
+        </Portal>
       )}
 
       {showDashboard && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, overflowY: 'auto', padding: '24px 16px' }}>
-          <div style={{ maxWidth: 1100, margin: '0 auto', background: '#f8fafc', borderRadius: 16, padding: 24 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1e293b', margin: 0 }}>📊 Dashboard projektów</h2>
-              <button onClick={() => setShowDashboard(false)}
-                style={{ background: '#dc2626', color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontWeight: 600 }}>
-                ✕ Zamknij
-              </button>
+        <Portal>
+          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:9999, overflowY:'auto', padding:'24px 16px' }}>
+            <div style={{ maxWidth:1100, margin:'0 auto', background:'#f8fafc', borderRadius:16, padding:24 }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
+                <h2 style={{ fontSize:22, fontWeight:800, color:'#1e293b', margin:0 }}>📊 Dashboard projektów</h2>
+                <button onClick={() => setShowDashboard(false)}
+                  style={{ background:'#dc2626', color:'white', border:'none', borderRadius:8, padding:'8px 16px', cursor:'pointer', fontWeight:600 }}>
+                  ✕ Zamknij
+                </button>
+              </div>
+              <Dashboard
+                onOpenProject={(id) => { setShowDashboard(false); setActiveProjectId(id); setShowProjects(true); }}
+                onNewProject={() => { setShowDashboard(false); setActiveProjectId(null); setShowProjects(true); }}
+              />
             </div>
-            <Dashboard
-              onOpenProject={(id) => { setShowDashboard(false); setActiveProjectId(id); setShowProjects(true); }}
-              onNewProject={() => { setShowDashboard(false); setActiveProjectId(null); setShowProjects(true); }}
-            />
           </div>
-        </div>
+        </Portal>
       )}
 
       {showProjects && (
-        <ProjectModal
-          projectId={activeProjectId}
-          onClose={() => { setShowProjects(false); setActiveProjectId(null); }}
-          onProjectSaved={() => {}}
-          contractors={contractors}
-        />
+        <Portal>
+          <ProjectModal
+            projectId={activeProjectId}
+            onClose={() => { setShowProjects(false); setActiveProjectId(null); }}
+            onProjectSaved={() => {}}
+            contractors={contractors}
+          />
+        </Portal>
       )}
     </>
   );
@@ -443,15 +464,14 @@ export default function App() {
       }
     })();
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
-      setLoading(false);
+      setSession(s); setLoading(false);
     });
     return () => { alive = false; sub?.subscription?.unsubscribe?.(); };
   }, []);
 
-  if (!supabase)  return <div style={{ padding: 24 }}>Brak konfiguracji Supabase.</div>;
-  if (loading)    return <div style={{ padding: 24 }}>Ładowanie…</div>;
-  if (bootError)  return <div style={{ padding: 24 }}>Błąd startu: {String(bootError?.message || bootError)}</div>;
+  if (!supabase)  return <div style={{ padding:24 }}>Brak konfiguracji Supabase.</div>;
+  if (loading)    return <div style={{ padding:24 }}>Ładowanie…</div>;
+  if (bootError)  return <div style={{ padding:24 }}>Błąd startu: {String(bootError?.message || bootError)}</div>;
 
   const path       = window.location.pathname;
   const isLogin    = path === "/login";
