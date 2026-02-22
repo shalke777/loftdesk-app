@@ -2,7 +2,7 @@
 // Hybrydowy: jeśli projectId podany — zapisuje w Supabase
 //            jeśli nie — działa jak poprzednio (localStorage)
 import { useState, useEffect, useCallback } from 'react';
-import { storage } from '../utils/storage';
+import { storage } from '../utils/storage.js';
 import { supabase } from '../lib/supabase';
 
 const STORAGE_KEY = 'loftdesk_costing_lines';
