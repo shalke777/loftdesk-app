@@ -24,7 +24,7 @@ import { supabase } from "./lib/supabase";
 import { saveBackupToDb } from "./lib/backup";
 import { fetchUserPlan } from "./lib/plan";
 import { startCheckout } from "./lib/stripeCheckout";
-import ProjectModal, { ProjectList } from './components/projects/ProjectModal';
+import ProjectModal from './components/projects/ProjectModal';
 import ErrorBoundary from "./ErrorBoundary";
 import AuthPage from "./AuthPage";
 import { 
@@ -342,7 +342,7 @@ if (used >= limit) {
   </button>
 
 <button
-  onClick={() => { setShowProjects(true); setActiveProjectId(null); setShowProjects(true) }}
+  onClick={() => { setShowProjects(true); setActiveProjectId(null ); setShowProjects(true) }}
   className="header-btn"
   data-testid="nav-projects"
 >
@@ -725,7 +725,14 @@ Pro
       {showCloudBackup && (
   <CloudBackupModal onClose={() => setShowCloudBackup(false)} />
 )}
-
+{showProjects && (
+  <ProjectModal
+    projectId={activeProjectId}
+    onClose={() => { setShowProjects(false); setActiveProjectId(null); }}
+    onProjectSaved={() => {}}
+    contractors={contractors}
+  />
+)}
     </div>
     
   );
