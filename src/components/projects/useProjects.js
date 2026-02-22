@@ -148,7 +148,7 @@ const payload = {
   budget_gross:   formData.budget_gross   === '' ? null : formData.budget_gross,
   costs_actual:   formData.costs_actual   === '' ? null : formData.costs_actual,
   contractor_id:  isValidUUID(formData.contractor_id)  ? formData.contractor_id  : null,
-  milestone_id:   isValidUUID(formData.milestone_id)   ? formData.milestone_id   : null,
+ 
 };
       let result;
       if (projectId) {
