@@ -78,28 +78,30 @@ function FormModal({ onClose, children, maxWidth = 820 }) {
 }
 
 function AppShell() {
-  const [showDashboard,    setShowDashboard]    = useState(false);
-  const [showProjects,     setShowProjects]     = useState(false);
-  const [activeProjectId,  setActiveProjectId]  = useState(null);
-  const [showBrandSettings,setShowBrandSettings]= useState(false);
-  const [showContractors,  setShowContractors]  = useState(false);
-  const [showPriceList,    setShowPriceList]    = useState(false);
-  const [showInvoices,     setShowInvoices]     = useState(false);
-  const [showInvoiceForm,  setShowInvoiceForm]  = useState(false);
-  const [showContracts,    setShowContracts]    = useState(false);
-  const [showContractForm, setShowContractForm] = useState(false);
-  const [showCloudBackup,  setShowCloudBackup]  = useState(false);
-const [projectsLoading, setProjectsLoading] = useState(false);
-const [projects, setProjects]               = useState([]);
-const [showProjectForm, setShowProjectForm] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
+  // ... inne state
 
-// Załaduj projekty z Supabase
-useEffect(() => {
-  if (!user) return;
-  setProjectsLoading(true);
-  supabase.from('projects').select('*').order('created_at', { ascending: false })
-    .then(({ data }) => { setProjects(data || []); setProjectsLoading(false); });
-}, [user]);
+  const { user } = useAuth(); // ✅ PRZENIEŚ TUTAJ (wcześniej)
+
+  const [projectsLoading, setProjectsLoading] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [showProjectForm, setShowProjectForm] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    setProjectsLoading(true);
+    supabase
+      .from('projects')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        setProjects(data || []);
+        setProjectsLoading(false);
+      });
+  }, [user]);
+
+  // ...
+}
 
 const handleDeleteProject = async (id) => {
   await supabase.from('projects').delete().eq('id', id);
@@ -208,7 +210,7 @@ const handleDeleteProject = async (id) => {
     alert("Faktura wystawiona! PDF został pobrany.");
   };
 const handleCreateContract = async (contractData) => {  
-  const handleGenerateInvoicePDF = async (invoice) => {
+  {
   const { generateInvoicePDFFromHTML } = await import("./utils/contractPDFTemplate");
   await generateInvoicePDFFromHTML(invoice, company);
 };  // ← dodaj "async"
