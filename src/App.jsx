@@ -31,10 +31,10 @@ import { AppNav } from './components/shared/AppNav';
 import { AppLayout } from './components/shared/AppLayout';
 import ErrorBoundary from "./ErrorBoundary";
 import AuthPage from "./AuthPage";
-import { Palette, Users, Building2, CheckCircle2 } from "lucide-react";
+import { Palette, Users, Building2, CheckCircle2, FileCheck, Receipt } from "lucide-react";
 import './App.css';
 
-// Portal - renderuje modale bezpośrednio na document.body
+// Portal — renderuje na document.body
 function Portal({ children }) {
   const [el] = useState(() => document.createElement('div'));
   useEffect(() => {
@@ -42,6 +42,38 @@ function Portal({ children }) {
     return () => { document.body.removeChild(el); };
   }, [el]);
   return ReactDOM.createPortal(children, el);
+}
+
+// Wrapper modal dla formularzy które nie mają własnego overlay
+function FormModal({ onClose, children, maxWidth = 820 }) {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    const esc = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', esc);
+    return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', esc); };
+  }, [onClose]);
+
+  return (
+    <div
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: 'rgba(15,23,42,0.75)',
+        backdropFilter: 'blur(4px)',
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+        padding: '32px 16px', overflowY: 'auto',
+      }}
+    >
+      <div style={{
+        width: '100%', maxWidth,
+        background: 'white', borderRadius: 20,
+        boxShadow: '0 25px 60px rgba(0,0,0,0.35)',
+        overflow: 'hidden', marginBottom: 32,
+      }}>
+        {children}
+      </div>
+    </div>
+  );
 }
 
 function AppShell() {
@@ -213,6 +245,7 @@ function AppShell() {
         pageTitle="Kosztorys i dokumenty"
         pageSubtitle="Kompleksowe wykończenia wnętrz • Małopolskie"
       >
+        {/* Dane nabywcy i firmy */}
         <div className="grid-2">
           <div className="card">
             <div className="card-header">
@@ -293,6 +326,7 @@ function AppShell() {
           </div>
         </div>
 
+        {/* Kosztorys */}
         <CostingPanel
           lines={costingLines} rates={rates}
           onAddLine={addLine}
@@ -316,6 +350,7 @@ function AppShell() {
           }}
         />
 
+        {/* Status */}
         <div className="status-card">
           <div className="status-icon" style={{ display:'flex', alignItems:'center', justifyContent:'center' }}>
             <CheckCircle2 size={48} style={{ color:'var(--color-primary)' }} />
@@ -340,7 +375,7 @@ function AppShell() {
         </div>
       </AppLayout>
 
-      {/* ═══ MODALE przez Portal — zawsze na document.body ═══ */}
+      {/* ═══ MODALE przez Portal ═══ */}
 
       {showBrandSettings && (
         <Portal>
@@ -373,11 +408,35 @@ function AppShell() {
         </Portal>
       )}
 
+      {/* InvoiceForm — w FormModal z własnym overlay */}
       {showInvoiceForm && (
         <Portal>
-          <InvoiceForm open={showInvoiceForm} onClose={() => setShowInvoiceForm(false)}
-            onSave={handleCreateInvoice} buyer={buyer} company={company}
-            rates={rates} nextNumber={getNextInvoiceNumber()} costingLines={costingLines} />
+          <FormModal onClose={() => setShowInvoiceForm(false)} maxWidth={900}>
+            {/* Kolorowy nagłówek */}
+            <div style={{ background:'linear-gradient(135deg, #dc2626, #b91c1c)', padding:'22px 28px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+                <div style={{ width:44, height:44, background:'rgba(255,255,255,0.2)', borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <Receipt size={22} color="white" />
+                </div>
+                <div>
+                  <h2 style={{ color:'white', fontSize:20, fontWeight:800, margin:0 }}>Nowa faktura VAT</h2>
+                  <p style={{ color:'rgba(255,255,255,0.75)', fontSize:13, margin:0 }}>Wypełnij dane i wygeneruj PDF</p>
+                </div>
+              </div>
+              <button onClick={() => setShowInvoiceForm(false)} style={{ width:36, height:36, borderRadius:10, background:'rgba(255,255,255,0.2)', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <span style={{ color:'white', fontSize:18, lineHeight:1 }}>✕</span>
+              </button>
+            </div>
+            <div style={{ padding:'0' }}>
+              <InvoiceForm
+                open={showInvoiceForm}
+                onClose={() => setShowInvoiceForm(false)}
+                onSave={handleCreateInvoice}
+                buyer={buyer} company={company} rates={rates}
+                nextNumber={getNextInvoiceNumber()} costingLines={costingLines}
+              />
+            </div>
+          </FormModal>
         </Portal>
       )}
 
@@ -394,11 +453,36 @@ function AppShell() {
         </Portal>
       )}
 
+      {/* ContractForm — w FormModal z własnym overlay */}
       {showContractForm && (
         <Portal>
-          <ContractForm open={showContractForm} onClose={() => setShowContractForm(false)}
-            onSave={handleCreateContract} buyer={buyer} company={company}
-            nextNumber={getNextContractNumber()} costingLines={costingLines} rates={rates} />
+          <FormModal onClose={() => setShowContractForm(false)} maxWidth={900}>
+            {/* Kolorowy nagłówek */}
+            <div style={{ background:'linear-gradient(135deg, #d97706, #b45309)', padding:'22px 28px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+                <div style={{ width:44, height:44, background:'rgba(255,255,255,0.2)', borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <FileCheck size={22} color="white" />
+                </div>
+                <div>
+                  <h2 style={{ color:'white', fontSize:20, fontWeight:800, margin:0 }}>Nowa umowa</h2>
+                  <p style={{ color:'rgba(255,255,255,0.75)', fontSize:13, margin:0 }}>Wypełnij dane i wygeneruj PDF</p>
+                </div>
+              </div>
+              <button onClick={() => setShowContractForm(false)} style={{ width:36, height:36, borderRadius:10, background:'rgba(255,255,255,0.2)', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <span style={{ color:'white', fontSize:18, lineHeight:1 }}>✕</span>
+              </button>
+            </div>
+            <div style={{ padding:'0' }}>
+              <ContractForm
+                open={showContractForm}
+                onClose={() => setShowContractForm(false)}
+                onSave={handleCreateContract}
+                buyer={buyer} company={company}
+                nextNumber={getNextContractNumber()}
+                costingLines={costingLines} rates={rates}
+              />
+            </div>
+          </FormModal>
         </Portal>
       )}
 
@@ -410,12 +494,12 @@ function AppShell() {
 
       {showDashboard && (
         <Portal>
-          <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.6)', zIndex:9999, overflowY:'auto', padding:'24px 16px' }}>
-            <div style={{ maxWidth:1100, margin:'0 auto', background:'#f8fafc', borderRadius:16, padding:24 }}>
+          <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(15,23,42,0.75)', backdropFilter:'blur(4px)', overflowY:'auto', padding:'24px 16px' }}>
+            <div style={{ maxWidth:1100, margin:'0 auto', background:'#f8fafc', borderRadius:20, padding:28, boxShadow:'0 25px 60px rgba(0,0,0,0.3)' }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
                 <h2 style={{ fontSize:22, fontWeight:800, color:'#1e293b', margin:0 }}>📊 Dashboard projektów</h2>
                 <button onClick={() => setShowDashboard(false)}
-                  style={{ background:'#dc2626', color:'white', border:'none', borderRadius:8, padding:'8px 16px', cursor:'pointer', fontWeight:600 }}>
+                  style={{ background:'#dc2626', color:'white', border:'none', borderRadius:10, padding:'9px 18px', cursor:'pointer', fontWeight:700, fontSize:13 }}>
                   ✕ Zamknij
                 </button>
               </div>
