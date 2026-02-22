@@ -29,6 +29,7 @@ import ProjectModal from './components/projects/ProjectModal';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { AppNav } from './components/shared/AppNav';
 import { AppLayout } from './components/shared/AppLayout';
+import { ProjectsPage } from './components/projects/ProjectsPage';
 import ErrorBoundary from "./ErrorBoundary";
 import AuthPage from "./AuthPage";
 import { Palette, Users, Building2, CheckCircle2, FileCheck, Receipt } from "lucide-react";
@@ -88,7 +89,22 @@ function AppShell() {
   const [showContracts,    setShowContracts]    = useState(false);
   const [showContractForm, setShowContractForm] = useState(false);
   const [showCloudBackup,  setShowCloudBackup]  = useState(false);
+const [projectsLoading, setProjectsLoading] = useState(false);
+const [projects, setProjects]               = useState([]);
+const [showProjectForm, setShowProjectForm] = useState(false);
 
+// Załaduj projekty z Supabase
+useEffect(() => {
+  if (!user) return;
+  setProjectsLoading(true);
+  supabase.from('projects').select('*').order('created_at', { ascending: false })
+    .then(({ data }) => { setProjects(data || []); setProjectsLoading(false); });
+}, [user]);
+
+const handleDeleteProject = async (id) => {
+  await supabase.from('projects').delete().eq('id', id);
+  setProjects(prev => prev.filter(p => p.id !== id));
+};
   const [buyer, setBuyer] = useState({ name: "", address: "", nip: "", phone: "", email: "" });
   const [company, setCompany] = useState(() => {
     const stored = storage.get(STORAGE_KEYS.COMPANY, DEFAULT_COMPANY);
@@ -187,28 +203,29 @@ function AppShell() {
       alert(`Limit planu FREE: ${limit} faktury/miesiąc.\nMasz już: ${used}/${limit}.\n\nPrzejdź na PRO.`);
       return;
     }
-    addInvoice({ ...invoiceData, isPaid: false });
+    await addInvoice({ ...invoiceData, isPaid: false });
     commitInvoiceNumber(invoiceData.number);
     alert("Faktura wystawiona! PDF został pobrany.");
   };
-
+const handleCreateContract = async (contractData) => {  
   const handleGenerateInvoicePDF = async (invoice) => {
-    const { generateInvoicePDFFromHTML } = await import("./utils/contractPDFTemplate");
-    await generateInvoicePDFFromHTML(invoice, company);
-  };
-
-  const handleCreateContract = (contractData) => {
-    const used  = countThisMonth(contracts, "createdAt");
-    const limit = LIMITS[plan]?.contractsPerMonth ?? 3;
-    if (used >= limit) {
-      alert(`Limit planu ${plan.toUpperCase()}: ${limit} umowy / miesiąc.\nPrzejdź na Pro.`);
-      return;
-    }
-    const contract = addContract({ ...contractData, isSigned: false });
-    commitContractNumber(contractData.number);
-    generateContractPDFFromHTML(contract, company);
-    alert("Umowa utworzona! PDF został pobrany.");
-  };
+  const { generateInvoicePDFFromHTML } = await import("./utils/contractPDFTemplate");
+  await generateInvoicePDFFromHTML(invoice, company);
+};  // ← dodaj "async"
+  const used  = countThisMonth(contracts, "createdAt");
+  
+  const limit = LIMITS[plan]?.contractsPerMonth ?? 3;
+  if (used >= limit) {
+    alert(`Limit planu ${plan.toUpperCase()}: ${limit} umowy / miesiąc.\nPrzejdź na Pro.`);
+    return;
+  }
+  const contract = await addContract({ ...contractData, isSigned: false });
+  if (!contract) return;                                   // ← zabezpieczenie
+  commitContractNumber(contractData.number);
+  generateContractPDFFromHTML(contract, company);
+  alert("Umowa utworzona! PDF został pobrany.");
+  
+};
 
   return (
     <>
@@ -511,17 +528,20 @@ function AppShell() {
           </div>
         </Portal>
       )}
-
-      {showProjects && (
-        <Portal>
-          <ProjectModal
-            projectId={activeProjectId}
-            onClose={() => { setShowProjects(false); setActiveProjectId(null); }}
-            onProjectSaved={() => {}}
-            contractors={contractors}
-          />
-        </Portal>
-      )}
+{showProjects && (
+  <Portal>
+    <ProjectsPage
+      projects={projects}
+      loading={projectsLoading}
+      onCreateProject={() => setShowProjectForm(true)}
+      onDeleteProject={handleDeleteProject}
+      onClose={() => setShowProjects(false)}
+      rates={rates}
+      company={company}
+      contractors={contractors}
+    />
+  </Portal>
+)}
     </>
   );
 }
