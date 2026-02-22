@@ -17,7 +17,7 @@ import { InvoicesModal } from "./components/Invoices/InvoicesModal";
 import { InvoiceForm } from "./components/Invoices/InvoiceForm";
 import { ContractsModal } from "./components/Contracts/ContractsModal";
 import { ContractForm } from "./components/Contracts/ContractForm";
-import { generateContractPDFFromHTML, } from "./utils/contractPDFTemplate";
+import { generateContractPDFFromHTML } from "./utils/contractPDFTemplate";
 import { CloudBackupModal } from './components/Auth/CloudBackupModal';
 import { useAuth } from './hooks/useAuth';
 import { supabase } from "./lib/supabase";
@@ -30,107 +30,13 @@ import { AppNav } from './components/shared/AppNav';
 import { AppLayout } from './components/shared/AppLayout';
 import ErrorBoundary from "./ErrorBoundary";
 import AuthPage from "./AuthPage";
-import { 
-  Palette, 
-  Download, 
-  Upload, 
-  Users, 
-  Building2, 
-  CheckCircle2,
-  Receipt,
-  FileCheck,
-  Cloud
-} from "lucide-react";
+import { Palette, Users, Building2, CheckCircle2 } from "lucide-react";
 import './App.css';
 
 function AppShell() {
-  console.log("URL ok?", !!process.env.REACT_APP_SUPABASE_URL);
-console.log("KEY ok?", !!process.env.REACT_APP_SUPABASE_ANON_KEY);
-
-const [showDashboard, setShowDashboard] = useState(false);
-
-const handleLogout = async () => {
-  if (!supabase) {
-    alert("Brak konfiguracji Supabase (.env / ENV na Netlify).");
-    return;
-  }
-
-  await supabase.auth.signOut();
-  window.location.href = "/login"; // po wylogowaniu pokaż ekran logowania
-};
-const [showProjects, setShowProjects] = useState(false);
-const [activeProjectId, setActiveProjectId] = useState(null);
-  const [company, setCompany] = useState(() => {
-    const stored = storage.get(STORAGE_KEYS.COMPANY, DEFAULT_COMPANY);
-    return {
-      ...stored,
-      logo: stored.logo || "",
-
-    };
-  });
-
-  const { user } = useAuth();
-  const [plan, setPlan] = useState(() => localStorage.getItem("loftdesk_plan") || "free");
-
-useEffect(() => {
-  localStorage.setItem("loftdesk_plan", plan);
-}, [plan]);
-
- // TODO: potem weź z Supabase/Stripe (pro/business)
-
-
-  const [showCloudBackup, setShowCloudBackup] = useState(false);
- 
-  // ... reszta bez zmian ...
-  const { brand, setBrand } = useBrand();
-  const { contractors, upsert, remove, replaceAll } = useContractors();
-  const { rates, updateRate, addRate, resetToDefaults } = useRates();
-  const { 
-    costingLines, 
-    addLine, 
-    addCustomLine,
-    updateLine, 
-    removeLine, 
-    clearAll 
-  } = useCosting();
-  const { invoices, addInvoice, removeInvoice, markAsPaid } = useInvoices();
-// ---- LIMITY + liczenie w tym miesiącu ----
-const LIMITS = {
-  free: { invoicesPerMonth: 3, contractsPerMonth: 3 },
-  pro: { invoicesPerMonth: Infinity, contractsPerMonth: Infinity },
-  business: { invoicesPerMonth: Infinity, contractsPerMonth: Infinity },
-};
-
-const countThisMonth = (items, dateKey = "createdAt") => {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = now.getMonth();
-  return (items || []).filter((it) => {
-    const d = it?.[dateKey] ? new Date(it[dateKey]) : null;
-    return d && d.getFullYear() === y && d.getMonth() === m;
-  }).length;
-};
-
-// UI: ile zostało faktur w tym miesiącu
-const invoicesUsed = countThisMonth(invoices, "createdAt");
-const invoicesLimit = LIMITS[plan]?.invoicesPerMonth ?? 3;
-const invoicesLeft =
-  invoicesLimit === Infinity ? "∞" : Math.max(0, invoicesLimit - invoicesUsed);
-
-
-  // ---- LIMITY (Free) ----
-
-  const { contracts, addContract, removeContract, markAsSigned } = useContracts();
-  
-  const { getNext: getNextInvoiceNumber, commit: commitInvoiceNumber } = useCounter(
-    STORAGE_KEYS.INVOICE_YEAR,
-    STORAGE_KEYS.INVOICE_COUNTER
-  );
-  const { getNext: getNextContractNumber, commit: commitContractNumber } = useCounter(
-    STORAGE_KEYS.CONTRACT_YEAR,
-    STORAGE_KEYS.CONTRACT_COUNTER
-  );
-  
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [showProjects, setShowProjects] = useState(false);
+  const [activeProjectId, setActiveProjectId] = useState(null);
   const [showBrandSettings, setShowBrandSettings] = useState(false);
   const [showContractors, setShowContractors] = useState(false);
   const [showPriceList, setShowPriceList] = useState(false);
@@ -138,147 +44,131 @@ const invoicesLeft =
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const [showContracts, setShowContracts] = useState(false);
   const [showContractForm, setShowContractForm] = useState(false);
-  console.log('🔍 showContractForm state:', showContractForm);
-  const [buyer, setBuyer] = useState({
-    name: "",
-    address: "",
-    nip: "",
-    phone: "",
-    email: "",
+  const [showCloudBackup, setShowCloudBackup] = useState(false);
+
+  const [buyer, setBuyer] = useState({ name: "", address: "", nip: "", phone: "", email: "" });
+
+  const [company, setCompany] = useState(() => {
+    const stored = storage.get(STORAGE_KEYS.COMPANY, DEFAULT_COMPANY);
+    return { ...stored, logo: stored.logo || "" };
   });
+
+  const { user } = useAuth();
+  const [plan, setPlan] = useState(() => localStorage.getItem("loftdesk_plan") || "free");
+
+  const { brand, setBrand } = useBrand();
+  const { contractors, upsert, remove, replaceAll } = useContractors();
+  const { rates, updateRate, addRate, resetToDefaults } = useRates();
+  const { costingLines, addLine, addCustomLine, updateLine, removeLine, clearAll } = useCosting();
+  const { invoices, addInvoice, removeInvoice, markAsPaid } = useInvoices();
+  const { contracts, addContract, removeContract, markAsSigned } = useContracts();
+
+  const { getNext: getNextInvoiceNumber, commit: commitInvoiceNumber } = useCounter(
+    STORAGE_KEYS.INVOICE_YEAR, STORAGE_KEYS.INVOICE_COUNTER
+  );
+  const { getNext: getNextContractNumber, commit: commitContractNumber } = useCounter(
+    STORAGE_KEYS.CONTRACT_YEAR, STORAGE_KEYS.CONTRACT_COUNTER
+  );
+
+  const LIMITS = {
+    free:     { invoicesPerMonth: 3,        contractsPerMonth: 3 },
+    pro:      { invoicesPerMonth: Infinity, contractsPerMonth: Infinity },
+    business: { invoicesPerMonth: Infinity, contractsPerMonth: Infinity },
+  };
+
+  const countThisMonth = (items, dateKey = "createdAt") => {
+    const now = new Date();
+    return (items || []).filter((it) => {
+      const d = it?.[dateKey] ? new Date(it[dateKey]) : null;
+      return d && d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    }).length;
+  };
+
+  const invoicesUsed  = countThisMonth(invoices, "createdAt");
+  const invoicesLimit = LIMITS[plan]?.invoicesPerMonth ?? 3;
+  const invoicesLeft  = invoicesLimit === Infinity ? "∞" : Math.max(0, invoicesLimit - invoicesUsed);
+
+  useEffect(() => { localStorage.setItem("loftdesk_plan", plan); }, [plan]);
+  useEffect(() => { storage.set(STORAGE_KEYS.COMPANY, company); }, [company]);
 
   useEffect(() => {
-    storage.set(STORAGE_KEYS.COMPANY, company);
-  }, [company]);
-
-useEffect(() => {
-  let alive = true;
-
-  (async () => {
-    try {
-      if (!user) {
-        if (alive) setPlan("free");
-        return;
-      }
-      const p = await fetchUserPlan(supabase);
-      if (alive) setPlan(p);
-    } catch (e) {
-      console.warn("fetchUserPlan error:", e);
-      if (alive) setPlan("free");
-    }
-  })();
-
-  return () => { alive = false; };
-}, [user]);
-
-
-const handleExport = async () => {
-  try {
-    const snap = makeBackupSnapshot();
-
-    // 1) zapis na dysk
-    downloadJson(`loftdesk-backup-${todayISO()}.json`, snap);
-
-    // 2) zapis do chmury (jeśli user zalogowany i supabase skonfigurowany)
-    if (supabase) {
+    let alive = true;
+    (async () => {
       try {
-        await saveBackupToDb({ supabase, tenantId: null, payload: snap });
-      } catch (cloudErr) {
-        console.warn("Cloud backup error:", cloudErr);
-        // nie blokuj użytkownika – plik i tak zapisany
+        if (!user) { if (alive) setPlan("free"); return; }
+        const p = await fetchUserPlan(supabase);
+        if (alive) setPlan(p);
+      } catch (e) {
+        console.warn("fetchUserPlan error:", e);
+        if (alive) setPlan("free");
       }
+    })();
+    return () => { alive = false; };
+  }, [user]);
+
+  const handleLogout = async () => {
+    if (!supabase) { alert("Brak konfiguracji Supabase."); return; }
+    await supabase.auth.signOut();
+    window.location.href = "/login";
+  };
+
+  const handleExport = async () => {
+    try {
+      const snap = makeBackupSnapshot();
+      downloadJson(`loftdesk-backup-${todayISO()}.json`, snap);
+      if (supabase) {
+        try { await saveBackupToDb({ supabase, tenantId: null, payload: snap }); }
+        catch (cloudErr) { console.warn("Cloud backup error:", cloudErr); }
+      }
+      alert("Zapisano ✅ (plik + chmura)");
+    } catch (e) { alert("Błąd zapisu: " + (e?.message || e)); }
+  };
+
+  const handleRestore = async () => {
+    try {
+      const { text } = await pickJsonFile();
+      restoreBackupSnapshot(JSON.parse(text));
+      alert("Backup wczytany! Odświeżam aplikację…");
+      window.location.reload();
+    } catch (e) { alert("Nie udało się wczytać backupu."); }
+  };
+
+  const handleSelectContractor = (c) => setBuyer({
+    name: c.name, address: c.address || "", nip: c.nip || "",
+    phone: c.phone || "", email: c.email || "",
+  });
+
+  const handleCreateInvoice = async (invoiceData) => {
+    const used  = countThisMonth(invoices, "createdAt");
+    const limit = LIMITS[plan]?.invoicesPerMonth ?? 3;
+    if (limit !== Infinity && used >= limit) {
+      alert(`Limit planu FREE: ${limit} faktury/miesiąc.\nMasz już: ${used}/${limit}.\n\nPrzejdź na PRO.`);
+      return;
     }
-
-    alert("Zapisano ✅ (plik + chmura)");
-  } catch (e) {
-    console.error(e);
-    alert("Błąd zapisu: " + (e?.message || e));
-  }
-};
-
-
-const handleRestore = async () => {
-  try {
-    const { text } = await pickJsonFile();
-    const snap = JSON.parse(text);
-    restoreBackupSnapshot(snap);
-    alert("Backup wczytany! Odświeżam aplikację…");
-    window.location.reload();
-  } catch (e) {
-    console.error(e);
-    alert("Nie udało się wczytać backupu.");
-  }
-};
-
-
-  const handleSelectContractor = (contractor) => {
-    setBuyer({
-      name: contractor.name,
-      address: contractor.address || "",
-      nip: contractor.nip || "",
-      phone: contractor.phone || "",
-      email: contractor.email || "",
-    });
+    addInvoice({ ...invoiceData, isPaid: false });
+    commitInvoiceNumber(invoiceData.number);
+    alert("Faktura wystawiona! PDF został pobrany.");
   };
 
-  const handleImportContractors = (list) => {
-    replaceAll(list);
+  const handleGenerateInvoicePDF = async (invoice) => {
+    const { generateInvoicePDFFromHTML } = await import("./utils/contractPDFTemplate");
+    await generateInvoicePDFFromHTML(invoice, company);
   };
 
-const handleCreateInvoice = async (invoiceData) => {
-  const used = countThisMonth(invoices, "createdAt");
-  const limit = LIMITS[plan]?.invoicesPerMonth ?? 3;
+  const handleCreateContract = (contractData) => {
+    const used  = countThisMonth(contracts, "createdAt");
+    const limit = LIMITS[plan]?.contractsPerMonth ?? 3;
+    if (used >= limit) {
+      alert(`Limit planu ${plan.toUpperCase()}: ${limit} umowy / miesiąc.\nPrzejdź na Pro.`);
+      return;
+    }
+    const contract = addContract({ ...contractData, isSigned: false });
+    commitContractNumber(contractData.number);
+    generateContractPDFFromHTML(contract, company);
+    alert("Umowa utworzona! PDF został pobrany.");
+  };
 
-  if (limit !== Infinity && used >= limit) {
-    alert(
-      `Limit planu FREE: ${limit} faktury/miesiąc.\nMasz już: ${used}/${limit}.\n\nPrzejdź na PRO, żeby mieć bez limitu.`
-    );
-    return;
-  }
-
- if (used >= limit) {
-  alert(`Limit planu ${plan.toUpperCase()}: ${limit} faktur / miesiąc.\nPrzejdź na Pro, żeby mieć bez limitu.`);
-  return;
-  
-}
-
-
-  addInvoice({
-    ...invoiceData,
-    isPaid: false,
-  });
-
-  commitInvoiceNumber(invoiceData.number);
-  alert("Faktura wystawiona! PDF został pobrany.");
-};
-
-
-const handleGenerateInvoicePDF = async (invoice) => {
-  const { generateInvoicePDFFromHTML } = await import("./utils/contractPDFTemplate");
-  await generateInvoicePDFFromHTML(invoice, company);
-};
-const handleCreateContract = (contractData) => {
-  const used = countThisMonth(contracts, "createdAt");
-const limit = LIMITS[plan]?.contractsPerMonth ?? 3;
-
-if (used >= limit) {
-  alert(`Limit planu ${plan.toUpperCase()}: ${limit} umowy / miesiąc.\nPrzejdź na Pro, żeby mieć bez limitu.`);
-  return;
-}
-
-
-  const contract = addContract({
-    ...contractData,
-    isSigned: false,
-  });
-
-  commitContractNumber(contractData.number);
-  generateContractPDFFromHTML(contract, company);
-  alert("Umowa utworzona! PDF został pobrany.");
-};
-
-
- return (
+  return (
     <AppLayout
       nav={
         <AppNav
@@ -301,10 +191,8 @@ if (used >= limit) {
         />
       }
       pageTitle="Kosztorys i dokumenty"
-      pageSubtitle="Kompleksowe wykończenia wnętrz • Małopolskie"
+      pageSubtitle="Kompleksowe wykończenia wnętrz"
     >
-    <div className="app-container">
-    
       <style>{`
         :root {
           --color-primary: ${brand.primary};
@@ -314,497 +202,220 @@ if (used >= limit) {
         }
       `}</style>
 
-      <div className="app-content">
-        <div className="header-card">
-          <div className="header-content">
-            <div className="header-left">
-              <img
-                src="/logo.png"
-                alt="LoftDesk"
-                className="header-logo"
-                onError={(e) => (e.currentTarget.style.display = "none")}
-              />
-              <div>
-                <h1 className="header-title">
-          LoftDesk – Kosztorys / Faktura / Umowa ({plan.toUpperCase()})
-                </h1>
-
-                <p className="header-subtitle">
-                  Kompleksowe wykończenia wnętrz • Małopolskie
-                </p>
-              </div>
-            </div>
-
-           <div className="header-buttons">
- <button onClick={handleExport} className="header-btn" title="Zapisz plik na komputerze + kopia w chmurze">
-  <Download size={18} />
-  Zapisz do pliku
-</button>
-
-  <button
-    onClick={handleRestore}
-    className="header-btn"
-    title="Wczytaj plik z danymi z komputera"
-  >
-    <Upload size={18} />
-    Import danych
-  </button>
-
-  <button onClick={() => setShowCloudBackup(true)} className="header-btn" title="Przywracanie / historia kopii w chmurze">
-  <Cloud size={18} />
-  Import z chmury {user ? "✓" : ""}
-</button>
-
-
-<button onClick={() => setShowInvoices(true)} className="header-btn">
-  <Receipt size={18} />
-  Faktury ({invoices.length}) • pozostało: {invoicesLeft}
-</button>
-
-  <button
-    onClick={() => setShowContracts(true)}
-    className="header-btn"
-  >
-    <FileCheck size={18} />
-    Umowy ({contracts.length})
-  </button>
-
-<button
-  onClick={() => { setShowProjects(true); setActiveProjectId(null ); setShowProjects(true) }}
-  className="header-btn"
-  data-testid="nav-projects"
->
- Projekty
-</button>
-<button
-  onClick={() => setShowDashboard(true)}
-  className="header-btn"
->
-  📊 Dashboard
-</button>
-  <button className="header-btn" onClick={handleLogout}>
-    Wyloguj
-  </button>
-<div>
-    <button className="header-btn" onClick={async () => {
-    try { await startCheckout("pro"); } catch (e) { alert(e.message); }
-   
-  }}
-> 
-Pro
-</button>
-
-<button
-  className="header-btn" onClick={async () => { try { await startCheckout("business"); }
-    catch (e) { alert(e.message); }
-  }}
->
-  Business
-</button>
-
-</div>
-</div>  
+      {/* Dane nabywcy i firmy */}
+      <div className="grid-2">
+        <div className="card">
+          <div className="card-header">
+            <h2 className="card-title">
+              <Users size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+              Dane nabywcy
+            </h2>
+            <button className="btn-secondary" onClick={() => setShowContractors(true)}>
+              <Users size={16} /> Kontrahenci
+            </button>
           </div>
-        </div>
-
-        <div className="grid-2">
-          <div className="card">
-            <div className="card-header">
-              <h2 className="card-title">
-                <Users size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
-                Dane nabywcy
-              </h2>
-              <button 
-                className="btn-secondary"
-                onClick={() => setShowContractors(true)}
-              >
-                <Users size={16} />
-                Kontrahenci
-              </button>
-            </div>
-
-            <div className="form-group">
-              <label>Nazwa / Imię i nazwisko</label>
-              <input
-                className="input"
-                placeholder="Wprowadź nazwę klienta..."
-                value={buyer.name}
-                onChange={(e) => setBuyer({ ...buyer, name: e.target.value })}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Adres</label>
-              <input
-                className="input"
-                placeholder="Ulica, miasto..."
-                value={buyer.address}
-                onChange={(e) => setBuyer({ ...buyer, address: e.target.value })}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>NIP</label>
-              <input 
-                className="input" 
-                placeholder="NIP..."
-                value={buyer.nip}
-                onChange={(e) => setBuyer({ ...buyer, nip: e.target.value })}
-              />
-            </div>
-
-            <div className="grid-2">
-              <div className="form-group">
-                <label>Telefon</label>
-                <input 
-                  className="input" 
-                  placeholder="+48..."
-                  value={buyer.phone}
-                  onChange={(e) => setBuyer({ ...buyer, phone: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label>E-mail</label>
-                <input 
-                  type="email" 
-                  className="input" 
-                  placeholder="email@..."
-                  value={buyer.email}
-                  onChange={(e) => setBuyer({ ...buyer, email: e.target.value })}
-                />
-              </div>
-            </div>
+          <div className="form-group">
+            <label>Nazwa / Imię i nazwisko</label>
+            <input className="input" placeholder="Wprowadź nazwę klienta..." value={buyer.name}
+              onChange={(e) => setBuyer({ ...buyer, name: e.target.value })} />
           </div>
-
-          <div className="card">
-  <h2 className="card-title">
-    <Building2 size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
-    Dane Twojej firmy
-  </h2>
-
- 
-
-  <div className="form-group">
-    <label>Nazwa firmy</label>
-    <input
-      className="input"
-      value={company.sellerName}
-      onChange={(e) => setCompany({ ...company, sellerName: e.target.value })}
-    />
-  </div>
-  
-  {/* reszta formularza... */}
-
+          <div className="form-group">
+            <label>Adres</label>
+            <input className="input" placeholder="Ulica, miasto..." value={buyer.address}
+              onChange={(e) => setBuyer({ ...buyer, address: e.target.value })} />
+          </div>
+          <div className="form-group">
+            <label>NIP</label>
+            <input className="input" placeholder="NIP..." value={buyer.nip}
+              onChange={(e) => setBuyer({ ...buyer, nip: e.target.value })} />
+          </div>
+          <div className="grid-2">
             <div className="form-group">
-              <label>Adres</label>
-              <input
-                className="input"
-                value={company.sellerAddress}
-                onChange={(e) => setCompany({ ...company, sellerAddress: e.target.value })}
-              />
+              <label>Telefon</label>
+              <input className="input" placeholder="+48..." value={buyer.phone}
+                onChange={(e) => setBuyer({ ...buyer, phone: e.target.value })} />
             </div>
-
-            <div className="grid-2">
-              <div className="form-group">
-                <label>NIP</label>
-                <input
-                  className="input"
-                  value={company.sellerNip}
-                  onChange={(e) => setCompany({ ...company, sellerNip: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label>Telefon</label>
-                <input
-                  className="input"
-                  value={company.sellerPhone}
-                  onChange={(e) => setCompany({ ...company, sellerPhone: e.target.value })}
-                />
-              </div>
-            </div>
-
             <div className="form-group">
               <label>E-mail</label>
-              <input
-                type="email"
-                className="input"
-                value={company.sellerEmail}
-                onChange={(e) => setCompany({ ...company, sellerEmail: e.target.value })}
-              />
+              <input type="email" className="input" placeholder="email@..." value={buyer.email}
+                onChange={(e) => setBuyer({ ...buyer, email: e.target.value })} />
             </div>
+          </div>
+        </div>
 
+        <div className="card">
+          <h2 className="card-title">
+            <Building2 size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+            Dane Twojej firmy
+          </h2>
+          <div className="form-group">
+            <label>Nazwa firmy</label>
+            <input className="input" value={company.sellerName}
+              onChange={(e) => setCompany({ ...company, sellerName: e.target.value })} />
+          </div>
+          <div className="form-group">
+            <label>Adres</label>
+            <input className="input" value={company.sellerAddress}
+              onChange={(e) => setCompany({ ...company, sellerAddress: e.target.value })} />
+          </div>
+          <div className="grid-2">
             <div className="form-group">
-              <label>IBAN</label>
-              <input
-                className="input"
-                value={company.iban}
-                onChange={(e) => setCompany({ ...company, iban: e.target.value })}
-              />
+              <label>NIP</label>
+              <input className="input" value={company.sellerNip}
+                onChange={(e) => setCompany({ ...company, sellerNip: e.target.value })} />
+            </div>
+            <div className="form-group">
+              <label>Telefon</label>
+              <input className="input" value={company.sellerPhone}
+                onChange={(e) => setCompany({ ...company, sellerPhone: e.target.value })} />
             </div>
           </div>
-        </div>
-
-        <CostingPanel
-  lines={costingLines}
-  rates={rates}
-  onAddLine={addLine}
-  onAddCustomLine={(data) => addCustomLine(data, addRate)}
-  onUpdateLine={updateLine}
-  onRemoveLine={removeLine}
-  onClearAll={clearAll}
-  onOpenPriceList={() => setShowPriceList(true)}
-  onGeneratePDF={async () => {
-    if (costingLines.length === 0) {
-      alert("Dodaj przynajmniej jedną pozycję do kosztorysu!");
-      return;
-    }
-
-    let totalNet = 0;
-    let totalVat = 0;
-    let totalGross = 0;
-
-    costingLines.forEach((line) => {
-      const rate = rates[line.code];
-      if (!rate) return;
-
-      const net = rate.priceNet * line.qty;
-      const vat = net * rate.vat;
-      const gross = net + vat;
-
-      totalNet += net;
-      totalVat += vat;
-      totalGross += gross;
-    });
-
-    const summary = {
-      net: totalNet,
-      vat: totalVat,
-      gross: totalGross,
-      materials: totalNet * 0.3,
-    };
-
-    const { generateCostingPDFFromHTML } = await import("./utils/contractPDFTemplate");
-    
-    await generateCostingPDFFromHTML({
-      buyer,
-      lines: costingLines,
-      rates,
-      summary,
-      date: todayISO(),
-    }, company);
-  }}
-/>
-
-        <div className="status-card">
-          <div className="status-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <CheckCircle2 size={48} style={{ color: 'var(--color-primary)' }} />
+          <div className="form-group">
+            <label>E-mail</label>
+            <input type="email" className="input" value={company.sellerEmail}
+              onChange={(e) => setCompany({ ...company, sellerEmail: e.target.value })} />
           </div>
-          <div className="status-content">
-            <h3 className="status-title">Aplikacja gotowa do pracy!</h3>
-            <p className="status-text">
-              Zarządzaj kosztorysami, fakturami i umowami w jednym miejscu. Wszystkie dane zapisywane lokalnie.
-            </p>
-            <div className="status-badges">
-              <span className="badge badge-green">Kontrahenci ({contractors.length})</span>
-              <span className="badge badge-blue">Cennik ({Object.keys(rates).length})</span>
-              <span className="badge badge-purple">Pozycje ({costingLines.length})</span>
-            <span className="badge badge-purple">
-  Faktury: {invoicesUsed}/{invoicesLimit === Infinity ? "∞" : invoicesLimit}
-</span>
-
-              <span className="badge badge-blue">Umowy ({contracts.length})</span>
-              <span className="badge badge-blue">Plan: {plan.toUpperCase()}</span>
-              <span className="badge badge-purple">
-  Faktury: {invoicesUsed}/{invoicesLimit === Infinity ? "∞" : invoicesLimit}
-</span>
-
-            </div>
-           
-<div style={{ marginTop: '20px', display: 'flex', gap: '12px', justifyContent: 'center' }}>
-  <button
-    onClick={() => setShowBrandSettings(true)}
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      padding: '10px 20px',
-      background: 'var(--color-primary)',
-      color: 'white',
-      border: 'none',
-      borderRadius: '8px',
-      fontSize: '14px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'all 0.2s',
-    }}
-    onMouseOver={(e) => e.target.style.background = 'var(--color-primary-dark)'}
-    onMouseOut={(e) => e.target.style.background = 'var(--color-primary)'}
-  >
-    <Palette size={18} />
-    Ustawienia firmy i branding
-  </button>
-</div>
+          <div className="form-group">
+            <label>IBAN</label>
+            <input className="input" value={company.iban}
+              onChange={(e) => setCompany({ ...company, iban: e.target.value })} />
           </div>
         </div>
       </div>
 
-    {showBrandSettings && (
-      <BrandSettings
-         brand={brand}
-          setBrand={setBrand}
-          company={company}
-           setCompany={setCompany}
-           onClose={() => setShowBrandSettings(false)}
-  />
-)}
-      {showContractors && (
-        <ContractorsModal
-          open={showContractors}
-          onClose={() => setShowContractors(false)}
-          contractors={contractors}
-          onUpsert={upsert}
-          onRemove={remove}
-          onImport={handleImportContractors}
-          onSelect={handleSelectContractor}
-        />
-      )}
-
-      {showPriceList && (
-        <PriceListModal
-          open={showPriceList}
-          onClose={() => setShowPriceList(false)}
-          rates={rates}
-          onUpdate={updateRate}
-          onAdd={addRate}
-          onReset={resetToDefaults}
-        />
-      )}
-
-    {showInvoices && (
-  <InvoicesModal
-    open={showInvoices}
-    onClose={() => setShowInvoices(false)}
-    invoices={invoices}
-    onRemove={removeInvoice}
-    onMarkAsPaid={markAsPaid}
-    onGeneratePDF={handleGenerateInvoicePDF}
-    onCreateNew={() => {
-      setShowInvoices(false);
-      setShowInvoiceForm(true);
-    }}
-  />
-)}
-
-      {showInvoiceForm && (
-        <InvoiceForm
-          open={showInvoiceForm}
-          onClose={() => setShowInvoiceForm(false)}
-          onSave={handleCreateInvoice}
-          buyer={buyer}
-          company={company}
-          rates={rates}
-          nextNumber={getNextInvoiceNumber()}
-          costingLines={costingLines}
-        />
-      )}
-
-{showDashboard && (
-  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, overflowY: 'auto', padding: '24px 16px' }}>
-    <div style={{ maxWidth: 1100, margin: '0 auto', background: '#f8fafc', borderRadius: 16, padding: 24 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1e293b', margin: 0 }}>📊 Dashboard projektów</h2>
-        <button onClick={() => setShowDashboard(false)} style={{ background: '#dc2626', color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontWeight: 600 }}>✕ Zamknij</button>
-      </div>
-      <Dashboard
-        onOpenProject={(id) => { setShowDashboard(false); setActiveProjectId(id); setShowProjects(true); }}
-        onNewProject={() => { setShowDashboard(false); setActiveProjectId(null); setShowProjects(true); }}
+      {/* Kosztorys */}
+      <CostingPanel
+        lines={costingLines}
+        rates={rates}
+        onAddLine={addLine}
+        onAddCustomLine={(data) => addCustomLine(data, addRate)}
+        onUpdateLine={updateLine}
+        onRemoveLine={removeLine}
+        onClearAll={clearAll}
+        onOpenPriceList={() => setShowPriceList(true)}
+        onGeneratePDF={async () => {
+          if (costingLines.length === 0) { alert("Dodaj przynajmniej jedną pozycję!"); return; }
+          let totalNet = 0, totalVat = 0, totalGross = 0;
+          costingLines.forEach((line) => {
+            const rate = rates[line.code];
+            if (!rate) return;
+            const net = rate.priceNet * line.qty;
+            const vat = net * rate.vat;
+            totalNet += net; totalVat += vat; totalGross += net + vat;
+          });
+          const { generateCostingPDFFromHTML } = await import("./utils/contractPDFTemplate");
+          await generateCostingPDFFromHTML({
+            buyer, lines: costingLines, rates,
+            summary: { net: totalNet, vat: totalVat, gross: totalGross, materials: totalNet * 0.3 },
+            date: todayISO(),
+          }, company);
+        }}
       />
-    </div>
-  </div>
-)}
-```
 
-**5. Plik skopiuj do:**
-```
-src/components/Dashboard/Dashboard.jsx
+      {/* Status */}
+      <div className="status-card">
+        <div className="status-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <CheckCircle2 size={48} style={{ color: 'var(--color-primary)' }} />
+        </div>
+        <div className="status-content">
+          <h3 className="status-title">Aplikacja gotowa do pracy!</h3>
+          <p className="status-text">Zarządzaj kosztorysami, fakturami i umowami w jednym miejscu.</p>
+          <div className="status-badges">
+            <span className="badge badge-green">Kontrahenci ({contractors.length})</span>
+            <span className="badge badge-blue">Cennik ({Object.keys(rates).length})</span>
+            <span className="badge badge-purple">Pozycje ({costingLines.length})</span>
+            <span className="badge badge-purple">Faktury: {invoicesUsed}/{invoicesLimit === Infinity ? "∞" : invoicesLimit}</span>
+            <span className="badge badge-blue">Umowy ({contracts.length})</span>
+            <span className="badge badge-blue">Plan: {plan.toUpperCase()}</span>
+          </div>
+          <div style={{ marginTop: '20px', display: 'flex', gap: '12px', justifyContent: 'center' }}>
+            <button onClick={() => setShowBrandSettings(true)} className="btn-primary">
+              <Palette size={18} /> Ustawienia firmy i branding
+            </button>
+          </div>
+        </div>
+      </div>
 
-
-{showContracts && (
-  <ContractsModal
-    open={showContracts}
-    onClose={() => setShowContracts(false)}
-    contracts={contracts}
-    onRemove={removeContract}
-    onMarkAsSigned={markAsSigned}
-    onGeneratePDF={(contract) => {
-      console.log('🔍 Generating contract PDF...');
-      console.log('🔍 Contract:', contract);
-      console.log('🔍 Company:', company);
-      
-      if (!contract || !contract.totalAmount) {
-        alert("Brak danych umowy - nie można wygenerować PDF");
-        console.error('❌ Contract validation failed');
-        return;
-      }
-      
-      try {
-        generateContractPDFFromHTML(contract, company);
-        console.log('✅ Contract PDF generated');
-      } catch (error) {
-        console.error('❌ Contract PDF generation error:', error);
-        alert('Błąd generowania PDF: ' + error.message);
-      }
-    }}
-    onCreateNew={() => {
-      console.log('🟢 Creating new contract...');
-      setShowContracts(false);
-      setShowContractForm(true);
-    }}
-  />
-)}
-{console.log('🔍 Rendering ContractForm, open=', showContractForm) || null}
-{showContractForm && (
-  <ContractForm
-  open={showContractForm}  
-  onClose={() => setShowContractForm(false)}
-  onSave={handleCreateContract}
-  buyer={buyer}
-  company={company}
-  nextNumber={getNextContractNumber()}
-  costingLines={costingLines}
-  rates={rates}
-/>
-)}
-
+      {/* Modale */}
+      {showBrandSettings && (
+        <BrandSettings brand={brand} setBrand={setBrand} company={company}
+          setCompany={setCompany} onClose={() => setShowBrandSettings(false)} />
+      )}
+      {showContractors && (
+        <ContractorsModal open={showContractors} onClose={() => setShowContractors(false)}
+          contractors={contractors} onUpsert={upsert} onRemove={remove}
+          onImport={replaceAll} onSelect={handleSelectContractor} />
+      )}
+      {showPriceList && (
+        <PriceListModal open={showPriceList} onClose={() => setShowPriceList(false)}
+          rates={rates} onUpdate={updateRate} onAdd={addRate} onReset={resetToDefaults} />
+      )}
+      {showInvoices && (
+        <InvoicesModal open={showInvoices} onClose={() => setShowInvoices(false)}
+          invoices={invoices} onRemove={removeInvoice} onMarkAsPaid={markAsPaid}
+          onGeneratePDF={handleGenerateInvoicePDF}
+          onCreateNew={() => { setShowInvoices(false); setShowInvoiceForm(true); }} />
+      )}
+      {showInvoiceForm && (
+        <InvoiceForm open={showInvoiceForm} onClose={() => setShowInvoiceForm(false)}
+          onSave={handleCreateInvoice} buyer={buyer} company={company}
+          rates={rates} nextNumber={getNextInvoiceNumber()} costingLines={costingLines} />
+      )}
+      {showContracts && (
+        <ContractsModal open={showContracts} onClose={() => setShowContracts(false)}
+          contracts={contracts} onRemove={removeContract} onMarkAsSigned={markAsSigned}
+          onGeneratePDF={(contract) => {
+            if (!contract || !contract.totalAmount) { alert("Brak danych umowy"); return; }
+            try { generateContractPDFFromHTML(contract, company); }
+            catch (error) { alert('Błąd PDF: ' + error.message); }
+          }}
+          onCreateNew={() => { setShowContracts(false); setShowContractForm(true); }} />
+      )}
+      {showContractForm && (
+        <ContractForm open={showContractForm} onClose={() => setShowContractForm(false)}
+          onSave={handleCreateContract} buyer={buyer} company={company}
+          nextNumber={getNextContractNumber()} costingLines={costingLines} rates={rates} />
+      )}
       {showCloudBackup && (
-  <CloudBackupModal onClose={() => setShowCloudBackup(false)} />
-)}
-{showProjects && (
-  <ProjectModal
-    projectId={activeProjectId}
-    onClose={() => { setShowProjects(false); setActiveProjectId(null); }}
-    onProjectSaved={() => {}}
-    contractors={contractors}
-  />
-)}
-    </div>
+        <CloudBackupModal onClose={() => setShowCloudBackup(false)} />
+      )}
+      {showDashboard && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, overflowY: 'auto', padding: '24px 16px' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto', background: '#f8fafc', borderRadius: 16, padding: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1e293b', margin: 0 }}>📊 Dashboard projektów</h2>
+              <button onClick={() => setShowDashboard(false)}
+                style={{ background: '#dc2626', color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontWeight: 600 }}>
+                ✕ Zamknij
+              </button>
+            </div>
+            <Dashboard
+              onOpenProject={(id) => { setShowDashboard(false); setActiveProjectId(id); setShowProjects(true); }}
+              onNewProject={() => { setShowDashboard(false); setActiveProjectId(null); setShowProjects(true); }}
+            />
+          </div>
+        </div>
+      )}
+      {showProjects && (
+        <ProjectModal
+          projectId={activeProjectId}
+          onClose={() => { setShowProjects(false); setActiveProjectId(null); }}
+          onProjectSaved={() => {}}
+          contractors={contractors}
+        />
+      )}
     </AppLayout>
   );
 }
 
 export default function App() {
   const [session, setSession] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading]   = React.useState(true);
   const [bootError, setBootError] = React.useState(null);
 
   React.useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-
+    if (!supabase) { setLoading(false); return; }
     let alive = true;
-
     (async () => {
       try {
         const { data, error } = await supabase.auth.getSession();
@@ -818,56 +429,29 @@ export default function App() {
         if (alive) setLoading(false);
       }
     })();
-
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
-      setLoading(false); // żeby nigdy nie utknęło na białym
+      setLoading(false);
     });
-
-    return () => {
-      alive = false;
-      sub?.subscription?.unsubscribe?.();
-    };
+    return () => { alive = false; sub?.subscription?.unsubscribe?.(); };
   }, []);
 
-  if (!supabase) {
-    return (
-      <div style={{ padding: 24, fontFamily: "system-ui" }}>
-        Brak konfiguracji Supabase. Ustaw REACT_APP_SUPABASE_URL i REACT_APP_SUPABASE_ANON_KEY.
-      </div>
-    );
-  }
+  if (!supabase) return <div style={{ padding: 24 }}>Brak konfiguracji Supabase.</div>;
+  if (loading)   return <div style={{ padding: 24 }}>Ładowanie…</div>;
+  if (bootError) return <div style={{ padding: 24 }}>Błąd startu: {String(bootError?.message || bootError)}</div>;
 
-  if (loading) {
-    return <div style={{ padding: 24, fontFamily: "system-ui" }}>Ładowanie…</div>;
-  }
-
-  if (bootError) {
-    return (
-      <div style={{ padding: 24, fontFamily: "system-ui" }}>
-        Błąd startu: {String(bootError?.message || bootError)}
-      </div>
-    );
-  }
-
-  const path = window.location.pathname;
-  const isLogin = path === "/login";
+  const path       = window.location.pathname;
+  const isLogin    = path === "/login";
   const isRegister = path === "/register";
-  const isApp = path === "/app" || path.startsWith("/app/");
+  const isApp      = path === "/app" || path.startsWith("/app/");
 
-  if (!session && (isLogin || isRegister || isApp)) {
+  if (!session && (isLogin || isRegister || isApp))
     return <AuthPage mode={isRegister ? "register" : "login"} supabase={supabase} />;
-  }
 
   if (session && (isLogin || isRegister)) {
     window.location.replace("/app");
     return null;
   }
 
-  return (
-  <ErrorBoundary>
-    <AppShell />
-  </ErrorBoundary>
-);
-
+  return <ErrorBoundary><AppShell /></ErrorBoundary>;
 }
