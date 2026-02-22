@@ -25,6 +25,7 @@ import { saveBackupToDb } from "./lib/backup";
 import { fetchUserPlan } from "./lib/plan";
 import { startCheckout } from "./lib/stripeCheckout";
 import ProjectModal from './components/projects/ProjectModal';
+import { Dashboard } from './components/Dashboard/Dashboard';
 import ErrorBoundary from "./ErrorBoundary";
 import AuthPage from "./AuthPage";
 import { 
@@ -43,6 +44,8 @@ import './App.css';
 function AppShell() {
   console.log("URL ok?", !!process.env.REACT_APP_SUPABASE_URL);
 console.log("KEY ok?", !!process.env.REACT_APP_SUPABASE_ANON_KEY);
+
+const [showDashboard, setShowDashboard] = useState(false);
 
 const handleLogout = async () => {
   if (!supabase) {
@@ -348,7 +351,12 @@ if (used >= limit) {
 >
  Projekty
 </button>
-
+<button
+  onClick={() => setShowDashboard(true)}
+  className="header-btn"
+>
+  📊 Dashboard
+</button>
   <button className="header-btn" onClick={handleLogout}>
     Wyloguj
   </button>
@@ -674,6 +682,27 @@ Pro
           costingLines={costingLines}
         />
       )}
+
+{showDashboard && (
+  <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, overflowY: 'auto', padding: '24px 16px' }}>
+    <div style={{ maxWidth: 1100, margin: '0 auto', background: '#f8fafc', borderRadius: 16, padding: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1e293b', margin: 0 }}>📊 Dashboard projektów</h2>
+        <button onClick={() => setShowDashboard(false)} style={{ background: '#dc2626', color: 'white', border: 'none', borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontWeight: 600 }}>✕ Zamknij</button>
+      </div>
+      <Dashboard
+        onOpenProject={(id) => { setShowDashboard(false); setActiveProjectId(id); setShowProjects(true); }}
+        onNewProject={() => { setShowDashboard(false); setActiveProjectId(null); setShowProjects(true); }}
+      />
+    </div>
+  </div>
+)}
+```
+
+**5. Plik skopiuj do:**
+```
+src/components/Dashboard/Dashboard.jsx
+
 
 {showContracts && (
   <ContractsModal
