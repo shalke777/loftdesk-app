@@ -1,50 +1,73 @@
-import { useState, useEffect, useCallback } from "react";
-import { storage } from "../utils/storage";
-import { uid, normalizeStr } from "../utils/format";
-import { STORAGE_KEYS } from "../constants";
+// src/hooks/useContractors.js
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../lib/supabase';
 
-export const useContractors = () => {
-  const [contractors, setContractors] = useState(() =>
-    storage.get(STORAGE_KEYS.CONTRACTORS, [])
-  );
+export function useContractors() {
+  const [contractors, setContractors] = useState([]);
+  const [loading, setLoading]         = useState(true);
 
-  useEffect(() => {
-    storage.set(STORAGE_KEYS.CONTRACTORS, contractors);
-  }, [contractors]);
-
-  const upsert = useCallback((item) => {
-    setContractors((prev) => {
-      const cleaned = {
-        id: item?.id || uid(),
-        name: normalizeStr(item?.name),
-        address: normalizeStr(item?.address),
-        nip: normalizeStr(item?.nip),
-        phone: normalizeStr(item?.phone),
-        email: normalizeStr(item?.email),
-        note: normalizeStr(item?.note),
-      };
-
-      if (!cleaned.name) {
-        throw new Error("Nazwa kontrahenta jest wymagana");
-      }
-
-      const idx = prev.findIndex((x) => x.id === cleaned.id);
-      if (idx >= 0) {
-        const copy = prev.slice();
-        copy[idx] = cleaned;
-        return copy;
-      }
-      return [cleaned, ...prev];
-    });
+  const fetch = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('contractors')
+      .select('*')
+      .order('name');
+    if (!error) setContractors(data || []);
+    setLoading(false);
   }, []);
 
-  const remove = useCallback((id) => {
-    setContractors((prev) => prev.filter((x) => x.id !== id));
-  }, []);
+  useEffect(() => { fetch(); }, [fetch]);
 
-  const replaceAll = useCallback((list) => {
-    setContractors(Array.isArray(list) ? list : []);
-  }, []);
+  const upsert = async (contractor) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const payload = {
+      user_id:  user.id,
+      name:     contractor.name,
+      address:  contractor.address || null,
+      nip:      contractor.nip     || null,
+      phone:    contractor.phone   || null,
+      email:    contractor.email   || null,
+      notes:    contractor.notes   || null,
+    };
 
-  return { contractors, upsert, remove, replaceAll };
-};
+    if (contractor.id && !contractor.id.includes('_')) {
+      // edycja istniejącego (UUID z Supabase)
+      const { error } = await supabase
+        .from('contractors')
+        .update(payload)
+        .eq('id', contractor.id);
+      if (error) { console.error(error); return; }
+    } else {
+      // nowy
+      const { error } = await supabase
+        .from('contractors')
+        .insert(payload);
+      if (error) { console.error(error); return; }
+    }
+    await fetch();
+  };
+
+  const remove = async (id) => {
+    await supabase.from('contractors').delete().eq('id', id);
+    await fetch();
+  };
+
+  // import zbiorczy (np. z pliku JSON)
+  const replaceAll = async (list) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    // usuń stare
+    await supabase.from('contractors').delete().eq('user_id', user.id);
+    // wstaw nowe
+    const rows = list.map(c => ({
+      user_id: user.id,
+      name:    c.name,
+      address: c.address || null,
+      nip:     c.nip     || null,
+      phone:   c.phone   || null,
+      email:   c.email   || null,
+    }));
+    await supabase.from('contractors').insert(rows);
+    await fetch();
+  };
+
+  return { contractors, loading, upsert, remove, replaceAll, refresh: fetch };
+}
