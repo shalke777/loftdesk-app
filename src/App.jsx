@@ -226,7 +226,10 @@ const handleCreateContract = async (contractData) => {
   alert("Umowa utworzona! PDF został pobrany.");
   
 };
-
+const handleGenerateInvoicePDF = async (invoice) => {
+  const { generateInvoicePDFFromHTML } = await import("./utils/contractPDFTemplate");
+  await generateInvoicePDFFromHTML(invoice, company);
+};
   return (
     <>
       <style>{`
