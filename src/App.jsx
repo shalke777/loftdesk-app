@@ -542,6 +542,19 @@ const handleCreateContract = async (contractData) => {
     />
   </Portal>
 )}
+{showProjectForm && (
+  <Portal>
+    <ProjectModal
+      projectId={null}
+      onClose={() => setShowProjectForm(false)}
+      onProjectSaved={(newProject) => {
+        setProjects(prev => [newProject, ...prev]);
+        setShowProjectForm(false);
+      }}
+      contractors={contractors}
+    />
+  </Portal>
+)}
     </>
   );
 }
