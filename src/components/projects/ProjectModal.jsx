@@ -1,8 +1,5 @@
 // src/components/projects/ProjectModal.jsx
-// Modal "Projekty i harmonogram" dla LoftDesk
-// Wersja: MVP 1.0
-
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useProject, useProjects } from './useProjects';
 
 import {
@@ -15,54 +12,55 @@ import {
 } from './projectValidation';
 
 // ============================================================
-// STYLE (inline, spójne z resztą LoftDesk)
+// STYLE — spójne z resztą LoftDesk (ciemny header, neutralne karty)
 // ============================================================
 const S = {
-overlay: {
-  position: 'fixed',
-  inset: 0,
-  zIndex: 10050, // było 1000
-  background: 'rgba(15,23,42,0.55)',
-  backdropFilter: 'blur(3px)',
-  display: 'flex',
-  alignItems: 'center', // było flex-start
-  justifyContent: 'center',
-  padding: '16px',
-  overflowY: 'auto',
-},
+  overlay: {
+    position: 'fixed', inset: 0, zIndex: 10050,
+    background: 'rgba(10,15,28,0.85)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    padding: '16px', overflowY: 'auto',
+  },
   modal: {
-    background: 'white', borderRadius: 16,
+    background: 'white', borderRadius: 18,
     width: '100%', maxWidth: 1100,
     minHeight: 'min(90vh, 800px)',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.18)',
+    boxShadow: '0 32px 72px rgba(0,0,0,0.45)',
     display: 'flex', flexDirection: 'column',
     position: 'relative', margin: '0 auto',
   },
   header: {
     position: 'sticky', top: 0, zIndex: 10,
-    background: '#dc2626', borderRadius: '16px 16px 0 0',
+    background: 'linear-gradient(135deg, #0f172a 0%, #1a2744 100%)',
+    borderRadius: '18px 18px 0 0',
     padding: '16px 24px',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     gap: 12, flexWrap: 'wrap',
+    borderBottom: '1px solid rgba(255,255,255,0.06)',
   },
   headerLeft: { display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 },
-  headerTitle: { color: 'white', fontWeight: 900, fontSize: 17, margin: 0,
-    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-  headerSub: { color: 'rgba(255,255,255,0.75)', fontSize: 13, marginTop: 2 },
+  headerIcon: {
+    width: 38, height: 38,
+    background: 'rgba(255,255,255,0.07)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 10,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontSize: 18, flexShrink: 0,
+  },
+  headerTitle: {
+    color: 'white', fontWeight: 800, fontSize: 16, margin: 0,
+    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+  },
+  headerSub: { color: 'rgba(255,255,255,0.4)', fontSize: 12, marginTop: 2 },
   headerActions: { display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' },
   btnClose: {
-    background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.3)',
-    color: 'white', borderRadius: 10, padding: '8px 14px',
-    cursor: 'pointer', fontWeight: 700, fontSize: 13,
-  },
-  btnWhite: {
-    background: 'white', color: '#dc2626', border: 'none',
-    borderRadius: 10, padding: '8px 16px',
-    cursor: 'pointer', fontWeight: 700, fontSize: 13,
+    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+    color: 'rgba(255,255,255,0.7)', borderRadius: 9, padding: '7px 13px',
+    cursor: 'pointer', fontWeight: 600, fontSize: 13,
   },
   btnGhost: {
-    background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)',
-    color: 'white', borderRadius: 10, padding: '8px 14px',
+    background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
+    color: 'rgba(255,255,255,0.7)', borderRadius: 9, padding: '7px 13px',
     cursor: 'pointer', fontWeight: 600, fontSize: 13,
   },
   tabs: {
@@ -71,17 +69,17 @@ overlay: {
     overflowX: 'auto', flexShrink: 0,
   },
   tab: {
-    padding: '12px 16px', cursor: 'pointer', fontWeight: 600, fontSize: 13,
+    padding: '11px 15px', cursor: 'pointer', fontWeight: 600, fontSize: 13,
     color: '#64748b', borderBottom: '3px solid transparent',
     whiteSpace: 'nowrap', background: 'none', border: 'none',
     borderBottomWidth: 3, transition: 'all .15s',
   },
-  tabActive: { color: '#dc2626', borderBottomColor: '#dc2626' },
+  tabActive: { color: '#0f172a', borderBottomColor: '#0f172a' },
   body: { flex: 1, overflow: 'auto', padding: 24 },
   footer: {
     position: 'sticky', bottom: 0,
     background: 'white', borderTop: '1px solid #e2e8f0',
-    borderRadius: '0 0 16px 16px',
+    borderRadius: '0 0 18px 18px',
     padding: '12px 24px',
     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
     gap: 12, flexWrap: 'wrap',
@@ -91,12 +89,15 @@ overlay: {
   card: {
     background: 'white', borderRadius: 12,
     border: '1px solid #e2e8f0', padding: 16,
-    boxShadow: '0 1px 3px rgba(0,0,0,.06)',
+    boxShadow: '0 1px 3px rgba(0,0,0,.05)',
   },
-  label: { display: 'block', fontSize: 12, fontWeight: 700,
-    color: '#475569', marginBottom: 6, textTransform: 'uppercase', letterSpacing: .3 },
+  label: {
+    display: 'block', fontSize: 11, fontWeight: 700,
+    color: '#64748b', marginBottom: 6,
+    textTransform: 'uppercase', letterSpacing: '.04em',
+  },
   input: {
-    width: '100%', border: '1px solid #e2e8f0', borderRadius: 10,
+    width: '100%', border: '1.5px solid #e2e8f0', borderRadius: 10,
     padding: '9px 12px', fontSize: 14, color: '#0f172a',
     outline: 'none', boxSizing: 'border-box',
     fontFamily: 'inherit', background: 'white',
@@ -105,50 +106,51 @@ overlay: {
   inputError: { borderColor: '#dc2626' },
   errorMsg: { color: '#dc2626', fontSize: 12, marginTop: 4 },
   select: {
-    width: '100%', border: '1px solid #e2e8f0', borderRadius: 10,
+    width: '100%', border: '1.5px solid #e2e8f0', borderRadius: 10,
     padding: '9px 12px', fontSize: 14, color: '#0f172a',
     outline: 'none', boxSizing: 'border-box', background: 'white',
     cursor: 'pointer', fontFamily: 'inherit',
   },
   textarea: {
-    width: '100%', border: '1px solid #e2e8f0', borderRadius: 10,
+    width: '100%', border: '1.5px solid #e2e8f0', borderRadius: 10,
     padding: '9px 12px', fontSize: 14, color: '#0f172a',
     outline: 'none', resize: 'vertical', minHeight: 80,
     boxSizing: 'border-box', fontFamily: 'inherit',
   },
   badge: (color, bg) => ({
     display: 'inline-flex', alignItems: 'center', gap: 4,
-    background: bg, color, borderRadius: 999,
+    background: bg || '#f1f5f9', color: color || '#475569', borderRadius: 999,
     padding: '3px 10px', fontSize: 12, fontWeight: 700,
   }),
   btnPrimary: {
-    background: '#dc2626', color: 'white', border: 'none',
-    borderRadius: 10, padding: '10px 20px',
-    cursor: 'pointer', fontWeight: 700, fontSize: 14,
+    background: '#0f172a', color: 'white', border: 'none',
+    borderRadius: 10, padding: '9px 18px',
+    cursor: 'pointer', fontWeight: 700, fontSize: 13,
+    display: 'inline-flex', alignItems: 'center', gap: 6,
   },
   btnSecondary: {
-    background: '#f1f5f9', color: '#475569', border: 'none',
-    borderRadius: 10, padding: '10px 16px',
-    cursor: 'pointer', fontWeight: 600, fontSize: 14,
+    background: '#f8fafc', color: '#475569', border: '1px solid #e2e8f0',
+    borderRadius: 10, padding: '9px 15px',
+    cursor: 'pointer', fontWeight: 600, fontSize: 13,
+    display: 'inline-flex', alignItems: 'center', gap: 6,
   },
   btnDanger: {
     background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca',
-    borderRadius: 10, padding: '8px 14px',
+    borderRadius: 10, padding: '7px 13px',
     cursor: 'pointer', fontWeight: 600, fontSize: 13,
   },
-  progressBar: (pct, color = '#dc2626') => ({
-    height: 8, background: '#f1f5f9', borderRadius: 999, overflow: 'hidden',
-    position: 'relative',
-  }),
-  progressFill: (pct, color = '#dc2626') => ({
+  progressBar: {
+    height: 7, background: '#f1f5f9', borderRadius: 999, overflow: 'hidden',
+  },
+  progressFill: (pct, color) => ({
     height: '100%', width: `${Math.min(pct, 100)}%`,
-    background: color, borderRadius: 999,
+    background: color || '#0f172a', borderRadius: 999,
     transition: 'width .4s ease',
   }),
 };
 
 // ============================================================
-// SKŁADOWE POMOCNICZE
+// Składowe pomocnicze
 // ============================================================
 function Field({ label, error, children }) {
   return (
@@ -167,8 +169,8 @@ function StatusBadge({ status, map }) {
 
 function ProgressBar({ value, color }) {
   return (
-    <div style={S.progressBar(value, color)}>
-      <div style={S.progressFill(value, color || '#dc2626')} />
+    <div style={S.progressBar}>
+      <div style={S.progressFill(value, color)} />
     </div>
   );
 }
@@ -176,7 +178,9 @@ function ProgressBar({ value, color }) {
 function SectionTitle({ children, action }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-      <h3 style={{ fontSize: 15, fontWeight: 800, color: '#0f172a', margin: 0 }}>{children}</h3>
+      <h3 style={{ fontSize: 11, fontWeight: 800, color: '#64748b', margin: 0, textTransform: 'uppercase', letterSpacing: '.06em' }}>
+        {children}
+      </h3>
       {action}
     </div>
   );
@@ -184,15 +188,16 @@ function SectionTitle({ children, action }) {
 
 function EmptyState({ icon, text }) {
   return (
-    <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8' }}>
-      <div style={{ fontSize: 36, marginBottom: 8 }}>{icon}</div>
+    <div style={{ textAlign: 'center', padding: '32px 0', color: '#94a3b8',
+      background: '#f8fafc', borderRadius: 10, border: '1px dashed #e2e8f0' }}>
+      <div style={{ fontSize: 32, marginBottom: 8 }}>{icon}</div>
       <div style={{ fontSize: 14 }}>{text}</div>
     </div>
   );
 }
 
 // ============================================================
-// MINIMODAL: formularz projektu
+// Formularz projektu
 // ============================================================
 function ProjectForm({ initialData, contractors = [], onSave, onCancel, saving }) {
   const [form, setForm] = useState(initialData || emptyProject());
@@ -297,9 +302,9 @@ function ProjectForm({ initialData, contractors = [], onSave, onCancel, saving }
 }
 
 // ============================================================
-// ZAKŁADKA: Podsumowanie
+// Zakładka: Podsumowanie
 // ============================================================
-function TabSummary({ project, tasks, milestones, onEditProject, onChangeStatus, contractors }) {
+function TabSummary({ project, tasks, milestones, onEditProject, onChangeStatus }) {
   const progress = calcProjectProgress(tasks);
   const budget   = calcProjectBudgetStatus(project);
   const daysLeft = calcDaysLeft(project?.end_date);
@@ -313,66 +318,70 @@ function TabSummary({ project, tasks, milestones, onEditProject, onChangeStatus,
 
   return (
     <div>
-      {/* Nagłówek info */}
       <div style={{ ...S.grid3, marginBottom: 16 }}>
         <div style={{ ...S.card, textAlign: 'center' }}>
-          <div style={{ fontSize: 28, fontWeight: 900, color: '#dc2626' }}>{progress}%</div>
-          <div style={{ fontSize: 12, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', margin: '6px 0' }}>Postęp</div>
-          <ProgressBar value={progress} />
+          <div style={{ fontSize: 30, fontWeight: 900, color: '#0f172a' }}>{progress}%</div>
+          <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700, textTransform: 'uppercase',
+            letterSpacing: '.05em', margin: '6px 0 8px' }}>Postęp</div>
+          <ProgressBar value={progress} color={progress === 100 ? '#16a34a' : '#0f172a'} />
         </div>
         <div style={{ ...S.card, textAlign: 'center' }}>
-          <div style={{ fontSize: 28, fontWeight: 900, color: overdue ? '#dc2626' : '#0f172a' }}>
-            {daysLeft !== null ? (overdue ? `${Math.abs(daysLeft)}` : daysLeft) : '—'}
+          <div style={{ fontSize: 30, fontWeight: 900, color: overdue ? '#dc2626' : '#0f172a' }}>
+            {daysLeft !== null ? Math.abs(daysLeft) : '—'}
           </div>
-          <div style={{ fontSize: 12, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', margin: '6px 0' }}>
+          <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700, textTransform: 'uppercase',
+            letterSpacing: '.05em', margin: '6px 0 4px' }}>
             {overdue ? 'Dni po terminie' : 'Dni do końca'}
           </div>
-          <div style={{ fontSize: 12, color: '#94a3b8' }}>{formatDate(project?.end_date)}</div>
+          <div style={{ fontSize: 11, color: '#94a3b8' }}>{formatDate(project?.end_date)}</div>
         </div>
         <div style={{ ...S.card, textAlign: 'center' }}>
-          <div style={{ fontSize: 28, fontWeight: 900, color: '#0f172a' }}>{tasks.length}</div>
-          <div style={{ fontSize: 12, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', margin: '6px 0' }}>Zadania</div>
-          <div style={{ fontSize: 12, color: '#16a34a' }}>{tasksByStatus.done || 0} ukończone</div>
+          <div style={{ fontSize: 30, fontWeight: 900, color: '#0f172a' }}>{tasks.length}</div>
+          <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700, textTransform: 'uppercase',
+            letterSpacing: '.05em', margin: '6px 0 4px' }}>Zadania</div>
+          <div style={{ fontSize: 11, color: '#16a34a', fontWeight: 600 }}>
+            {tasksByStatus.done || 0} ukończone
+          </div>
         </div>
       </div>
 
       <div style={S.grid2}>
-        {/* Dane projektu */}
         <div style={S.card}>
           <SectionTitle children="Informacje o projekcie"
             action={<button style={S.btnDanger} onClick={onEditProject}>✏️ Edytuj</button>} />
           <table style={{ width: '100%', fontSize: 13, borderCollapse: 'collapse' }}>
             <tbody>
               {[
-                ['Kod', project?.code],
-                ['Status', <StatusBadge status={project?.status} map={PROJECT_STATUS} />],
+                ['Kod',       project?.code],
+                ['Status',    <StatusBadge status={project?.status}   map={PROJECT_STATUS}   />],
                 ['Priorytet', <StatusBadge status={project?.priority} map={PROJECT_PRIORITY} />],
-                ['Klient', project?.contractors?.name || '—'],
-                ['Adres', project?.address || '—'],
-                ['Opiekun', project?.manager_name || '—'],
-                ['Start', formatDate(project?.start_date)],
-                ['Koniec', formatDate(project?.end_date)],
+                ['Klient',    project?.contractors?.name || '—'],
+                ['Adres',     project?.address || '—'],
+                ['Opiekun',   project?.manager_name || '—'],
+                ['Start',     formatDate(project?.start_date)],
+                ['Koniec',    formatDate(project?.end_date)],
               ].map(([k, v]) => (
                 <tr key={k}>
-                  <td style={{ padding: '5px 0', color: '#64748b', fontWeight: 600, width: '40%' }}>{k}</td>
-                  <td style={{ padding: '5px 0', color: '#0f172a' }}>{v}</td>
+                  <td style={{ padding: '5px 0', color: '#64748b', fontWeight: 600, width: '38%',
+                    borderBottom: '1px solid #f8fafc' }}>{k}</td>
+                  <td style={{ padding: '5px 0 5px 8px', color: '#0f172a',
+                    borderBottom: '1px solid #f8fafc' }}>{v}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        {/* Status i budżet */}
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {availableStatuses.length > 0 && (
-            <div style={{ ...S.card, marginBottom: 16 }}>
+            <div style={S.card}>
               <SectionTitle children="Zmień status" />
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {availableStatuses.map(s => (
                   <button key={s} style={{
                     ...S.badge(PROJECT_STATUS[s]?.color, PROJECT_STATUS[s]?.bg),
-                    cursor: 'pointer', border: `1px solid ${PROJECT_STATUS[s]?.color}40`,
-                    padding: '6px 14px', fontSize: 13,
+                    cursor: 'pointer', border: `1px solid ${PROJECT_STATUS[s]?.color}30`,
+                    padding: '6px 14px', fontSize: 12,
                   }} onClick={() => onChangeStatus(s)}>
                     → {PROJECT_STATUS[s]?.label}
                   </button>
@@ -385,11 +394,15 @@ function TabSummary({ project, tasks, milestones, onEditProject, onChangeStatus,
             <div style={S.card}>
               <SectionTitle children="Budżet" />
               <div style={{ marginBottom: 8 }}>
-                <ProgressBar value={budget.pct} color={budget.color} />
+                <ProgressBar value={budget.pct} color={budget.overBudget ? '#dc2626' : '#0f172a'} />
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                <span style={{ color: '#64748b' }}>Wydano: <strong>{parseFloat(project?.costs_actual || 0).toLocaleString('pl-PL')} zł</strong></span>
-                <span style={{ color: '#64748b' }}>Budżet: <strong>{parseFloat(project?.budget_net || 0).toLocaleString('pl-PL')} zł</strong></span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginTop: 6 }}>
+                <span style={{ color: '#64748b' }}>Wydano: <strong style={{ color: '#0f172a' }}>
+                  {parseFloat(project?.costs_actual || 0).toLocaleString('pl-PL')} zł</strong>
+                </span>
+                <span style={{ color: '#64748b' }}>Budżet: <strong style={{ color: '#0f172a' }}>
+                  {parseFloat(project?.budget_net || 0).toLocaleString('pl-PL')} zł</strong>
+                </span>
               </div>
               {budget.overBudget && (
                 <div style={{ marginTop: 8, color: '#dc2626', fontSize: 12, fontWeight: 700 }}>
@@ -399,11 +412,11 @@ function TabSummary({ project, tasks, milestones, onEditProject, onChangeStatus,
             </div>
           )}
 
-          {/* Zadania wg statusu */}
-          <div style={{ ...S.card, marginTop: 16 }}>
+          <div style={S.card}>
             <SectionTitle children="Zadania wg statusu" />
             {Object.entries(TASK_STATUS).map(([k, v]) => (
-              <div key={k} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 13 }}>
+              <div key={k} style={{ display: 'flex', justifyContent: 'space-between',
+                alignItems: 'center', marginBottom: 7, fontSize: 13 }}>
                 <span style={S.badge(v.color, v.bg)}>{v.label}</span>
                 <strong style={{ color: '#0f172a' }}>{tasksByStatus[k] || 0}</strong>
               </div>
@@ -413,9 +426,9 @@ function TabSummary({ project, tasks, milestones, onEditProject, onChangeStatus,
       </div>
 
       {project?.description && (
-        <div style={{ ...S.card, marginTop: 16 }}>
+        <div style={{ ...S.card, marginTop: 12 }}>
           <SectionTitle children="Opis" />
-          <p style={{ color: '#475569', fontSize: 14, lineHeight: 1.6, margin: 0 }}>{project.description}</p>
+          <p style={{ color: '#475569', fontSize: 14, lineHeight: 1.65, margin: 0 }}>{project.description}</p>
         </div>
       )}
     </div>
@@ -423,11 +436,11 @@ function TabSummary({ project, tasks, milestones, onEditProject, onChangeStatus,
 }
 
 // ============================================================
-// ZAKŁADKA: Harmonogram (etapy)
+// Zakładka: Harmonogram
 // ============================================================
 function TabSchedule({ project, milestones, onSaveMilestone, onDeleteMilestone, saving, onShift }) {
-  const [editM, setEditM] = useState(null);
-  const [errors, setErrors] = useState({});
+  const [editM,     setEditM]     = useState(null);
+  const [errors,    setErrors]    = useState({});
   const [shiftDays, setShiftDays] = useState('');
   const [showShift, setShowShift] = useState(false);
 
@@ -439,7 +452,9 @@ function TabSchedule({ project, milestones, onSaveMilestone, onDeleteMilestone, 
     else if (result?.errors) setErrors(result.errors);
   };
 
-  const totalDays = project ? Math.ceil((new Date(project.end_date) - new Date(project.start_date)) / 86400000) : 1;
+  const totalDays = project
+    ? Math.ceil((new Date(project.end_date) - new Date(project.start_date)) / 86400000)
+    : 1;
   const dateToOffset = (d) => {
     if (!project || !d) return 0;
     const diff = new Date(d) - new Date(project.start_date);
@@ -460,11 +475,12 @@ function TabSchedule({ project, milestones, onSaveMilestone, onDeleteMilestone, 
         </div>
       </SectionTitle>
 
-      {/* Przesuń harmonogram */}
       {showShift && (
-        <div style={{ ...S.card, marginBottom: 16, background: '#fffbeb', borderColor: '#fde68a' }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#92400e', marginBottom: 8 }}>Przesuń cały harmonogram</div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ ...S.card, marginBottom: 16, background: '#f8fafc', borderLeft: '3px solid #0f172a' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', marginBottom: 10 }}>
+            Przesuń cały harmonogram
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
             <input type="number" style={{ ...S.input, width: 120 }} value={shiftDays}
               onChange={e => setShiftDays(e.target.value)} placeholder="Dni (np. 7 lub -3)" />
             <button style={S.btnPrimary} disabled={saving || !shiftDays}
@@ -472,38 +488,38 @@ function TabSchedule({ project, milestones, onSaveMilestone, onDeleteMilestone, 
               Przesuń
             </button>
             <button style={S.btnSecondary} onClick={() => setShowShift(false)}>Anuluj</button>
-            <span style={{ fontSize: 12, color: '#92400e' }}>Przesuwa projekt, etapy i zadania o podaną liczbę dni (+/-)</span>
+            <span style={{ fontSize: 12, color: '#94a3b8' }}>
+              Przesuwa projekt, etapy i zadania o podaną liczbę dni (+/-)
+            </span>
           </div>
         </div>
       )}
 
-      {/* Gantt uproszczony */}
       {milestones.length > 0 && project && (
         <div style={{ ...S.card, marginBottom: 16, overflowX: 'auto' }}>
-          <div style={{ fontSize: 12, color: '#64748b', fontWeight: 700, marginBottom: 8, textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 11, color: '#64748b', fontWeight: 700, marginBottom: 10,
+            textTransform: 'uppercase', letterSpacing: '.05em' }}>
             Oś czasu: {formatDate(project.start_date)} – {formatDate(project.end_date)}
           </div>
-          <div style={{ minWidth: 400, position: 'relative' }}>
-            {/* Linia bazowa */}
-            <div style={{ background: '#f1f5f9', height: 4, borderRadius: 2, marginBottom: 8 }} />
+          <div style={{ minWidth: 400 }}>
+            <div style={{ background: '#f1f5f9', height: 4, borderRadius: 2, marginBottom: 10 }} />
             {milestones.map(m => (
-              <div key={m.id} style={{ marginBottom: 10, position: 'relative' }}>
-                <div style={{ fontSize: 12, color: '#0f172a', fontWeight: 600, marginBottom: 3 }}>
-                  {m.is_done ? '✅' : '🔷'} {m.name}
+              <div key={m.id} style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 12, color: '#0f172a', fontWeight: 600, marginBottom: 4 }}>
+                  {m.is_done ? '✅' : '◆'} {m.name}
                 </div>
-                <div style={{ position: 'relative', height: 20, background: '#f1f5f9', borderRadius: 4 }}>
+                <div style={{ position: 'relative', height: 22, background: '#f1f5f9', borderRadius: 5 }}>
                   <div style={{
                     position: 'absolute',
                     left: `${dateToOffset(m.start_date)}%`,
                     width: `${dateToWidth(m.start_date, m.end_date)}%`,
                     height: '100%',
-                    background: m.is_done ? '#16a34a' : (m.color || '#dc2626'),
-                    borderRadius: 4,
+                    background: m.is_done ? '#16a34a' : '#0f172a',
+                    borderRadius: 5,
                     display: 'flex', alignItems: 'center',
-                    padding: '0 6px',
-                    overflow: 'hidden',
+                    padding: '0 8px', overflow: 'hidden',
                   }}>
-                    <span style={{ fontSize: 11, color: 'white', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                    <span style={{ fontSize: 10, color: 'white', fontWeight: 700, whiteSpace: 'nowrap' }}>
                       {formatDate(m.start_date)} – {formatDate(m.end_date)}
                     </span>
                   </div>
@@ -514,16 +530,16 @@ function TabSchedule({ project, milestones, onSaveMilestone, onDeleteMilestone, 
         </div>
       )}
 
-      {/* Lista etapów */}
       {milestones.length === 0 ? (
         <EmptyState icon="📋" text="Brak etapów. Kliknij '+ Dodaj etap' aby rozpocząć." />
       ) : (
         <div style={{ display: 'grid', gap: 10 }}>
           {milestones.map(m => (
-            <div key={m.id} style={{ ...S.card, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div key={m.id} style={{ ...S.card, display: 'flex', justifyContent: 'space-between',
+              alignItems: 'flex-start', gap: 12 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>
-                  {m.is_done ? '✅' : '🔷'} {m.name}
+                <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4, color: '#0f172a' }}>
+                  {m.is_done ? '✅' : '◆'} {m.name}
                 </div>
                 {m.description && <div style={{ color: '#64748b', fontSize: 13, marginBottom: 4 }}>{m.description}</div>}
                 <div style={{ fontSize: 12, color: '#94a3b8' }}>
@@ -533,7 +549,7 @@ function TabSchedule({ project, milestones, onSaveMilestone, onDeleteMilestone, 
                   )}
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 6, marginLeft: 12 }}>
+              <div style={{ display: 'flex', gap: 6 }}>
                 <button style={S.btnSecondary} onClick={() => { setEditM({ ...m }); setErrors({}); }}>✏️</button>
                 <button style={S.btnDanger} onClick={() => onDeleteMilestone(m.id)}>🗑️</button>
               </div>
@@ -542,11 +558,12 @@ function TabSchedule({ project, milestones, onSaveMilestone, onDeleteMilestone, 
         </div>
       )}
 
-      {/* Mini-modal edycji etapu */}
       {editM && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(15,23,42,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <div style={{ ...S.card, width: '100%', maxWidth: 520, padding: 24 }}>
-            <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 16 }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 11000, background: 'rgba(10,15,28,0.7)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div style={{ ...S.card, width: '100%', maxWidth: 520, padding: 24,
+            boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+            <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 16, color: '#0f172a' }}>
               {editM.id ? 'Edytuj etap' : 'Nowy etap'}
             </div>
             <Field label="Nazwa etapu *" error={errors.name}>
@@ -567,7 +584,7 @@ function TabSchedule({ project, milestones, onSaveMilestone, onDeleteMilestone, 
                   value={editM.end_date} onChange={e => setEditM(v => ({...v, end_date: e.target.value}))} />
               </Field>
             </div>
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4 }}>
               <button style={S.btnSecondary} onClick={() => setEditM(null)}>Anuluj</button>
               <button style={S.btnPrimary} onClick={handleSave} disabled={saving}>
                 {saving ? '...' : 'Zapisz'}
@@ -581,9 +598,9 @@ function TabSchedule({ project, milestones, onSaveMilestone, onDeleteMilestone, 
 }
 
 // ============================================================
-// ZAKŁADKA: Zadania
+// Zakładka: Zadania
 // ============================================================
-function TabTasks({ project, tasks, milestones, onSaveTask, onChangeTaskStatus, onArchiveTask, saving }) {
+function TabTasks({ project, tasks, milestones, onSaveTask, onArchiveTask, saving }) {
   const [editT,   setEditT]   = useState(null);
   const [errors,  setErrors]  = useState({});
   const [filterS, setFilterS] = useState('all');
@@ -608,14 +625,16 @@ function TabTasks({ project, tasks, milestones, onSaveTask, onChangeTaskStatus, 
   return (
     <div>
       <SectionTitle children={`Zadania (${tasks.length})`}>
-        <button style={S.btnPrimary} onClick={() => { setEditT(emptyTask(project?.id)); setErrors({}); }}>+ Dodaj zadanie</button>
+        <button style={S.btnPrimary}
+          onClick={() => { setEditT(emptyTask(project?.id)); setErrors({}); }}>
+          + Dodaj zadanie
+        </button>
       </SectionTitle>
 
-      {/* Filtry */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
         <input style={{ ...S.input, maxWidth: 200 }} value={filterA}
           onChange={e => setFilterA(e.target.value)} placeholder="🔍 Szukaj..." />
-        <select style={{ ...S.select, maxWidth: 150 }} value={filterS} onChange={e => setFilterS(e.target.value)}>
+        <select style={{ ...S.select, maxWidth: 160 }} value={filterS} onChange={e => setFilterS(e.target.value)}>
           <option value="all">Wszystkie statusy</option>
           {Object.entries(TASK_STATUS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
         </select>
@@ -634,31 +653,34 @@ function TabTasks({ project, tasks, milestones, onSaveTask, onChangeTaskStatus, 
             const pp = PROJECT_PRIORITY[t.priority];
             return (
               <div key={t.id} style={{ ...S.card, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                {/* Checkbox progress */}
                 <div style={{
-                  width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                  background: ts?.bg, border: `2px solid ${ts?.color}40`,
+                  width: 38, height: 38, borderRadius: 10, flexShrink: 0,
+                  background: '#f8fafc', border: '1.5px solid #e2e8f0',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, color: ts?.color, fontWeight: 900,
+                  fontSize: 12, color: '#0f172a', fontWeight: 800,
                 }}>
                   {t.progress || 0}%
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
-                    <span style={{ fontWeight: 800, fontSize: 14 }}>{t.title}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+                    <span style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>{t.title}</span>
                     <StatusBadge status={t.status} map={TASK_STATUS} />
-                    <span style={{ ...S.badge(pp?.color, '#f8fafc'), fontSize: 11 }}>{pp?.label}</span>
+                    {pp && <span style={{ ...S.badge(pp.color, '#f8fafc'), fontSize: 11 }}>{pp.label}</span>}
                   </div>
                   <ProgressBar value={t.progress || 0} />
                   <div style={{ display: 'flex', gap: 12, marginTop: 6, fontSize: 12, color: '#94a3b8', flexWrap: 'wrap' }}>
                     {t.assigned_to && <span>👤 {t.assigned_to}</span>}
-                    {t.due_date && <span style={{ color: new Date(t.due_date) < new Date() && t.status !== 'done' ? '#dc2626' : 'inherit' }}>📅 {formatDate(t.due_date)}</span>}
+                    {t.due_date && (
+                      <span style={{ color: new Date(t.due_date) < new Date() && t.status !== 'done' ? '#dc2626' : '#94a3b8' }}>
+                        📅 {formatDate(t.due_date)}
+                      </span>
+                    )}
                     {milestones.find(m => m.id === t.milestone_id) && (
-                      <span>🔷 {milestones.find(m => m.id === t.milestone_id)?.name}</span>
+                      <span>◆ {milestones.find(m => m.id === t.milestone_id)?.name}</span>
                     )}
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 4, flexShrink: 0, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
                   <button style={S.btnSecondary} onClick={() => { setEditT({ ...t }); setErrors({}); }}>✏️</button>
                   <button style={S.btnDanger} onClick={() => onArchiveTask(t.id)}>🗑️</button>
                 </div>
@@ -668,11 +690,12 @@ function TabTasks({ project, tasks, milestones, onSaveTask, onChangeTaskStatus, 
         </div>
       )}
 
-      {/* Mini-modal zadania */}
       {editT && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(15,23,42,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, overflowY: 'auto' }}>
-          <div style={{ ...S.card, width: '100%', maxWidth: 580, padding: 24, margin: 'auto' }}>
-            <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 16 }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 11000, background: 'rgba(10,15,28,0.7)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, overflowY: 'auto' }}>
+          <div style={{ ...S.card, width: '100%', maxWidth: 580, padding: 24, margin: 'auto',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+            <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 16, color: '#0f172a' }}>
               {editT.id ? 'Edytuj zadanie' : 'Nowe zadanie'}
             </div>
             <Field label="Tytuł zadania *" error={errors.title}>
@@ -681,12 +704,14 @@ function TabTasks({ project, tasks, milestones, onSaveTask, onChangeTaskStatus, 
             </Field>
             <div style={S.grid2}>
               <Field label="Status" error={errors.status}>
-                <select style={S.select} value={editT.status} onChange={e => setEditT(v => ({...v, status: e.target.value}))}>
+                <select style={S.select} value={editT.status}
+                  onChange={e => setEditT(v => ({...v, status: e.target.value}))}>
                   {Object.entries(TASK_STATUS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
               </Field>
               <Field label="Priorytet">
-                <select style={S.select} value={editT.priority} onChange={e => setEditT(v => ({...v, priority: e.target.value}))}>
+                <select style={S.select} value={editT.priority}
+                  onChange={e => setEditT(v => ({...v, priority: e.target.value}))}>
                   {Object.entries(PROJECT_PRIORITY).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
               </Field>
@@ -725,7 +750,7 @@ function TabTasks({ project, tasks, milestones, onSaveTask, onChangeTaskStatus, 
               <textarea style={S.textarea} value={editT.description || ''}
                 onChange={e => setEditT(v => ({...v, description: e.target.value}))} />
             </Field>
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4 }}>
               <button style={S.btnSecondary} onClick={() => setEditT(null)}>Anuluj</button>
               <button style={S.btnPrimary} onClick={handleSave} disabled={saving}>
                 {saving ? '...' : 'Zapisz'}
@@ -739,7 +764,7 @@ function TabTasks({ project, tasks, milestones, onSaveTask, onChangeTaskStatus, 
 }
 
 // ============================================================
-// ZAKŁADKA: Historia aktywności
+// Zakładka: Historia
 // ============================================================
 function TabHistory({ activityLog }) {
   const actionLabels = {
@@ -755,9 +780,7 @@ function TabHistory({ activityLog }) {
     schedule_shifted:  '📅 Przesunięto harmonogram',
   };
 
-  if (!activityLog.length) {
-    return <EmptyState icon="📋" text="Brak historii aktywności." />;
-  }
+  if (!activityLog.length) return <EmptyState icon="📋" text="Brak historii aktywności." />;
 
   return (
     <div>
@@ -785,35 +808,36 @@ function TabHistory({ activityLog }) {
 }
 
 // ============================================================
-// GŁÓWNY KOMPONENT: ProjectModal
+// Główny komponent: ProjectModal
 // ============================================================
-export default function ProjectModal({ projectId, onClose, onProjectSaved, contractors = [] }) {
-  const [activeTab, setActiveTab] = useState('summary');
+export default function ProjectModal({ projectId, onClose, onProjectSaved, contractors = [], embedded = false }) {
+  const [activeTab,      setActiveTab]      = useState('summary');
   const [editingProject, setEditingProject] = useState(!projectId);
 
-  const { project, milestones, tasks, members: _members, activityLog,
+  const {
+    project, milestones, tasks, members: _members, activityLog,
     loading, error, saving,
     saveProject, changeProjectStatus, archiveProject,
     saveMilestone, deleteMilestone,
-    saveTask, changeTaskStatus, archiveTask,
+    saveTask, changeTaskStatus: _changeTaskStatus, archiveTask,
     shiftSchedule,
   } = useProject(projectId);
 
   const TABS = [
-    { id: 'summary',   label: '📊 Podsumowanie' },
-    { id: 'schedule',  label: '📅 Harmonogram' },
+    { id: 'summary',   label: '📊 Podsumowanie'           },
+    { id: 'schedule',  label: '📅 Harmonogram'             },
     { id: 'tasks',     label: `✅ Zadania (${tasks.length})` },
-    { id: 'budget',    label: '💰 Budżet i marża' },
-    { id: 'documents', label: '📁 Dokumenty' },
-    { id: 'team',      label: '👥 Zespół' },
-    { id: 'history',   label: '📋 Historia' },
+    { id: 'budget',    label: '💰 Budżet i marża'          },
+    { id: 'documents', label: '📁 Dokumenty'               },
+    { id: 'team',      label: '👥 Zespół'                  },
+    { id: 'history',   label: '📋 Historia'                },
   ];
 
   const handleSaveProject = async (formData) => {
     const result = await saveProject(formData);
     if (result?.success) {
       setEditingProject(false);
-      onProjectSaved?.();
+      onProjectSaved?.(result.project || formData);
     }
     return result;
   };
@@ -824,32 +848,38 @@ export default function ProjectModal({ projectId, onClose, onProjectSaved, contr
     if (result?.success) onClose();
   };
 
-  // Trap focus / close on Escape
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [onClose]);
 
-  return (
-    <div style={S.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
-      <div style={S.modal} role="dialog" aria-modal="true"
-        aria-label={project ? `Projekt: ${project.name}` : 'Nowy projekt'}>
+  const inner = (
+    <div style={embedded
+      ? { display: 'flex', flexDirection: 'column', minHeight: 500 }
+      : S.modal}
+      role="dialog" aria-modal="true"
+      aria-label={project ? `Projekt: ${project.name}` : 'Nowy projekt'}>
 
-        {/* STICKY HEADER */}
+      {/* HEADER */}
+      {!embedded && (
         <div style={S.header}>
           <div style={S.headerLeft}>
-            <span style={{ fontSize: 22 }}>🏗️</span>
+            <div style={S.headerIcon}>🏗️</div>
             <div>
               <div style={S.headerTitle}>
                 {project ? project.name : 'Nowy projekt'}
-                {project?.code && <span style={{ fontSize: 13, opacity: .7, marginLeft: 8 }}>[{project.code}]</span>}
+                {project?.code && (
+                  <span style={{ fontSize: 12, opacity: .45, marginLeft: 8 }}>[{project.code}]</span>
+                )}
               </div>
               <div style={S.headerSub}>
                 {project ? (
                   <>
                     <StatusBadge status={project.status} map={PROJECT_STATUS} />
-                    {isProjectOverdue(project) && <span style={{ color: '#fca5a5', marginLeft: 8, fontWeight: 700 }}>⚠️ Po terminie</span>}
+                    {isProjectOverdue(project) && (
+                      <span style={{ color: '#fca5a5', marginLeft: 8, fontWeight: 700 }}>⚠️ Po terminie</span>
+                    )}
                   </>
                 ) : 'Tworzenie nowego projektu'}
               </div>
@@ -865,122 +895,127 @@ export default function ProjectModal({ projectId, onClose, onProjectSaved, contr
             <button style={S.btnClose} onClick={onClose}>✕ Zamknij</button>
           </div>
         </div>
+      )}
 
-        {/* ZAKŁADKI (nie pokazuj przy nowym projekcie) */}
-        {!editingProject && project && (
-          <div style={S.tabs}>
-            {TABS.map(t => (
-              <button key={t.id} style={{ ...S.tab, ...(activeTab === t.id ? S.tabActive : {}) }}
-                onClick={() => setActiveTab(t.id)}>
-                {t.label}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* BODY */}
-        <div style={S.body}>
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8' }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
-              Ładowanie projektu...
-            </div>
-          ) : error ? (
-            <div style={{ ...S.card, borderColor: '#fecaca', background: '#fef2f2' }}>
-              <div style={{ color: '#dc2626', fontWeight: 700 }}>Błąd: {error}</div>
-            </div>
-          ) : editingProject ? (
-            <ProjectForm
-              initialData={project || undefined}
-              contractors={contractors}
-              onSave={handleSaveProject}
-              onCancel={() => { if (project) setEditingProject(false); else onClose(); }}
-              saving={saving}
-            />
-          ) : (
-            <>
-              {activeTab === 'summary'  && (
-                <TabSummary project={project} tasks={tasks} milestones={milestones}
-                  contractors={contractors}
-                  onEditProject={() => setEditingProject(true)}
-                  onChangeStatus={changeProjectStatus} />
-              )}
-              {activeTab === 'schedule' && (
-                <TabSchedule project={project} milestones={milestones}
-                  onSaveMilestone={saveMilestone} onDeleteMilestone={deleteMilestone}
-                  saving={saving} onShift={shiftSchedule} />
-              )}
-              {activeTab === 'tasks'    && (
-                <TabTasks project={project} tasks={tasks} milestones={milestones}
-                  onSaveTask={saveTask} onChangeTaskStatus={changeTaskStatus}
-                  onArchiveTask={archiveTask} saving={saving} />
-              )}
-              {activeTab === 'budget' && (
-                <div style={S.card}>
-                  <SectionTitle children="Budżet i marża" />
-                  <p style={{ color: '#64748b', fontSize: 14 }}>
-                    Powiąż projekt z kosztorysem i fakturami aby zobaczyć pełną analizę marży.
-                    Budżet netto projektu: <strong>{parseFloat(project?.budget_net || 0).toLocaleString('pl-PL')} zł</strong>.
-                  </p>
-                  <p style={{ color: '#94a3b8', fontSize: 13 }}>
-                    Integracja z modułem Koszty i Marża — dostępna w V2.
-                  </p>
-                </div>
-              )}
-              {activeTab === 'documents' && (
-                <div style={S.card}>
-                  <SectionTitle children="Powiązane dokumenty" />
-                  <p style={{ color: '#64748b', fontSize: 14 }}>
-                    Powiąż faktury, umowy i kosztorysy z tym projektem.
-                    Integracja z modułem Dokumenty — dostępna w V2.
-                  </p>
-                </div>
-              )}
-              {activeTab === 'team' && (
-                <div style={S.card}>
-                  <SectionTitle children="Zespół i uprawnienia" />
-                  <p style={{ color: '#64748b', fontSize: 14 }}>
-                    Zarządzanie uprawnieniami per projekt (RBAC).
-                    Zapraszanie współpracowników — dostępne w V2 (Plan Business).
-                  </p>
-                </div>
-              )}
-              {activeTab === 'history' && (
-                <TabHistory activityLog={activityLog} />
-              )}
-            </>
-          )}
+      {/* ZAKŁADKI */}
+      {!editingProject && project && (
+        <div style={S.tabs}>
+          {TABS.map(t => (
+            <button key={t.id}
+              style={{ ...S.tab, ...(activeTab === t.id ? S.tabActive : {}) }}
+              onClick={() => setActiveTab(t.id)}>
+              {t.label}
+            </button>
+          ))}
         </div>
+      )}
 
-        {/* STICKY FOOTER */}
+      {/* BODY */}
+      <div style={S.body}>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8' }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>⏳</div>
+            Ładowanie projektu...
+          </div>
+        ) : error ? (
+          <div style={{ ...S.card, borderColor: '#fecaca', background: '#fef2f2' }}>
+            <div style={{ color: '#dc2626', fontWeight: 700 }}>Błąd: {error}</div>
+          </div>
+        ) : editingProject ? (
+          <ProjectForm
+            initialData={project || undefined}
+            contractors={contractors}
+            onSave={handleSaveProject}
+            onCancel={() => { if (project) setEditingProject(false); else onClose(); }}
+            saving={saving}
+          />
+        ) : (
+          <>
+            {activeTab === 'summary' && (
+              <TabSummary project={project} tasks={tasks} milestones={milestones}
+                contractors={contractors}
+                onEditProject={() => setEditingProject(true)}
+                onChangeStatus={changeProjectStatus} />
+            )}
+            {activeTab === 'schedule' && (
+              <TabSchedule project={project} milestones={milestones}
+                onSaveMilestone={saveMilestone} onDeleteMilestone={deleteMilestone}
+                saving={saving} onShift={shiftSchedule} />
+            )}
+            {activeTab === 'tasks' && (
+              <TabTasks project={project} tasks={tasks} milestones={milestones}
+                onSaveTask={saveTask} onArchiveTask={archiveTask} saving={saving} />
+            )}
+            {activeTab === 'budget' && (
+              <div style={S.card}>
+                <SectionTitle children="Budżet i marża" />
+                <p style={{ color: '#64748b', fontSize: 14 }}>
+                  Powiąż projekt z kosztorysem i fakturami aby zobaczyć pełną analizę marży.
+                  Budżet netto projektu:{' '}
+                  <strong style={{ color: '#0f172a' }}>
+                    {parseFloat(project?.budget_net || 0).toLocaleString('pl-PL')} zł
+                  </strong>.
+                </p>
+                <p style={{ color: '#94a3b8', fontSize: 13 }}>
+                  Integracja z modułem Koszty i Marża — dostępna w V2.
+                </p>
+              </div>
+            )}
+            {activeTab === 'documents' && (
+              <div style={S.card}>
+                <SectionTitle children="Powiązane dokumenty" />
+                <p style={{ color: '#64748b', fontSize: 14 }}>
+                  Powiąż faktury, umowy i kosztorysy z tym projektem.
+                  Integracja z modułem Dokumenty — dostępna w V2.
+                </p>
+              </div>
+            )}
+            {activeTab === 'team' && (
+              <div style={S.card}>
+                <SectionTitle children="Zespół i uprawnienia" />
+                <p style={{ color: '#64748b', fontSize: 14 }}>
+                  Zarządzanie uprawnieniami per projekt (RBAC).
+                  Zapraszanie współpracowników — dostępne w V2 (Plan Business).
+                </p>
+              </div>
+            )}
+            {activeTab === 'history' && (
+              <TabHistory activityLog={activityLog} />
+            )}
+          </>
+        )}
+      </div>
+
+      {/* FOOTER */}
+      {!embedded && (
         <div style={S.footer}>
           <div style={{ fontSize: 12, color: '#94a3b8' }}>
-            {project ? (
-              <>Projekt • {formatDate(project.start_date)} – {formatDate(project.end_date)}
-              {' '}• {tasks.length} zadań • {milestones.length} etapów</>
-            ) : 'Wypełnij formularz i zapisz projekt'}
+            {project
+              ? <>Projekt · {formatDate(project.start_date)} – {formatDate(project.end_date)}
+                  {' '}· {tasks.length} zadań · {milestones.length} etapów</>
+              : 'Wypełnij formularz i zapisz projekt'}
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {project && activeTab === 'tasks' && (
-              <button style={S.btnSecondary}
-                onClick={() => { document.querySelector('[data-add-task]')?.click(); }}>
-                + Dodaj zadanie
-              </button>
-            )}
-            <button style={S.btnSecondary} onClick={onClose}>Zamknij</button>
-          </div>
+          <button style={S.btnSecondary} onClick={onClose}>Zamknij</button>
         </div>
-      </div>
+      )}
+    </div>
+  );
+
+  if (embedded) return inner;
+
+  return (
+    <div style={S.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
+      {inner}
     </div>
   );
 }
 
 // ============================================================
-// EKSPORT: lista projektów (mini-komponent do osadzenia w app)
+// ProjectList — mini-komponent do osadzenia
 // ============================================================
 export function ProjectList({ onOpenProject, onNewProject }) {
   const [filters, setFilters] = useState({});
-  const { projects, loading, error, refetch :_refetch } = useProjects(filters);
+  const { projects, loading, error, refetch: _refetch } = useProjects(filters);
 
   if (loading) return <div style={{ textAlign: 'center', padding: 40, color: '#94a3b8' }}>Ładowanie...</div>;
   if (error)   return <div style={{ color: '#dc2626', padding: 16 }}>Błąd: {error}</div>;
@@ -988,7 +1023,7 @@ export function ProjectList({ onOpenProject, onNewProject }) {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a', margin: 0 }}>Projekty</h2>
+        <h2 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', margin: 0 }}>Projekty</h2>
         <button style={S.btnPrimary} onClick={() => onNewProject()}>+ Nowy projekt</button>
       </div>
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
@@ -1003,34 +1038,37 @@ export function ProjectList({ onOpenProject, onNewProject }) {
       {projects.length === 0 ? (
         <EmptyState icon="🏗️" text="Brak projektów. Kliknij '+ Nowy projekt' aby rozpocząć." />
       ) : (
-        <div style={{ display: 'grid', gap: 12 }}>
+        <div style={{ display: 'grid', gap: 10 }}>
           {projects.map(p => {
-            const ps = PROJECT_STATUS[p.status];
-            const tasks = p.project_tasks || [];
-            const prog  = calcProjectProgress(tasks);
+            const ps    = PROJECT_STATUS[p.status];
+            const ptasks = p.project_tasks || [];
+            const prog   = calcProjectProgress(ptasks);
             return (
-              <div key={p.id} style={{ ...S.card, cursor: 'pointer', transition: 'box-shadow .15s' }}
+              <div key={p.id}
+                style={{ ...S.card, cursor: 'pointer', transition: 'all .15s' }}
                 onClick={() => onOpenProject(p.id)}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,.1)'}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,.06)'}>
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,.1)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,.05)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <span style={{ fontWeight: 800, fontSize: 15 }}>{p.name}</span>
-                      <span style={{ ...S.badge(ps?.color, ps?.bg) }}>{ps?.label}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>{p.name}</span>
+                      <span style={S.badge(ps?.color, ps?.bg)}>{ps?.label}</span>
                       <span style={{ color: '#94a3b8', fontSize: 12 }}>[{p.code}]</span>
                     </div>
                     <div style={{ color: '#64748b', fontSize: 13, marginBottom: 8 }}>
-                      {p.contractors?.name && <span>👤 {p.contractors.name} • </span>}
+                      {p.contractors?.name && <span>👤 {p.contractors.name} · </span>}
                       <span>📅 {formatDate(p.start_date)} – {formatDate(p.end_date)}</span>
-                      {isProjectOverdue(p) && <span style={{ color: '#dc2626', fontWeight: 700 }}> ⚠️ Po terminie</span>}
+                      {isProjectOverdue(p) && (
+                        <span style={{ color: '#dc2626', fontWeight: 700 }}> ⚠️ Po terminie</span>
+                      )}
                     </div>
                     <ProgressBar value={prog} />
-                    <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>
-                      {prog}% ukończone • {tasks.filter(t => t.status === 'done').length}/{tasks.length} zadań
+                    <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
+                      {prog}% ukończone · {ptasks.filter(t => t.status === 'done').length}/{ptasks.length} zadań
                     </div>
                   </div>
-                  <span style={{ fontSize: 20, color: '#dc2626' }}>→</span>
+                  <span style={{ fontSize: 18, color: '#94a3b8' }}>→</span>
                 </div>
               </div>
             );

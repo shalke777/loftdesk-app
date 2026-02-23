@@ -1,17 +1,26 @@
 // src/components/PriceList/PriceListModal.jsx
 import React, { useState, useMemo } from "react";
-import { Search, RotateCcw, DollarSign, Edit2, Save, X, Plus, ChevronDown } from "lucide-react";
+import { Search, RotateCcw, List, Edit2, X, Plus, ChevronDown } from "lucide-react";
 import { uid } from "../../utils/format";
 
+// ── Design System ─────────────────────────────────────────
+const DS = {
+  headerBg: 'linear-gradient(135deg, #0f172a 0%, #1a2744 100%)',
+  surface: '#ffffff', surfaceAlt: '#f8fafc',
+  border: '#e2e8f0', text: '#0f172a',
+  textMuted: '#64748b', textFaint: '#94a3b8',
+  accent: '#dc2626', accentSoft: '#fef2f2',
+  shadowLg: '0 32px 72px rgba(0,0,0,0.42)',
+};
+
 const INPUT = {
-  width:'100%', padding:'10px 14px',
-  border:'1.5px solid #e2e8f0', borderRadius:10,
-  fontSize:14, outline:'none', fontFamily:'inherit', boxSizing:'border-box',
+  width:'100%', padding:'10px 14px', border:'1.5px solid #e2e8f0',
+  borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit',
+  boxSizing:'border-box', color:'#0f172a', background:'#fff',
 };
 const LABEL = {
-  display:'block', fontSize:11, fontWeight:700,
-  color:'#64748b', textTransform:'uppercase',
-  letterSpacing:'0.05em', marginBottom:5,
+  display:'block', fontSize:11, fontWeight:700, color:'#64748b',
+  textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:5,
 };
 
 function Field({ label, children }) {
@@ -19,6 +28,31 @@ function Field({ label, children }) {
     <div style={{ marginBottom:14 }}>
       <label style={LABEL}>{label}</label>
       {children}
+    </div>
+  );
+}
+
+// Formularz (nowy lub edycja) — bez kolorowych tła, tylko neutralny card
+function InlineForm({ title, onSave, onCancel, children, saveLabel }) {
+  return (
+    <div style={{ margin:'16px 20px', padding:'20px 22px', background:'#f8fafc',
+      borderRadius:12, border:'1px solid #e2e8f0',
+      borderLeft:'3px solid #0f172a' /* jedyna wyróżniająca linia */ }}>
+      <div style={{ fontSize:13, fontWeight:700, color:'#0f172a', marginBottom:14,
+        display:'flex', alignItems:'center', gap:8 }}>
+        {title}
+      </div>
+      {children}
+      <div style={{ display:'flex', gap:8, justifyContent:'flex-end', marginTop:4 }}>
+        <button onClick={onCancel}
+          style={{ padding:'8px 16px', background:'white', border:'1px solid #e2e8f0', borderRadius:9, fontSize:13, fontWeight:600, cursor:'pointer', color:'#475569' }}>
+          Anuluj
+        </button>
+        <button onClick={onSave}
+          style={{ padding:'8px 18px', background:'#0f172a', color:'white', border:'none', borderRadius:9, fontSize:13, fontWeight:700, cursor:'pointer' }}>
+          {saveLabel}
+        </button>
+      </div>
     </div>
   );
 }
@@ -51,7 +85,7 @@ export const PriceListModal = ({ open, onClose, rates, onUpdate, onReset, onAdd 
   const saveEdit   = () => { onUpdate(editing, editForm); setEditing(null); setEditForm({}); };
 
   const startNew  = () => { setShowNewForm(true); setEditing(null); setNewForm({ category: categoryFilter||"Własne", name:"", unit:"m²", priceNet:0, vat:0.08 }); };
-  const cancelNew = () => { setShowNewForm(false); };
+  const cancelNew = () => setShowNewForm(false);
   const saveNew   = () => {
     if (!newForm.name.trim())     { alert("Nazwa jest wymagana!"); return; }
     if (!newForm.category.trim()) { alert("Kategoria jest wymagana!"); return; }
@@ -63,59 +97,79 @@ export const PriceListModal = ({ open, onClose, rates, onUpdate, onReset, onAdd 
 
   const totalPositions = Object.keys(rates).length;
 
-  return (
-    <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(15,23,42,0.7)', display:'flex', alignItems:'flex-start', justifyContent:'center', padding:'24px 16px', overflowY:'auto' }}>
-      <div style={{ width:'100%', maxWidth:1000, background:'white', borderRadius:20, boxShadow:'0 25px 60px rgba(0,0,0,0.3)', overflow:'hidden' }}>
+  // VAT badge — neutralny, nie żółty
+  const VatBadge = ({ vat }) => (
+    <span style={{ padding:'2px 7px', borderRadius:999, background:'#f1f5f9', color:'#475569', fontSize:11, fontWeight:700 }}>
+      {Math.round(vat*100)}%
+    </span>
+  );
 
-        {/* Header */}
-        <div style={{ background:'linear-gradient(135deg,#0f172a,#1e293b)', padding:'22px 28px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-            <div style={{ width:44, height:44, background:'rgba(255,255,255,0.1)', borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <DollarSign size={22} color="white"/>
+  return (
+    <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(10,15,28,0.85)',
+        display:'flex', alignItems:'flex-start', justifyContent:'center',
+        padding:'24px 16px', overflowY:'auto' }}>
+      <div style={{ width:'100%', maxWidth:1000, background:'white', borderRadius:18,
+        boxShadow: DS.shadowLg, overflow:'hidden', marginBottom:24 }}>
+
+        {/* ── Header ── */}
+        <div style={{ background: DS.headerBg, padding:'18px 24px',
+          display:'flex', alignItems:'center', justifyContent:'space-between',
+          borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+            <div style={{ width:38, height:38, background:'rgba(255,255,255,0.07)',
+              border:'1px solid rgba(255,255,255,0.1)', borderRadius:10,
+              display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <List size={18} color="rgba(255,255,255,0.8)"/>
             </div>
             <div>
-              <h2 style={{ color:'white', fontSize:20, fontWeight:800, margin:0 }}>Cennik usług</h2>
-              <p style={{ color:'rgba(255,255,255,0.6)', fontSize:13, margin:0 }}>{totalPositions} pozycji w cenniku</p>
+              <div style={{ color:'white', fontSize:16, fontWeight:700, lineHeight:1.2 }}>Cennik usług</div>
+              <div style={{ color:'rgba(255,255,255,0.4)', fontSize:12, marginTop:2 }}>{totalPositions} pozycji w cenniku</div>
             </div>
           </div>
-          <button onClick={onClose} style={{ width:36, height:36, borderRadius:10, background:'rgba(255,255,255,0.1)', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <X size={18} color="white"/>
+          <button onClick={onClose}
+            style={{ width:32, height:32, borderRadius:8, background:'rgba(255,255,255,0.06)',
+              border:'1px solid rgba(255,255,255,0.1)', cursor:'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center' }}
+            onMouseOver={e => e.currentTarget.style.background='rgba(255,255,255,0.12)'}
+            onMouseOut={e  => e.currentTarget.style.background='rgba(255,255,255,0.06)'}>
+            <X size={15} color="rgba(255,255,255,0.6)"/>
           </button>
         </div>
 
-        {/* Toolbar */}
-        <div style={{ padding:'16px 20px', borderBottom:'1px solid #f1f5f9', display:'flex', gap:10, flexWrap:'wrap', alignItems:'center', background:'#fafafa' }}>
+        {/* ── Toolbar ── */}
+        <div style={{ padding:'12px 18px', background:'#f8fafc', borderBottom:'1px solid #f1f5f9',
+          display:'flex', gap:8, flexWrap:'wrap', alignItems:'center' }}>
           <div style={{ flex:1, minWidth:200, position:'relative' }}>
-            <Search size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'#94a3b8' }}/>
+            <Search size={14} style={{ position:'absolute', left:11, top:'50%', transform:'translateY(-50%)', color:'#94a3b8' }}/>
             <input placeholder="Szukaj po nazwie..." value={search} onChange={e=>setSearch(e.target.value)}
-              style={{ ...INPUT, padding:'9px 12px 9px 36px' }}/>
+              style={{ ...INPUT, padding:'8px 12px 8px 34px', fontSize:13 }}/>
           </div>
-          <div style={{ position:'relative', minWidth:180 }}>
+          <div style={{ position:'relative', minWidth:170 }}>
             <select value={categoryFilter} onChange={e=>setCategoryFilter(e.target.value)}
-              style={{ ...INPUT, padding:'9px 32px 9px 12px', appearance:'none', cursor:'pointer', width:'auto', minWidth:180 }}>
+              style={{ ...INPUT, width:'auto', minWidth:170, padding:'8px 28px 8px 12px', fontSize:13, appearance:'none', cursor:'pointer' }}>
               <option value="">Wszystkie kategorie</option>
               {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </select>
-            <ChevronDown size={13} style={{ position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', color:'#64748b', pointerEvents:'none' }}/>
+            <ChevronDown size={12} style={{ position:'absolute', right:9, top:'50%', transform:'translateY(-50%)', color:'#64748b', pointerEvents:'none' }}/>
           </div>
           <button onClick={startNew}
-            style={{ display:'flex', alignItems:'center', gap:6, padding:'9px 18px', background:'#16a34a', color:'white', border:'none', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer' }}>
-            <Plus size={15}/> Nowa pozycja
+            style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 16px',
+              background:'#0f172a', color:'white', border:'none', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer' }}>
+            <Plus size={14}/> Nowa pozycja
           </button>
           <button onClick={() => { if(window.confirm('Przywrócić domyślny cennik? Własne pozycje zostaną usunięte.')) onReset(); }}
-            style={{ display:'flex', alignItems:'center', gap:6, padding:'9px 14px', background:'#fef2f2', color:'#dc2626', border:'1.5px solid #fecaca', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer' }}>
-            <RotateCcw size={14}/> Reset
+            style={{ display:'flex', alignItems:'center', gap:5, padding:'8px 13px',
+              background:'white', color:'#475569', border:'1px solid #e2e8f0', borderRadius:10, fontSize:12, fontWeight:600, cursor:'pointer' }}>
+            <RotateCcw size={12}/> Reset
           </button>
         </div>
 
-        <div style={{ maxHeight:540, overflowY:'auto', padding:'0' }}>
+        <div style={{ maxHeight:540, overflowY:'auto' }}>
 
           {/* Formularz nowej pozycji */}
           {showNewForm && (
-            <div style={{ margin:'16px 20px', padding:'20px', background:'#f0fdf4', borderRadius:14, border:'2px solid #86efac' }}>
-              <h3 style={{ margin:'0 0 16px 0', fontSize:15, fontWeight:700, color:'#16a34a', display:'flex', alignItems:'center', gap:8 }}>
-                <Plus size={18}/> Nowa pozycja w cenniku
-              </h3>
+            <InlineForm title="+ Nowa pozycja w cenniku" onSave={saveNew} onCancel={cancelNew} saveLabel="Dodaj do cennika">
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0 16px' }}>
                 <div style={{ gridColumn:'1/-1' }}>
                   <Field label="Nazwa usługi *">
@@ -130,8 +184,7 @@ export const PriceListModal = ({ open, onClose, rates, onUpdate, onReset, onAdd 
                 </Field>
                 <Field label="Jednostka">
                   <select style={{...INPUT,appearance:'none'}} value={newForm.unit} onChange={e=>setNewForm({...newForm,unit:e.target.value})}>
-                    <option value="m²">m²</option><option value="mb">mb</option><option value="m³">m³</option>
-                    <option value="szt">szt</option><option value="kpl">kpl</option><option value="godz">godz</option><option value="dni">dni</option>
+                    {['m²','mb','m³','szt','kpl','godz','dni'].map(u=><option key={u} value={u}>{u}</option>)}
                   </select>
                 </Field>
                 <Field label="Cena netto (zł)">
@@ -144,19 +197,12 @@ export const PriceListModal = ({ open, onClose, rates, onUpdate, onReset, onAdd 
                   </select>
                 </Field>
               </div>
-              <div style={{ display:'flex', gap:8, justifyContent:'flex-end', marginTop:8 }}>
-                <button onClick={cancelNew} style={{ padding:'9px 18px', background:'white', border:'1.5px solid #e2e8f0', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', color:'#475569' }}>Anuluj</button>
-                <button onClick={saveNew}   style={{ padding:'9px 20px', background:'#16a34a', color:'white', border:'none', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer' }}>Dodaj do cennika</button>
-              </div>
-            </div>
+            </InlineForm>
           )}
 
           {/* Formularz edycji */}
           {editing && (
-            <div style={{ margin:'16px 20px', padding:'20px', background:'#eff6ff', borderRadius:14, border:'2px solid #93c5fd' }}>
-              <h3 style={{ margin:'0 0 16px 0', fontSize:15, fontWeight:700, color:'#2563eb', display:'flex', alignItems:'center', gap:8 }}>
-                <Edit2 size={18}/> Edycja pozycji
-              </h3>
+            <InlineForm title="Edycja pozycji" onSave={saveEdit} onCancel={cancelEdit} saveLabel="Zapisz zmiany">
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0 16px' }}>
                 <div style={{ gridColumn:'1/-1' }}>
                   <Field label="Nazwa">
@@ -168,8 +214,7 @@ export const PriceListModal = ({ open, onClose, rates, onUpdate, onReset, onAdd 
                 </Field>
                 <Field label="Jednostka">
                   <select style={{...INPUT,appearance:'none'}} value={editForm.unit||'m²'} onChange={e=>setEditForm({...editForm,unit:e.target.value})}>
-                    <option value="m²">m²</option><option value="mb">mb</option><option value="m³">m³</option>
-                    <option value="szt">szt</option><option value="kpl">kpl</option><option value="godz">godz</option><option value="dni">dni</option>
+                    {['m²','mb','m³','szt','kpl','godz','dni'].map(u=><option key={u} value={u}>{u}</option>)}
                   </select>
                 </Field>
                 <Field label="Cena netto (zł)">
@@ -182,25 +227,23 @@ export const PriceListModal = ({ open, onClose, rates, onUpdate, onReset, onAdd 
                   </select>
                 </Field>
               </div>
-              <div style={{ display:'flex', gap:8, justifyContent:'flex-end', marginTop:8 }}>
-                <button onClick={cancelEdit} style={{ padding:'9px 18px', background:'white', border:'1.5px solid #e2e8f0', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', color:'#475569' }}>Anuluj</button>
-                <button onClick={saveEdit}   style={{ padding:'9px 20px', background:'#2563eb', color:'white', border:'none', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer' }}>Zapisz zmiany</button>
-              </div>
-            </div>
+            </InlineForm>
           )}
 
-          {/* Tabela */}
+          {/* ── Tabela ── */}
           {filtered.length === 0 ? (
             <div style={{ textAlign:'center', padding:'48px 20px', color:'#94a3b8' }}>
-              <Search size={40} style={{ opacity:0.3, marginBottom:12 }}/>
-              <div style={{ fontSize:15, fontWeight:600 }}>Brak wyników</div>
+              <Search size={36} style={{ opacity:0.2, marginBottom:10 }}/>
+              <div style={{ fontSize:14, fontWeight:600, color:'#475569' }}>Brak wyników</div>
             </div>
           ) : (
             <table style={{ width:'100%', borderCollapse:'collapse' }}>
               <thead>
                 <tr style={{ background:'#f8fafc', borderBottom:'2px solid #f1f5f9' }}>
                   {['Kategoria','Nazwa','Jedn.','Cena netto','VAT','Cena brutto',''].map((h,i) => (
-                    <th key={i} style={{ padding:'10px 16px', fontSize:11, fontWeight:700, color:'#64748b', textTransform:'uppercase', letterSpacing:'0.05em', textAlign: i>=3?'right':'left', whiteSpace:'nowrap' }}>{h}</th>
+                    <th key={i} style={{ padding:'9px 16px', fontSize:11, fontWeight:700, color:'#64748b',
+                      textTransform:'uppercase', letterSpacing:'0.05em',
+                      textAlign: i>=3 ? 'right' : 'left', whiteSpace:'nowrap' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -208,24 +251,27 @@ export const PriceListModal = ({ open, onClose, rates, onUpdate, onReset, onAdd 
                 {filtered.map(([code, r]) => (
                   <tr key={code} style={{ borderBottom:'1px solid #f8fafc' }}
                     onMouseOver={e=>e.currentTarget.style.background='#f8fafc'}
-                    onMouseOut={e=>e.currentTarget.style.background='white'}>
-                    <td style={{ padding:'10px 16px', fontSize:13 }}>
-                      <span style={{ fontSize:12, fontWeight:600, color:'#475569' }}>{r.category}</span>
-                      {code.startsWith('CUSTOM_') && <span style={{ marginLeft:6, padding:'2px 6px', background:'#dcfce7', color:'#166534', borderRadius:4, fontSize:10, fontWeight:700 }}>WŁASNA</span>}
+                    onMouseOut={e =>e.currentTarget.style.background='white'}>
+                    <td style={{ padding:'10px 16px', fontSize:12, fontWeight:600, color:'#475569' }}>
+                      {r.category}
+                      {code.startsWith('CUSTOM_') && (
+                        <span style={{ marginLeft:6, padding:'1px 5px', background:'#f1f5f9',
+                          color:'#64748b', borderRadius:4, fontSize:10, fontWeight:700 }}>WŁASNA</span>
+                      )}
                     </td>
-                    <td style={{ padding:'10px 16px', fontSize:13, fontWeight:500, color:'#1e293b' }}>{r.name}</td>
-                    <td style={{ padding:'10px 16px', fontSize:13, color:'#64748b' }}>{r.unit}</td>
+                    <td style={{ padding:'10px 16px', fontSize:13, fontWeight:500, color:'#0f172a' }}>{r.name}</td>
+                    <td style={{ padding:'10px 16px', fontSize:12, color:'#64748b' }}>{r.unit}</td>
                     <td style={{ padding:'10px 16px', fontSize:13, textAlign:'right', fontWeight:600 }}>{r.priceNet.toFixed(2)} zł</td>
-                    <td style={{ padding:'10px 16px', fontSize:13, textAlign:'right' }}>
-                      <span style={{ padding:'2px 8px', borderRadius:20, background:'#fef9c3', color:'#854d0e', fontSize:12, fontWeight:600 }}>{Math.round(r.vat*100)}%</span>
-                    </td>
-                    <td style={{ padding:'10px 16px', fontSize:14, textAlign:'right', fontWeight:800, color:'#1e293b' }}>
+                    <td style={{ padding:'10px 16px', textAlign:'right' }}><VatBadge vat={r.vat}/></td>
+                    <td style={{ padding:'10px 16px', fontSize:14, textAlign:'right', fontWeight:800, color:'#0f172a' }}>
                       {(r.priceNet*(1+r.vat)).toFixed(2)} zł
                     </td>
                     <td style={{ padding:'10px 16px', textAlign:'right' }}>
-                      <button onClick={()=>startEdit(code,r)}
-                        style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'6px 12px', background:'#eff6ff', color:'#2563eb', border:'none', borderRadius:8, fontSize:12, fontWeight:700, cursor:'pointer' }}>
-                        <Edit2 size={13}/> Edytuj
+                      <button onClick={() => startEdit(code, r)}
+                        style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'5px 11px',
+                          background:'#f8fafc', color:'#475569', border:'1px solid #e2e8f0',
+                          borderRadius:8, fontSize:12, fontWeight:600, cursor:'pointer' }}>
+                        <Edit2 size={12}/> Edytuj
                       </button>
                     </td>
                   </tr>
@@ -235,10 +281,14 @@ export const PriceListModal = ({ open, onClose, rates, onUpdate, onReset, onAdd 
           )}
         </div>
 
-        {/* Footer */}
-        <div style={{ padding:'14px 20px', borderTop:'1px solid #f1f5f9', display:'flex', justifyContent:'space-between', alignItems:'center', background:'#fafafa' }}>
-          <span style={{ fontSize:13, color:'#64748b' }}>Łącznie: <strong>{totalPositions}</strong> pozycji</span>
-          <button onClick={onClose} style={{ padding:'9px 20px', background:'#f1f5f9', border:'none', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', color:'#475569' }}>Zamknij</button>
+        {/* ── Footer ── */}
+        <div style={{ padding:'12px 18px', borderTop:'1px solid #f1f5f9', background:'#f8fafc',
+          display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <span style={{ fontSize:12, color:'#94a3b8' }}>Łącznie: {totalPositions} pozycji</span>
+          <button onClick={onClose}
+            style={{ padding:'8px 18px', background:'white', border:'1px solid #e2e8f0', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', color:'#475569' }}>
+            Zamknij
+          </button>
         </div>
       </div>
     </div>

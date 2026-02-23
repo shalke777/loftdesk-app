@@ -30,7 +30,7 @@ import { Dashboard } from "./components/Dashboard/Dashboard";
 import { AppNav } from "./components/shared/AppNav";
 import { AppLayout } from "./components/shared/AppLayout";
 import { ProjectsPage } from "./components/projects/ProjectsPage";
-import { KSeFModal } from "../components/KSeF/KSeFModal";
+import { KSeFModal } from "./components/KSeF/KSeFModal";
 import ErrorBoundary from "./ErrorBoundary";
 import AuthPage from "./AuthPage";
 import {

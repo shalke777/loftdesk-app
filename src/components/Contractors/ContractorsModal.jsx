@@ -2,37 +2,36 @@
 import React, { useState, useRef } from 'react';
 import { X, Plus, Search, Users, Phone, Mail, MapPin, FileText, Edit2, Trash2, Check, Download, Upload } from 'lucide-react';
 
-// FormField MUSI być poza komponentem - inaczej React niszczy input przy każdym znaku
+// ── Design System ─────────────────────────────────────────
+const DS = {
+  headerBg: 'linear-gradient(135deg, #0f172a 0%, #1a2744 100%)',
+  surface: '#ffffff', surfaceAlt: '#f8fafc', surfaceHover: '#f8fafc',
+  border: '#e2e8f0', text: '#0f172a', textSoft: '#334155',
+  textMuted: '#64748b', textFaint: '#94a3b8',
+  accent: '#dc2626', accentSoft: '#fef2f2',
+  shadow: '0 1px 3px rgba(15,23,42,0.07)',
+  shadowLg: '0 32px 72px rgba(0,0,0,0.42)',
+  input: { width:'100%', padding:'10px 14px', border:'1.5px solid #e2e8f0', borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', boxSizing:'border-box', color:'#0f172a', background:'#fff' },
+  label: { display:'block', fontSize:11, fontWeight:700, color:'#64748b', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:5 },
+};
+
+// FormField MUSI być poza komponentem — inaczej React niszczy input przy każdym znaku
 function FormField({ label, name, type = 'text', placeholder = '', defaultValue = '', inputRef, error }) {
   return (
     <div style={{ marginBottom: 14 }}>
-      <label style={{ display:'block', fontSize:11, fontWeight:700, color:'#64748b', textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:5 }}>
-        {label}
-      </label>
-      <input
-        ref={inputRef}
-        type={type}
-        name={name}
-        defaultValue={defaultValue}
-        placeholder={placeholder}
-        style={{
-          width:'100%', padding:'10px 14px',
-          border:`1.5px solid ${error ? '#dc2626' : '#e2e8f0'}`,
-          borderRadius:10, fontSize:14, outline:'none',
-          fontFamily:'inherit', boxSizing:'border-box',
-        }}
-      />
-      {error && <div style={{ color:'#dc2626', fontSize:11, marginTop:3 }}>{error}</div>}
+      <label style={DS.label}>{label}</label>
+      <input ref={inputRef} type={type} name={name} defaultValue={defaultValue} placeholder={placeholder}
+        style={{ ...DS.input, ...(error ? { borderColor: DS.accent } : {}) }} />
+      {error && <div style={{ color: DS.accent, fontSize: 11, marginTop: 3 }}>{error}</div>}
     </div>
   );
 }
 
 export function ContractorsModal({ open, onClose, contractors = [], onUpsert, onRemove, onImport, onSelect }) {
-  const [search,   setSearch]   = useState('');
-  const [editing,  setEditing]  = useState(null); // null | 'new' | id
-  const [errors,   setErrors]   = useState({});
+  const [search,  setSearch]  = useState('');
+  const [editing, setEditing] = useState(null);
+  const [errors,  setErrors]  = useState({});
 
-  // Refs dla inputów — żadnego stanu formularza = zero re-renderów podczas pisania
   const refName    = useRef();
   const refAddress = useRef();
   const refNip     = useRef();
@@ -54,12 +53,9 @@ export function ContractorsModal({ open, onClose, contractors = [], onUpsert, on
     email:   refEmail.current?.value   || '',
   });
 
-  const openNew = () => { setErrors({}); setEditing('new'); };
-
+  const openNew  = () => { setErrors({}); setEditing('new'); };
   const openEdit = (c) => {
-    setErrors({});
-    setEditing(c.id || c.name);
-    // Ustaw wartości po renderze
+    setErrors({}); setEditing(c.id || c.name);
     setTimeout(() => {
       if (refName.current)    refName.current.value    = c.name    || '';
       if (refAddress.current) refAddress.current.value = c.address || '';
@@ -68,7 +64,6 @@ export function ContractorsModal({ open, onClose, contractors = [], onUpsert, on
       if (refEmail.current)   refEmail.current.value   = c.email   || '';
     }, 0);
   };
-
   const cancel = () => { setEditing(null); setErrors({}); };
 
   const handleSave = () => {
@@ -83,7 +78,6 @@ export function ContractorsModal({ open, onClose, contractors = [], onUpsert, on
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = 'kontrahenci.json'; a.click();
   };
-
   const handleImport = () => {
     const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
     input.onchange = async (e) => {
@@ -93,102 +87,121 @@ export function ContractorsModal({ open, onClose, contractors = [], onUpsert, on
     input.click();
   };
 
-  // Znajdź aktualnie edytowanego kontrahenta (do defaultValue)
   const editingContractor = editing && editing !== 'new'
     ? contractors.find(c => (c.id || c.name) === editing)
     : null;
 
-  return (
-    <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(15,23,42,0.7)', display:'flex', alignItems:'flex-start', justifyContent:'center', padding:'24px 16px', overflowY:'auto' }}>
-      <div style={{ width:'100%', maxWidth:680, background:'white', borderRadius:20, boxShadow:'0 25px 60px rgba(0,0,0,0.3)', overflow:'hidden' }}>
+  const isForm = !!editing;
 
-        {/* Header */}
-        <div style={{ background:'linear-gradient(135deg,#7c3aed,#6d28d9)', padding:'22px 28px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-            <div style={{ width:44, height:44, background:'rgba(255,255,255,0.2)', borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <Users size={22} color="white"/>
+  return (
+    <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(10,15,28,0.85)',
+        display:'flex', alignItems:'flex-start', justifyContent:'center',
+        padding:'24px 16px', overflowY:'auto' }}>
+      <div style={{ width:'100%', maxWidth:680, background:'white', borderRadius:18,
+        boxShadow: DS.shadowLg, overflow:'hidden', marginBottom:24 }}>
+
+        {/* ── Header ── */}
+        <div style={{ background: DS.headerBg, padding:'18px 24px',
+          display:'flex', alignItems:'center', justifyContent:'space-between',
+          borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+            <div style={{ width:38, height:38, background:'rgba(255,255,255,0.07)',
+              border:'1px solid rgba(255,255,255,0.1)', borderRadius:10,
+              display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <Users size={18} color="rgba(255,255,255,0.8)" />
             </div>
             <div>
-              <h2 style={{ color:'white', fontSize:20, fontWeight:800, margin:0 }}>
-                {editing ? (editing === 'new' ? 'Nowy kontrahent' : 'Edytuj kontrahenta') : 'Kontrahenci'}
-              </h2>
-              <p style={{ color:'rgba(255,255,255,0.7)', fontSize:13, margin:0 }}>
-                {editing ? 'Wypełnij dane kontrahenta' : `${contractors.length} kontrahentów`}
-              </p>
+              <div style={{ color:'white', fontSize:16, fontWeight:700, lineHeight:1.2 }}>
+                {isForm ? (editing === 'new' ? 'Nowy kontrahent' : 'Edytuj kontrahenta') : 'Kontrahenci'}
+              </div>
+              <div style={{ color:'rgba(255,255,255,0.4)', fontSize:12, marginTop:2 }}>
+                {isForm ? 'Wypełnij dane' : `${contractors.length} kontrahentów w bazie`}
+              </div>
             </div>
           </div>
-          <button onClick={onClose} style={{ width:36, height:36, borderRadius:10, background:'rgba(255,255,255,0.2)', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <X size={18} color="white"/>
+          <button onClick={onClose}
+            style={{ width:32, height:32, borderRadius:8, background:'rgba(255,255,255,0.06)',
+              border:'1px solid rgba(255,255,255,0.1)', cursor:'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center' }}
+            onMouseOver={e => e.currentTarget.style.background='rgba(255,255,255,0.12)'}
+            onMouseOut={e  => e.currentTarget.style.background='rgba(255,255,255,0.06)'}>
+            <X size={15} color="rgba(255,255,255,0.6)" />
           </button>
         </div>
 
-        {/* Formularz edycji / dodawania */}
-        {editing ? (
+        {/* ── Formularz ── */}
+        {isForm ? (
           <div style={{ padding:'24px 28px' }}>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0 16px' }}>
               <div style={{ gridColumn:'1/-1' }}>
                 <FormField label="Nazwa firmy / Imię nazwisko *" name="name" placeholder="np. Jan Kowalski"
-                  defaultValue={editingContractor?.name || ''}
-                  inputRef={refName} error={errors.name} />
+                  defaultValue={editingContractor?.name || ''} inputRef={refName} error={errors.name} />
               </div>
               <FormField label="Adres" name="address" placeholder="ul. Przykładowa 1, Kraków"
-                defaultValue={editingContractor?.address || ''}
-                inputRef={refAddress} />
+                defaultValue={editingContractor?.address || ''} inputRef={refAddress} />
               <FormField label="NIP" name="nip" placeholder="000-000-00-00"
-                defaultValue={editingContractor?.nip || ''}
-                inputRef={refNip} />
+                defaultValue={editingContractor?.nip || ''} inputRef={refNip} />
               <FormField label="Telefon" name="phone" type="tel" placeholder="+48 000 000 000"
-                defaultValue={editingContractor?.phone || ''}
-                inputRef={refPhone} />
+                defaultValue={editingContractor?.phone || ''} inputRef={refPhone} />
               <FormField label="E-mail" name="email" type="email" placeholder="jan@firma.pl"
-                defaultValue={editingContractor?.email || ''}
-                inputRef={refEmail} />
+                defaultValue={editingContractor?.email || ''} inputRef={refEmail} />
             </div>
-            <div style={{ display:'flex', gap:10, justifyContent:'flex-end', marginTop:8 }}>
-              <button onClick={cancel} style={{ padding:'10px 20px', background:'#f1f5f9', border:'none', borderRadius:10, fontSize:14, fontWeight:600, cursor:'pointer', color:'#475569' }}>
+            <div style={{ display:'flex', gap:8, justifyContent:'flex-end', marginTop:8, paddingTop:16, borderTop:'1px solid #f1f5f9' }}>
+              <button onClick={cancel}
+                style={{ padding:'9px 20px', background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', color:'#475569' }}>
                 Anuluj
               </button>
-              <button onClick={handleSave} style={{ padding:'10px 24px', background:'#7c3aed', color:'white', border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor:'pointer' }}>
-                Zapisz
+              <button onClick={handleSave}
+                style={{ padding:'9px 22px', background:'#0f172a', color:'white', border:'none', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer' }}>
+                Zapisz kontrahenta
               </button>
             </div>
           </div>
+
         ) : (
-          /* Lista kontrahentów */
+          /* ── Lista ── */
           <>
-            <div style={{ padding:'14px 20px', borderBottom:'1px solid #f1f5f9', display:'flex', gap:10, flexWrap:'wrap' }}>
+            <div style={{ padding:'12px 18px', background:'#f8fafc', borderBottom:'1px solid #f1f5f9',
+              display:'flex', gap:8, flexWrap:'wrap', alignItems:'center' }}>
               <div style={{ flex:1, minWidth:180, position:'relative' }}>
-                <Search size={15} style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', color:'#94a3b8' }}/>
-                <input placeholder="Szukaj..." value={search} onChange={e=>setSearch(e.target.value)}
-                  style={{ width:'100%', padding:'9px 12px 9px 36px', border:'1.5px solid #e2e8f0', borderRadius:10, fontSize:13, outline:'none', fontFamily:'inherit', boxSizing:'border-box' }}/>
+                <Search size={14} style={{ position:'absolute', left:11, top:'50%', transform:'translateY(-50%)', color:'#94a3b8' }}/>
+                <input placeholder="Szukaj po nazwie, NIP, email..." value={search} onChange={e=>setSearch(e.target.value)}
+                  style={{ ...DS.input, padding:'8px 12px 8px 34px', fontSize:13 }}/>
               </div>
-              <button onClick={handleExport} style={{ padding:'9px 14px', background:'#f1f5f9', border:'none', borderRadius:10, fontSize:13, cursor:'pointer', display:'flex', alignItems:'center', gap:6, color:'#475569', fontWeight:600 }}>
-                <Download size={14}/> Eksport
+              <button onClick={handleExport}
+                style={{ padding:'8px 13px', background:'white', border:'1px solid #e2e8f0', borderRadius:10, fontSize:12, cursor:'pointer', display:'flex', alignItems:'center', gap:5, color:'#475569', fontWeight:600 }}>
+                <Download size={13}/> Eksport
               </button>
-              <button onClick={handleImport} style={{ padding:'9px 14px', background:'#f1f5f9', border:'none', borderRadius:10, fontSize:13, cursor:'pointer', display:'flex', alignItems:'center', gap:6, color:'#475569', fontWeight:600 }}>
-                <Upload size={14}/> Import
+              <button onClick={handleImport}
+                style={{ padding:'8px 13px', background:'white', border:'1px solid #e2e8f0', borderRadius:10, fontSize:12, cursor:'pointer', display:'flex', alignItems:'center', gap:5, color:'#475569', fontWeight:600 }}>
+                <Upload size={13}/> Import
               </button>
-              <button onClick={openNew} style={{ padding:'9px 18px', background:'#7c3aed', color:'white', border:'none', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:6 }}>
-                <Plus size={15}/> Nowy
+              <button onClick={openNew}
+                style={{ padding:'8px 16px', background:'#0f172a', color:'white', border:'none', borderRadius:10, fontSize:13, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:6 }}>
+                <Plus size={14}/> Nowy
               </button>
             </div>
 
             <div style={{ maxHeight:440, overflowY:'auto' }}>
               {filtered.length === 0 ? (
                 <div style={{ textAlign:'center', padding:'48px 20px', color:'#94a3b8' }}>
-                  <Users size={40} style={{ opacity:0.3, marginBottom:12 }}/>
-                  <div style={{ fontSize:15, fontWeight:600 }}>Brak kontrahentów</div>
-                  <div style={{ fontSize:13, marginTop:4 }}>Kliknij "Nowy" aby dodać</div>
+                  <Users size={36} style={{ opacity:0.2, marginBottom:10 }}/>
+                  <div style={{ fontSize:14, fontWeight:600, color:'#475569' }}>Brak kontrahentów</div>
+                  <div style={{ fontSize:13, marginTop:4 }}>Kliknij "Nowy" aby dodać pierwszego</div>
                 </div>
               ) : filtered.map((c) => (
-                <div key={c.id||c.name} style={{ padding:'14px 20px', borderBottom:'1px solid #f8fafc', display:'flex', gap:12, alignItems:'center', background:'white' }}
+                <div key={c.id||c.name}
+                  style={{ padding:'13px 18px', borderBottom:'1px solid #f8fafc', display:'flex', gap:12, alignItems:'center', background:'white', cursor:'default' }}
                   onMouseOver={e=>e.currentTarget.style.background='#f8fafc'}
-                  onMouseOut={e=>e.currentTarget.style.background='white'}>
-                  <div style={{ width:44, height:44, borderRadius:12, background:'linear-gradient(135deg,#f3e8ff,#ede9fe)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                    <span style={{ fontSize:17, fontWeight:800, color:'#7c3aed' }}>{(c.name||'?')[0].toUpperCase()}</span>
+                  onMouseOut={e =>e.currentTarget.style.background='white'}>
+                  {/* Avatar — bez kolorów, neutralny */}
+                  <div style={{ width:40, height:40, borderRadius:10, background:'#f1f5f9', border:'1px solid #e2e8f0',
+                    display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <span style={{ fontSize:15, fontWeight:800, color:'#475569' }}>{(c.name||'?')[0].toUpperCase()}</span>
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:14, fontWeight:700, color:'#1e293b' }}>{c.name}</div>
+                    <div style={{ fontSize:14, fontWeight:700, color:'#0f172a' }}>{c.name}</div>
                     <div style={{ display:'flex', gap:10, marginTop:3, flexWrap:'wrap' }}>
                       {c.nip     && <span style={{ fontSize:11, color:'#64748b', display:'flex', alignItems:'center', gap:3 }}><FileText size={10}/>{c.nip}</span>}
                       {c.phone   && <span style={{ fontSize:11, color:'#64748b', display:'flex', alignItems:'center', gap:3 }}><Phone size={10}/>{c.phone}</span>}
@@ -198,27 +211,31 @@ export function ContractorsModal({ open, onClose, contractors = [], onUpsert, on
                   </div>
                   <div style={{ display:'flex', gap:4, flexShrink:0 }}>
                     {onSelect && (
-                      <button onClick={()=>{ onSelect(c); onClose(); }}
-                        style={{ padding:'7px 12px', background:'#7c3aed', color:'white', border:'none', borderRadius:8, fontSize:12, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>
+                      <button onClick={() => { onSelect(c); onClose(); }}
+                        style={{ padding:'6px 12px', background:'#0f172a', color:'white', border:'none', borderRadius:8, fontSize:12, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>
                         <Check size={13}/> Wybierz
                       </button>
                     )}
-                    <button onClick={()=>openEdit(c)}
-                      style={{ width:32, height:32, borderRadius:8, background:'#eff6ff', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                      <Edit2 size={14} color="#2563eb"/>
+                    <button onClick={() => openEdit(c)}
+                      style={{ width:30, height:30, borderRadius:8, background:'#f8fafc', border:'1px solid #e2e8f0', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      <Edit2 size={13} color="#475569"/>
                     </button>
-                    <button onClick={()=>{ if(window.confirm('Usunąć kontrahenta?')) onRemove(c.id||c.name); }}
-                      style={{ width:32, height:32, borderRadius:8, background:'#fef2f2', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                      <Trash2 size={14} color="#dc2626"/>
+                    <button onClick={() => { if(window.confirm('Usunąć kontrahenta?')) onRemove(c.id||c.name); }}
+                      style={{ width:30, height:30, borderRadius:8, background:'#fef2f2', border:'1px solid #fecaca', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      <Trash2 size={13} color="#dc2626"/>
                     </button>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div style={{ padding:'14px 20px', borderTop:'1px solid #f1f5f9', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-              <span style={{ fontSize:13, color:'#64748b' }}>Łącznie: {contractors.length}</span>
-              <button onClick={onClose} style={{ padding:'9px 20px', background:'#f1f5f9', border:'none', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', color:'#475569' }}>Zamknij</button>
+            <div style={{ padding:'12px 18px', borderTop:'1px solid #f1f5f9', background:'#f8fafc',
+              display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+              <span style={{ fontSize:12, color:'#94a3b8' }}>{contractors.length} kontrahentów łącznie</span>
+              <button onClick={onClose}
+                style={{ padding:'8px 18px', background:'white', border:'1px solid #e2e8f0', borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', color:'#475569' }}>
+                Zamknij
+              </button>
             </div>
           </>
         )}
