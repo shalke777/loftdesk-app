@@ -5,27 +5,30 @@ import React, { useState } from 'react';
 import {
   LayoutDashboard, FolderKanban, Receipt, FileCheck,
   Users, Download, Upload, Cloud, LogOut, ChevronRight,
-  Settings, Zap, Building2
+  Settings, Zap, Building2, ClipboardList, ShieldCheck,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard',    color: '#6366f1' },
-  { id: 'projects',  icon: FolderKanban,   label: 'Projekty',      color: '#dc2626' },
-  { id: 'invoices',  icon: Receipt,        label: 'Faktury',       color: '#059669' },
-  { id: 'contracts', icon: FileCheck,      label: 'Umowy',         color: '#d97706' },
-  { id: 'clients',   icon: Users,          label: 'Kontrahenci',   color: '#7c3aed' },
+  { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard',       color: '#6366f1' },
+  { id: 'projects',  icon: FolderKanban,   label: 'Projekty',         color: '#0ea5e9' },
+  { id: 'costing',   icon: ClipboardList,  label: 'Kosztorys',        color: '#0f172a' }, // ← NOWE
+  { id: 'invoices',  icon: Receipt,        label: 'Faktury',          color: '#059669' },
+  { id: 'contracts', icon: FileCheck,      label: 'Umowy',            color: '#d97706' },
+  { id: 'clients',   icon: Users,          label: 'Kontrahenci',      color: '#7c3aed' },
+  { id: 'ksef',      icon: ShieldCheck,    label: 'KSeF — e-Faktury', color: '#dc2626' }, // ← NOWE
 ];
 
 const TOOL_ITEMS = [
-  { id: 'export',  icon: Download, label: 'Zapisz kopię'   },
-  { id: 'import',  icon: Upload,   label: 'Wczytaj dane'  },
+  { id: 'export',  icon: Download, label: 'Zapisz kopię'    },
+  { id: 'import',  icon: Upload,   label: 'Wczytaj dane'   },
   { id: 'cloud',   icon: Cloud,    label: 'Import z chmury' },
-  { id: 'brand',   icon: Settings, label: 'Ustawienia firmy' },
+  { id: 'brand',   icon: Settings, label: 'Ustawienia firmy'},
 ];
 
 export function AppNav({
   plan, invoices, contracts, invoicesLeft,
-  onDashboard, onProjects, onInvoices, onContracts, onClients,
+  onHome, onDashboard, onProjects, onCosting, // ← onHome, onCosting NOWE
+  onInvoices, onContracts, onClients, onKsef,  // ← onKsef NOWE
   onExport, onImport, onCloud, onBrand,
   onLogout, onUpgradePro,
   activeModule,
@@ -34,15 +37,23 @@ export function AppNav({
 
   const handleNav = (id) => {
     const map = {
-      dashboard: onDashboard, projects: onProjects,
-      invoices: onInvoices, contracts: onContracts, clients: onClients,
-      export: onExport, import: onImport, cloud: onCloud, brand: onBrand,
+      dashboard: onDashboard,
+      projects:  onProjects,
+      costing:   onCosting,   // ← NOWE
+      invoices:  onInvoices,
+      contracts: onContracts,
+      clients:   onClients,
+      ksef:      onKsef,       // ← NOWE
+      export:    onExport,
+      import:    onImport,
+      cloud:     onCloud,
+      brand:     onBrand,
     };
     map[id]?.();
   };
 
   const counts = {
-    invoices: invoices?.length || 0,
+    invoices:  invoices?.length  || 0,
     contracts: contracts?.length || 0,
   };
 
@@ -58,15 +69,19 @@ export function AppNav({
       position: 'relative',
     }}>
 
-      {/* Logo */}
-      <div style={{
-        padding: collapsed ? '20px 0' : '20px 16px',
-        borderBottom: '1px solid #1e293b',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        justifyContent: collapsed ? 'center' : 'flex-start',
-      }}>
+      {/* Logo — klik → strona główna */}
+      <div
+        onClick={() => onHome?.()}
+        style={{
+          padding: collapsed ? '20px 0' : '20px 16px',
+          borderBottom: '1px solid #1e293b',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          justifyContent: collapsed ? 'center' : 'flex-start',
+          cursor: 'pointer',
+        }}
+      >
         <div style={{
           width: 36, height: 36, borderRadius: 10,
           background: 'linear-gradient(135deg, #dc2626, #ef4444)',
@@ -99,6 +114,7 @@ export function AppNav({
             <button
               key={item.id}
               onClick={() => handleNav(item.id)}
+              title={collapsed ? item.label : undefined}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center',
                 gap: 10, padding: collapsed ? '10px 0' : '10px 12px',
@@ -110,7 +126,7 @@ export function AppNav({
                 position: 'relative',
               }}
               onMouseOver={e => !isActive && (e.currentTarget.style.background = '#1e293b')}
-              onMouseOut={e => !isActive && (e.currentTarget.style.background = 'transparent')}
+              onMouseOut={e  => !isActive && (e.currentTarget.style.background = 'transparent')}
             >
               {isActive && (
                 <div style={{
@@ -154,6 +170,7 @@ export function AppNav({
             <button
               key={item.id}
               onClick={() => handleNav(item.id)}
+              title={collapsed ? item.label : undefined}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center',
                 gap: 10, padding: collapsed ? '8px 0' : '8px 12px',
@@ -163,7 +180,7 @@ export function AppNav({
                 justifyContent: collapsed ? 'center' : 'flex-start',
               }}
               onMouseOver={e => e.currentTarget.style.background = '#1e293b'}
-              onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+              onMouseOut={e  => e.currentTarget.style.background = 'transparent'}
             >
               <Icon size={15} />
               {!collapsed && item.label}
@@ -212,7 +229,7 @@ export function AppNav({
             transition: 'all 0.15s', justifyContent: collapsed ? 'center' : 'flex-start',
           }}
           onMouseOver={e => { e.currentTarget.style.background = '#1e293b'; e.currentTarget.style.color = '#ef4444'; }}
-          onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748b'; }}
+          onMouseOut={e  => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748b'; }}
         >
           <LogOut size={16} />
           {!collapsed && <span style={{ fontSize: 13 }}>Wyloguj</span>}
