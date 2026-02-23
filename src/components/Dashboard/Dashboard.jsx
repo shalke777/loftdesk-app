@@ -761,18 +761,18 @@ const smallBtnStyle = {
 
 function actionIcon(action) {
   const icons = {
-    project_updated: '✏️',
-    status_changed: '🔄',
-    project_archived: '📦',
-    milestone_added: '📍',
-    milestone_updated: '📍',
-    milestone_deleted: '🗑️',
-    task_added: '✅',
-    task_updated: '✏️',
-    task_archived: '📦',
-    schedule_shifted: '📅',
+    project_updated: '',
+    status_changed: '',
+    project_archived: '',
+    milestone_added: '',
+    milestone_updated: '',
+    milestone_deleted: '',
+    task_added: '',
+    task_updated: '',
+    task_archived: '',
+    schedule_shifted: '',
   };
-  return icons[action] || '📌';
+  return icons[action] || '';
 }
 
 function actionLabel(action) {

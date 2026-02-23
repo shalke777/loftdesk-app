@@ -18,13 +18,18 @@ import {
 // STYLE (inline, spójne z resztą LoftDesk)
 // ============================================================
 const S = {
-  overlay: {
-    position: 'fixed', inset: 0, zIndex: 10050,
-    background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(3px)',
-    display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-    padding: '16px',
-    overflowY: 'auto',
-  },
+overlay: {
+  position: 'fixed',
+  inset: 0,
+  zIndex: 10050, // było 1000
+  background: 'rgba(15,23,42,0.55)',
+  backdropFilter: 'blur(3px)',
+  display: 'flex',
+  alignItems: 'center', // było flex-start
+  justifyContent: 'center',
+  padding: '16px',
+  overflowY: 'auto',
+},
   modal: {
     background: 'white', borderRadius: 16,
     width: '100%', maxWidth: 1100,
